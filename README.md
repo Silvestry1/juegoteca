@@ -55,3 +55,11 @@ Los cambios a juegos que ya existen llegan solos: la app siempre intenta bajar l
 - Cada juego propio carga `inicio.js`, que pone un botón flotante 🎬 abajo a la izquierda para volver al menú (pide confirmación para no cortar una partida). En la página principal, el cartel "Juegoteca" de arriba también lleva al inicio. Un juego propio nuevo tiene que llevar `<script src="../../inicio.js"></script>` antes de `</body>`.
 - La caja **+** del catálogo agrega juegos **solo en ese celu**: por link (se guarda en `localStorage` → `juegoteca-locales`) o subiendo los archivos (`.html` más sus `.js`, `.css` e imágenes). Los archivos se unen en un solo HTML (`locales.js` → `empaquetar`), se guardan en IndexedDB y se abren con `jugar.html?id=...` dentro de un iframe aislado.
 - Para que un juego agregado por link entre al catálogo de todos: en su caja, **📋 Copiar ficha** y pegar ese bloque en `juegos.json`.
+
+## Cartas propias (juegos de adivinar)
+
+`juegos/comun/cartas-propias.js` agrega el botón **✏️ Agregar o sacar cartas** a Mostralo y Ni se te ocurra: cartas propias (con sus opciones de modo, dificultad y ATP/+18), pausar o borrar, y sacar cartas oficiales. Todo queda en el celu (`localStorage`, clave `cartas-propias.<juego>`).
+
+**Compartir mi lista** arma un texto (`#cartas <juego>`, una carta por línea con campos separados por `|`, y `#sacadas` con las oficiales sacadas) para mandar por WhatsApp. Ese texto se puede pegar en otro celu (**Pegar una lista que te mandaron**) o usar para sumar cartas al mazo oficial del `index.html`.
+
+Para un juego de adivinar nuevo: cargá el script, llamá a `CartasPropias({juego, nombre, campos, clave, resumen, oficiales, validar, alCambiar})` (ver el comentario al principio del archivo) y armá el mazo con `mis.activas()` y `mis.ocultas()`.
