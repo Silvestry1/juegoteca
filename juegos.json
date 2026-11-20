@@ -64,6 +64,22 @@
   "lema": "Bolillero en un celu, cartones en todos"
  },
  {
+  "nombre": "Bingo musical",
+  "tipo": "Música",
+  "min": 3,
+  "max": null,
+  "edad": "10+",
+  "propio": true,
+  "descripcion": "El cartón tiene temas en vez de números. El anfitrión carga una playlist de YouTube (o pega la lista de Spotify, TIDAL o lo que sea), reparte un cartón por celu con un QR y pone la música; cada uno marca el tema cuando lo reconoce. Línea, columna, diagonal o cartón lleno, verificado por código.",
+  "url": "juegos/bingomusical/",
+  "icono": "🎶",
+  "colores": [
+   "#ff4fa3",
+   "#1a0b2e"
+  ],
+  "lema": "Si lo reconocés, lo marcás"
+ },
+ {
   "nombre": "La Ruleta",
   "tipo": "Herramientas",
   "min": 2,
