@@ -1,0 +1,66 @@
+/* C · Videoclub 8 bits: la misma idea del estante, en pixeles: pared de ladrillo, cartel de neón escalonado y repisas de madera */
+:root{--px-res:16;--bg:#2b1010;--txt:#fff4e6;--sub:#e6c9a8;--acc:#ffb347;--chip:#4a1f1a;--neon:#ff5ec4;--madera:#8a5a2b}
+body{font-family:"VT323",monospace;font-size:1.3rem;background-color:#3a1512;
+  background-image:
+   linear-gradient(#250b09 4px,transparent 4px),
+   linear-gradient(90deg,#250b09 4px,transparent 4px),
+   linear-gradient(90deg,#250b09 4px,transparent 4px);
+  background-size:48px 24px,48px 48px,48px 48px;background-position:0 0,0 0,24px 24px}
+header{background:#1a0907;padding-bottom:16px;border-bottom:8px solid #000}
+.cartel{border:0;padding:12px 14px;background:#000;
+  box-shadow:0 -4px 0 var(--neon),0 4px 0 var(--neon),-4px 0 0 var(--neon),4px 0 0 var(--neon),0 0 0 12px #000,0 0 0 16px #4a2a6a}
+h1{font-family:"Silkscreen",monospace;font-weight:700;font-size:1.9rem;letter-spacing:2px;color:#fff;
+  text-shadow:0 0 0 #fff,2px 0 0 var(--neon),-2px 0 0 var(--neon),0 2px 0 var(--neon),0 -2px 0 var(--neon),0 0 14px var(--neon);animation:neon 4s steps(1) infinite}
+@keyframes neon{0%,92%,96%{opacity:1}93%,95%{opacity:.35}}
+header p{font-size:1.35rem;color:var(--sub);margin-top:16px}
+.btnqr{font-family:"Silkscreen",monospace;font-size:.95rem;padding:10px 14px;background:var(--acc);color:#2b1010;box-shadow:0 4px 0 #9c5a12,4px 4px 0 #000}
+.btninst{background:var(--chip);color:var(--txt);box-shadow:0 4px 0 #1a0907,4px 4px 0 #000}
+.filtros{padding-top:16px}
+.filtros button{font-family:"VT323",monospace;font-size:1.3rem;padding:4px 12px;background:#1a0907;color:var(--sub);box-shadow:0 0 0 3px #000}
+.filtros button.on{background:var(--neon);color:#1a0907}
+.cant{font-size:1.35rem;color:var(--sub)}
+.cant input{font-family:"VT323",monospace;font-size:1.35rem;background:#000;color:var(--acc)}
+main{gap:34px 14px}
+.caja::after{left:-10px;right:-10px;bottom:-18px;height:12px;
+  background:linear-gradient(#c08850 0 4px,var(--madera) 4px 8px,#5a3615 8px);box-shadow:0 4px 0 #0008}
+.cara{box-shadow:none}
+.frente{padding:8px 8px 10px 22px;
+  background:linear-gradient(180deg,var(--c1) 0 50%,var(--c2) 50%) !important;
+  border:4px solid #000}
+.frente::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,#fff3 4px,transparent 4px) 22px 0/100% 100% no-repeat}
+.lomo{width:16px;background:#111;border-right:4px solid #000}
+.lomo span{font-family:"Silkscreen",monospace;font-size:.5rem;letter-spacing:1px;color:var(--acc)}
+.calif{font-family:"Silkscreen",monospace;font-weight:700;width:34px;height:34px;font-size:.62rem;border:3px solid #000}
+.jug{font-family:"VT323",monospace;font-size:1.05rem;background:#000;padding:1px 5px}
+.ilus{margin:4px 0}
+.titulo{font-family:"Silkscreen",monospace;font-weight:700;font-size:.95rem;line-height:1.05;background:#000;padding:4px 6px;text-shadow:none;color:#fff}
+.lema{font-family:"VT323",monospace;font-style:normal;font-size:1rem;line-height:1;background:#000c;padding:2px 6px;margin-top:0;color:var(--sub)}
+.casa{font-family:"VT323",monospace;font-size:.95rem;letter-spacing:0;padding:0 6px;background:var(--acc);box-shadow:2px 2px 0 #000}
+.dorso{background:#fff4e6;color:#2b1010;border:4px solid #000;
+  background-image:linear-gradient(90deg,transparent 0 calc(100% - 8px),#ff5ec4 0)}
+.dorso h2{font-family:"Silkscreen",monospace;font-size:.9rem}
+.dorso p{font-size:1.15rem;line-height:1.05}
+.ficha span{background:#2b1010;font-size:.95rem}
+.dorso a{font-family:"Silkscreen",monospace;font-weight:700;font-size:1rem;background:#000;color:var(--acc);box-shadow:4px 4px 0 var(--neon)}
+.dorso small{font-size:.95rem;color:#8a6a50}
+.caja.nueva .cara{background:#0006;border:4px dashed var(--acc);color:var(--sub)}
+.caja.nueva .cara b{font-family:"Silkscreen",monospace;font-size:3rem}
+.caja.nueva .cara span{font-family:"Silkscreen",monospace;font-size:.8rem}
+.caja.nueva .cara small{font-size:1.05rem}
+footer{font-size:1.15rem;color:var(--sub)}
+#lupa{background:#1a0907f0;backdrop-filter:none}
+#lupa .cerrar{background:var(--neon);color:#000;font-family:"Silkscreen",monospace;box-shadow:4px 4px 0 #000}
+#lupa .pista{font-size:1.4rem;color:var(--sub)}
+#lupa .frente{padding:14px 14px 16px 34px;border-width:6px}
+#lupa .calif{width:58px;height:58px;font-size:1rem}
+#lupa .jug{font-size:1.5rem}
+#lupa .titulo{font-size:1.7rem;padding:6px 10px}
+#lupa .lema{font-size:1.45rem}
+#lupa .casa{font-size:1.3rem}
+#lupa .dorso{border-width:6px}
+#lupa .dorso h2{font-size:1.4rem}
+#lupa .dorso p{font-size:1.6rem;line-height:1.1}
+#lupa .ficha span{font-size:1.3rem}
+#lupa .dorso a{font-size:1.4rem;padding:16px}
+#lupa .dorso small{font-size:1.25rem}

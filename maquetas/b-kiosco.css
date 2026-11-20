@@ -1,0 +1,63 @@
+/* B · Kiosco de día: fondo claro de cuaderno cuadriculado, letra pixel redonda y grande (pensada para la abuela) */
+:root{--px-res:20;--bg:#f6eed8;--txt:#2a1b0c;--sub:#6b5537;--acc:#e8413b;--chip:#fffaf0;--tinta:#2a1b0c}
+body{font-family:"Pixelify Sans",system-ui,sans-serif;font-size:1.1rem;color:var(--txt);background-color:var(--bg);
+  background-image:linear-gradient(#e4d6b2 2px,transparent 2px),linear-gradient(90deg,#e4d6b2 2px,transparent 2px);background-size:24px 24px}
+.cartel{border:0;padding:10px 16px;background:#fff;
+  box-shadow:0 -4px 0 var(--tinta),0 4px 0 var(--tinta),-4px 0 0 var(--tinta),4px 0 0 var(--tinta),8px 8px 0 #0003}
+h1{font-family:"Silkscreen",monospace;font-weight:700;font-size:1.9rem;letter-spacing:1px;color:var(--acc);text-shadow:3px 3px 0 #ffc23d}
+header p{color:var(--sub);font-size:1.15rem;margin-top:14px}
+.btnqr{font-family:"Pixelify Sans",sans-serif;font-weight:700;font-size:1.1rem;padding:12px 16px;background:#ffc23d;color:var(--tinta);
+  box-shadow:0 -3px 0 var(--tinta),0 3px 0 var(--tinta),-3px 0 0 var(--tinta),3px 0 0 var(--tinta),3px 6px 0 var(--tinta)}
+.btnqr:active{transform:translateY(3px)}
+.btninst{background:#fff;color:var(--tinta)}
+.filtros{gap:10px}
+.filtros button{font-family:"Pixelify Sans",sans-serif;font-size:1.1rem;padding:8px 14px;background:#fff;color:var(--tinta);
+  box-shadow:0 -3px 0 var(--tinta),0 3px 0 var(--tinta),-3px 0 0 var(--tinta),3px 0 0 var(--tinta)}
+.filtros button.on{background:var(--tinta);color:#ffc23d}
+.cant{font-size:1.15rem;color:var(--sub)}
+.cant input{font-family:"Pixelify Sans",sans-serif;font-size:1.2rem;background:#fff;color:var(--tinta);box-shadow:0 0 0 3px var(--tinta)}
+main{gap:30px 18px}
+.caja::after{display:none}
+.cara{box-shadow:6px 6px 0 #0003}
+
+.frente{padding:10px 10px 12px 22px;
+  background:var(--c1) !important;
+  background-image:repeating-conic-gradient(var(--c2) 0 25%,transparent 0 50%) !important;
+  background-size:6px 6px !important;
+  border:4px solid var(--tinta)}
+.frente>*{z-index:1}
+.ilus{margin:4px -2px;background:color-mix(in srgb,var(--c1) 70%,#fff);box-shadow:0 0 0 3px var(--tinta)}
+.lomo{width:14px;background:var(--tinta)}
+.lomo span{font-family:"Silkscreen",monospace;font-size:.5rem;letter-spacing:1px;color:#ffc23d}
+.top{margin-bottom:6px}
+.calif{font-family:"Silkscreen",monospace;font-weight:700;width:auto;height:auto;padding:3px 6px;font-size:.8rem;border:3px solid var(--tinta);background:#fff}
+.jug{font-family:"Pixelify Sans",sans-serif;font-size:.9rem;background:#fff;color:var(--tinta);box-shadow:0 0 0 3px var(--tinta)}
+.titulo-caja,.titulo{background:#fff;color:var(--tinta);text-shadow:none;font-family:"Pixelify Sans",sans-serif;font-weight:700;font-size:1.05rem;line-height:1.1;padding:4px 6px;margin-top:8px;box-shadow:0 0 0 3px var(--tinta)}
+.lema{display:none}
+.casa{font-family:"Pixelify Sans",sans-serif;font-size:.8rem;letter-spacing:0;background:#ffc23d;color:var(--tinta);box-shadow:0 0 0 3px var(--tinta);margin-top:8px}
+.dorso{background:#fff;color:var(--tinta);border:4px solid var(--tinta)}
+.dorso h2{font-family:"Silkscreen",monospace;font-size:.95rem;color:var(--acc)}
+.dorso p{font-size:1rem;line-height:1.3}
+.ficha span{background:var(--tinta);color:#fff;font-size:.8rem}
+.dorso a{font-family:"Silkscreen",monospace;font-weight:700;font-size:1rem;background:var(--acc);color:#fff;box-shadow:0 4px 0 #8f1e1a}
+.dorso small{color:var(--sub);font-size:.8rem}
+.caja.nueva .cara{background:#fff8;border:4px dashed var(--tinta);color:var(--sub)}
+.caja.nueva .cara b{font-family:"Silkscreen",monospace;font-size:3.2rem;color:var(--acc)}
+.caja.nueva .cara span{font-family:"Pixelify Sans",sans-serif;color:var(--tinta);font-size:1rem}
+.caja.nueva .cara small{font-size:.85rem}
+footer{color:var(--sub);font-size:1rem}
+#lupa{background:#f6eed8f2;backdrop-filter:none}
+#lupa .cerrar{background:var(--tinta);color:#ffc23d;font-size:1.4rem}
+#lupa .pista{color:var(--sub);font-size:1.15rem}
+#lupa .frente{padding:16px 16px 18px 32px;border-width:6px;background-size:8px 8px !important}
+#lupa .calif{font-size:1.25rem;padding:6px 10px}
+#lupa .jug{font-size:1.3rem}
+#lupa .titulo{font-size:1.9rem;padding:8px 10px}
+#lupa .lema{display:block;font-family:"Pixelify Sans",sans-serif;font-style:normal;color:var(--tinta);background:#fffc;padding:4px 8px;margin-top:8px;font-size:1.1rem}
+#lupa .casa{font-size:1.1rem}
+#lupa .dorso{border-width:6px}
+#lupa .dorso h2{font-size:1.5rem}
+#lupa .dorso p{font-size:1.3rem;line-height:1.4}
+#lupa .ficha span{font-size:1.05rem}
+#lupa .dorso a{font-size:1.4rem;padding:18px}
+#lupa .dorso small{font-size:1rem}

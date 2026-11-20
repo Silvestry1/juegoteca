@@ -1,0 +1,11 @@
+/* Base compartida de las maquetas pixel */
+*{border-radius:0 !important}
+img,canvas{image-rendering:pixelated}
+.ilus div{background:none !important;filter:none !important;width:100% !important;height:auto !important;font-size:0 !important}
+.px-ico{width:min(72%,120px);height:auto;display:block;margin:auto;image-rendering:pixelated}
+#lupa .px-ico{width:min(70%,220px)}
+.frente::before{display:none}
+.giro{transition:transform .5s steps(6)}
+#lupa,#lupa .lugar{transition-timing-function:steps(4)}
+.caja.nueva .cara{backdrop-filter:none;-webkit-backdrop-filter:none}
+.cartel h1 .emo,.btnqr .emo{display:none}
