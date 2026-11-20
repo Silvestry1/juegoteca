@@ -1,6 +1,6 @@
 // Service worker de la Juegoteca.
 // Al agregar un juego propio nuevo, sumá su carpeta a PROPIOS y subí VERSION.
-const VERSION = "v5";
+const VERSION = "v6";
 const CACHE = "juegoteca-" + VERSION;
 const PROPIOS = [
   "./",

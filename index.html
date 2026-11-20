@@ -99,13 +99,41 @@ dialog .acciones button.prim{background:#111;color:var(--acc)}
 #agregar .fila{display:flex;gap:8px}#agregar .fila>div{flex:1}
 #agregar .nota{font-size:.78rem;color:#666;margin:8px 0 0;line-height:1.35}
 #agregar .error{color:#b3261e;font-size:.85rem;font-weight:700;margin-top:8px}
+/* lupa: caja ampliada */
+body.sin-scroll{overflow:hidden}
+#lupa{position:fixed;inset:0;z-index:60;background:rgba(10,7,18,.86);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;opacity:0;transition:opacity .25s}
+#lupa.on{opacity:1}
+#lupa[hidden]{display:none}
+#lupa .lugar{width:min(88vw,400px,calc((100dvh - 110px) * 2 / 3));transform:scale(.85);transition:transform .3s}
+#lupa.on .lugar{transform:scale(1)}
+#lupa .caja{width:100%;cursor:default}
+#lupa .caja::after{display:none}
+#lupa .cerrar{position:absolute;top:calc(12px + env(safe-area-inset-top));right:12px;width:44px;height:44px;border-radius:50%;border:0;background:#ffffff22;color:#fff;font-size:1.3rem}
+#lupa .pista{margin:0;color:var(--sub);font-size:.85rem}
+#lupa .cara{border-radius:10px}
+#lupa .frente{padding:14px 14px 16px 32px}
+#lupa .lomo{width:22px}#lupa .lomo span{font-size:.8rem}
+#lupa .calif{width:58px;height:58px;font-size:1.15rem}
+#lupa .jug{font-size:1rem;padding:6px 10px}
+#lupa .ilus div{font-size:6rem;width:160px;height:160px}
+#lupa .titulo{font-size:2rem}
+#lupa .lema{font-size:1rem}
+#lupa .casa,#lupa .loc-tag,#lupa .sinred-tag{font-size:.8rem;padding:3px 9px}
+#lupa .dorso{padding:22px;gap:14px}
+#lupa .dorso h2{font-size:1.6rem}
+#lupa .dorso p{font-size:1.12rem;line-height:1.5}
+#lupa .ficha{gap:6px}#lupa .ficha span{font-size:.9rem;padding:4px 9px}
+#lupa .dorso a{font-size:1.25rem;padding:15px;border-radius:10px}
+#lupa .dorso small{font-size:.8rem}
+#lupa .dorso .extra button{font-size:.95rem;padding:11px 6px}
 @media (display-mode: standalone),(display-mode: fullscreen){.btninst{display:none}}
 </style>
 </head>
 <body>
 <header>
   <a class="cartel" href="./" title="Volver al inicio"><h1>🎬 Juegoteca</h1></a>
-  <p>Elegí una caja, dala vuelta y a jugar</p>
+  <p>Tocá una caja para verla de cerca y a jugar</p>
   <div class="botones">
     <button class="btnqr" id="abrirQR">📱 Mostrar QR</button>
     <button class="btnqr btninst" id="abrirAyuda">📲 Instalar</button>
@@ -116,6 +144,12 @@ dialog .acciones button.prim{background:#111;color:var(--acc)}
 <div class="cant"><label for="n">Somos</label><input id="n" type="number" min="1" inputmode="numeric" placeholder="—"><span>personas</span></div>
 <main id="lista"></main>
 <footer>Los juegos que agregás con <b>+</b> quedan guardados solo en este celu.</footer>
+
+<div id="lupa" hidden role="dialog" aria-modal="true" aria-label="Detalle del juego">
+  <button type="button" class="cerrar" aria-label="Cerrar">✕</button>
+  <div class="lugar"></div>
+  <p class="pista">Tocá afuera para volver al estante</p>
+</div>
 
 <dialog id="qr">
   <img src="qr-juegoteca.png" alt="Código QR de la Juegoteca" width="592" height="812">
@@ -234,22 +268,51 @@ function pinta(){
       <div class="giro"><div class="cara"><b>+</b><span>Agregar juego</span><small>Pegá un link o subí los archivos</small></div></div>
     </article>`;
 }
+async function accionesLocales(e){
+  const q=e.target.closest("[data-quitar]");
+  if(q){const j=Locales.lista().find(x=>x.id===q.dataset.quitar);
+    if(j&&confirm(`¿Quitar "${j.nombre}" de este celu?`)){await Locales.quitar(j.id);cerrarLupa();pinta();}return true;}
+  const cp=e.target.closest("[data-copiar]");
+  if(cp){const j=Locales.lista().find(x=>x.id===cp.dataset.copiar);if(!j)return true;
+    const {id,local,...ficha}=j;const txt=JSON.stringify(ficha,null,2);
+    try{await navigator.clipboard.writeText(txt);cp.textContent="✔ Copiada";}catch{prompt("Copiá la ficha:",txt);}
+    return true;}
+  return false;
+}
+// Lupa: la caja tocada se abre grande, centrada, y se da vuelta
+const lupa=$("#lupa");
+function abrirLupa(caja){
+  const c=caja.cloneNode(true);c.classList.remove("vuelta");c.removeAttribute("tabindex");
+  lupa.querySelector(".lugar").replaceChildren(c);
+  lupa.hidden=false;document.body.classList.add("sin-scroll");
+  if(!history.state||!history.state.lupa)history.pushState({lupa:1},"");
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{lupa.classList.add("on");c.classList.add("vuelta");}));
+  lupa.querySelector(".cerrar").focus({preventScroll:true});
+}
+function cerrarLupa(desdeHistoria){
+  if(lupa.hidden)return;
+  lupa.classList.remove("on");lupa.querySelector(".caja")?.classList.remove("vuelta");
+  document.body.classList.remove("sin-scroll");
+  setTimeout(()=>{if(!lupa.classList.contains("on"))lupa.hidden=true;},300);
+  if(!desdeHistoria&&history.state&&history.state.lupa)history.back();
+}
+addEventListener("popstate",()=>cerrarLupa(true));
+lupa.addEventListener("click",async e=>{
+  if(e.target.closest("a"))return;
+  if(await accionesLocales(e))return;
+  if(e.target.closest(".cerrar")||!e.target.closest(".caja")){cerrarLupa();return;}
+  lupa.querySelector(".caja").classList.toggle("vuelta");
+});
+addEventListener("keydown",e=>{if(e.key==="Escape"&&!lupa.hidden)cerrarLupa();});
 $("#lista").addEventListener("click",async e=>{
   if(e.target.closest("a"))return;
   if(e.target.closest("#cajaMas")){abrirAgregar();return;}
-  const q=e.target.closest("[data-quitar]");
-  if(q){const j=Locales.lista().find(x=>x.id===q.dataset.quitar);
-    if(j&&confirm(`¿Quitar "${j.nombre}" de este celu?`)){await Locales.quitar(j.id);pinta();}return;}
-  const cp=e.target.closest("[data-copiar]");
-  if(cp){const j=Locales.lista().find(x=>x.id===cp.dataset.copiar);if(!j)return;
-    const {id,local,...ficha}=j;const txt=JSON.stringify(ficha,null,2);
-    try{await navigator.clipboard.writeText(txt);cp.textContent="✔ Copiada";}catch{prompt("Copiá la ficha:",txt);}
-    return;}
-  const c=e.target.closest(".caja"); if(c) c.classList.toggle("vuelta");
+  if(await accionesLocales(e))return;
+  const c=e.target.closest(".caja"); if(c) abrirLupa(c);
 });
 $("#lista").addEventListener("keydown",e=>{
   if((e.key==="Enter"||e.key===" ")&&e.target.id==="cajaMas"){e.preventDefault();abrirAgregar();return;}
-  if((e.key==="Enter"||e.key===" ")&&e.target.classList.contains("caja")){e.preventDefault();e.target.classList.toggle("vuelta");}
+  if((e.key==="Enter"||e.key===" ")&&e.target.classList.contains("caja")){e.preventDefault();abrirLupa(e.target);}
 });
 $("#abrirQR").onclick=()=>$("#qr").showModal();
 $("#cerrarQR").onclick=()=>$("#qr").close();
