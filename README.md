@@ -49,3 +49,9 @@ Si agregás un juego propio nuevo en `juegos/<nombre>/`:
 
 Los cambios a juegos que ya existen llegan solos: la app siempre intenta bajar la versión nueva y usa la guardada solo si no hay señal (o tarda más de 3,5 s).
 - `juegos/truco/`: **Anotador de truco**. Nosotros/Ellos con nombres editables, partida a 15 o a 30 (malas y buenas), fósforos de a 5, +1/+2/+3/+4 y −1, deshacer, aviso de ganador y partidas ganadas. Se guarda en `localStorage` (`truco-anotador`) y mantiene la pantalla prendida. Categoría "Herramientas".
+
+## Volver al menú y juegos agregados desde el celu
+
+- Cada juego propio carga `inicio.js`, que pone un botón flotante 🎬 abajo a la izquierda para volver al menú (pide confirmación para no cortar una partida). En la página principal, el cartel "Juegoteca" de arriba también lleva al inicio. Un juego propio nuevo tiene que llevar `<script src="../../inicio.js"></script>` antes de `</body>`.
+- La caja **+** del catálogo agrega juegos **solo en ese celu**: por link (se guarda en `localStorage` → `juegoteca-locales`) o subiendo los archivos (`.html` más sus `.js`, `.css` e imágenes). Los archivos se unen en un solo HTML (`locales.js` → `empaquetar`), se guardan en IndexedDB y se abren con `jugar.html?id=...` dentro de un iframe aislado.
+- Para que un juego agregado por link entre al catálogo de todos: en su caja, **📋 Copiar ficha** y pegar ese bloque en `juegos.json`.

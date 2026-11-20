@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Juegoteca</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#120e1c">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+<style>
+html,body{margin:0;height:100%;background:#120e1c;color:#f5f1ff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+iframe{position:fixed;inset:0;width:100%;height:100%;border:0;background:#fff}
+.msj{display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;height:100%;padding:16px;text-align:center}
+.msj a{color:#ffc23d}
+</style>
+</head>
+<body>
+<div class="msj" id="msj">Cargando…</div>
+<script src="locales.js"></script>
+<script src="inicio.js"></script>
+<script>
+(async () => {
+  const id = new URLSearchParams(location.search).get("id");
+  const meta = Locales.lista().find(j => j.id === id);
+  let html = null;
+  try { html = id ? await Locales.leerHTML(id) : null; } catch {}
+  if (!html) {
+    document.getElementById("msj").innerHTML = 'Este juego no está guardado en este celu.<br>Los juegos agregados con el botón + quedan solo en el dispositivo donde se cargaron.<a href="./">← Volver a la Juegoteca</a>';
+    return;
+  }
+  if (meta) document.title = meta.nombre + " · Juegoteca";
+  const f = document.createElement("iframe");
+  // Aislado: el juego cargado no puede tocar los datos de la Juegoteca.
+  f.setAttribute("sandbox", "allow-scripts allow-forms allow-modals allow-popups allow-pointer-lock allow-downloads");
+  f.setAttribute("allow", "fullscreen; autoplay; clipboard-write");
+  f.srcdoc = html;
+  document.getElementById("msj").remove();
+  document.body.prepend(f);
+})();
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+</script>
+</body>
+</html>

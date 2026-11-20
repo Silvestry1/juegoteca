@@ -342,6 +342,7 @@ function setModo(m){
 $("#tabLibre").onclick=()=>setModo("libre");$("#tabCasino").onclick=()=>setModo("casino");
 setModo(new URLSearchParams(location.search).get("modo")==="casino"?"casino":"libre");
 </script>
+<script src="../../inicio.js"></script>
 <script>if("serviceWorker" in navigator)navigator.serviceWorker.register("../../sw.js",{scope:"../../"});</script>
 </body>
 </html>
