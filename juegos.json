@@ -1,0 +1,128 @@
+[
+ {
+  "nombre": "skribbl.io",
+  "tipo": "Dibujar",
+  "min": 2,
+  "max": 20,
+  "edad": "8+",
+  "descripcion": "Uno dibuja una palabra y el resto escribe qué es. Suma el que adivina más rápido.",
+  "url": "https://skribbl.io"
+ },
+ {
+  "nombre": "Gartic Phone",
+  "tipo": "Dibujar",
+  "min": 4,
+  "max": 30,
+  "edad": "8+",
+  "descripcion": "Teléfono descompuesto con dibujos: escribís, el otro dibuja, el siguiente describe.",
+  "url": "https://garticphone.com"
+ },
+ {
+  "nombre": "StopotS",
+  "tipo": "Palabras",
+  "min": null,
+  "max": 10,
+  "edad": "10+",
+  "descripcion": "Tutti Frutti online: sale una letra, completás categorías y se votan las respuestas.",
+  "url": "https://stopots.com"
+ },
+ {
+  "nombre": "Codenames",
+  "tipo": "Equipos",
+  "min": 4,
+  "max": 64,
+  "edad": "10+",
+  "descripcion": "Dos equipos; el jefe de espías da pistas de una palabra para encontrar sus cartas.",
+  "url": "https://codenames.game"
+ },
+ {
+  "nombre": "Spyfall",
+  "tipo": "Deducción",
+  "min": 3,
+  "max": 8,
+  "edad": "13+",
+  "descripcion": "Todos saben el lugar menos el espía. Preguntas para descubrirlo.",
+  "url": "https://derewah.itch.io/spyfall"
+ },
+ {
+  "nombre": "Secret Hitler",
+  "tipo": "Deducción",
+  "min": 5,
+  "max": 10,
+  "edad": "13+",
+  "descripcion": "Roles ocultos: liberales contra fascistas. Pide cuenta gratuita.",
+  "url": "https://secrethitler.io"
+ },
+ {
+  "nombre": "Wolvesville",
+  "tipo": "Deducción",
+  "min": null,
+  "max": null,
+  "edad": "12+",
+  "descripcion": "El Lobo: de noche se ataca, de día se debate y se vota.",
+  "url": "https://www.wolvesville.com"
+ },
+ {
+  "nombre": "JKLM BombParty",
+  "tipo": "Palabras",
+  "min": 2,
+  "max": 16,
+  "edad": "10+",
+  "descripcion": "Escribí una palabra con las letras dadas antes de que explote la bomba.",
+  "url": "https://jklm.fun"
+ },
+ {
+  "nombre": "Board Game Arena",
+  "tipo": "Mesa",
+  "min": null,
+  "max": null,
+  "edad": "según juego",
+  "descripcion": "Cientos de juegos de mesa con licencia. Muchos gratis, otros Premium.",
+  "url": "https://boardgamearena.com"
+ },
+ {
+  "nombre": "playingcards.io",
+  "tipo": "Cartas",
+  "min": null,
+  "max": null,
+  "edad": "según juego",
+  "descripcion": "Mesa virtual de cartas, sin registro. Sirve para mazos propios.",
+  "url": "https://playingcards.io"
+ },
+ {
+  "nombre": "Letter Jam",
+  "tipo": "Palabras",
+  "min": null,
+  "max": null,
+  "edad": "10+",
+  "descripcion": "Cooperativo: ves las letras de los demás y no la tuya; se dan pistas con palabras.",
+  "url": "https://letterjam.game"
+ },
+ {
+  "nombre": "Decrypto",
+  "tipo": "Equipos",
+  "min": null,
+  "max": null,
+  "edad": "12+",
+  "descripcion": "Dos equipos se pasan códigos con pistas sin que el rival los descifre.",
+  "url": "https://decryptr.io"
+ },
+ {
+  "nombre": "Make It Meme",
+  "tipo": "Humor",
+  "min": null,
+  "max": null,
+  "edad": "13+",
+  "descripcion": "Cada uno le pone texto a un meme y se vota el mejor.",
+  "url": "https://makeitmeme.com"
+ },
+ {
+  "nombre": "Vote's Out",
+  "tipo": "Humor",
+  "min": null,
+  "max": null,
+  "edad": "13+",
+  "descripcion": "Respuestas graciosas a consignas y votación.",
+  "url": "https://votesout.com"
+ }
+]

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QR Juegoteca</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+body{margin:0;background:#fff;color:#111;font-family:system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;padding:32px 16px;text-align:center}
+h1{margin:0 0 4px;font-size:2.4rem}
+p{margin:0 0 24px;font-size:1.2rem}
+#qr{padding:16px;border:6px solid #111;border-radius:16px}
+small{margin-top:16px;color:#555}
+@media print{small{display:none}}
+</style>
+</head>
+<body>
+<h1>🎲 Juegoteca</h1>
+<p>Escaneá con la cámara y elegí a qué jugamos</p>
+<div id="qr"></div>
+<small id="u"></small>
+<script>
+const url=location.href.replace(/qr\.html.*$/,"");
+document.getElementById("u").textContent=url+" · Imprimí esta página (Ctrl+P)";
+new QRCode(document.getElementById("qr"),{text:url,width:280,height:280,correctLevel:QRCode.CorrectLevel.M});
+</script>
+</body>
+</html>
