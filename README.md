@@ -49,7 +49,7 @@ Si agregás un juego propio nuevo en `juegos/<nombre>/`:
 
 Los cambios a juegos que ya existen llegan solos: la app siempre intenta bajar la versión nueva y usa la guardada solo si no hay señal (o tarda más de 3,5 s).
 - `juegos/truco/`: **Anotador de truco**. Nosotros/Ellos con nombres editables, partida a 15 o a 30 (malas y buenas), fósforos de a 5, +1/+2/+3/+4 y −1, deshacer, aviso de ganador y partidas ganadas. Se guarda en `localStorage` (`truco-anotador`) y mantiene la pantalla prendida. Categoría "Herramientas".
-  Botón "Pica-pica" (rojo = prendido): desde que un equipo tiene 5 hasta que uno llega a 25, al terminar cada redonda se abre encima un marcador propio del pica-pica; al cerrar la ronda pasa al marcador general solo la diferencia.
+  Botón "Pica-pica" (rojo = prendido): al llegar un equipo a 5 se abre solo, encima del marcador (fondo teñido y desenfocado), un marcador propio del pica-pica; al cerrar la ronda pasa al general solo la diferencia. Después de cada redonda, el botón rojo "Terminó la redonda → PICA-PICA" lo vuelve a abrir, hasta que alguien llega a 25.
 
 ## Volver al menú y juegos agregados desde el celu
 
