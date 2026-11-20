@@ -32,6 +32,38 @@
   "lema": "Lo mismo, pero sin filtro"
  },
  {
+  "nombre": "Ni se te ocurra",
+  "tipo": "Palabras",
+  "min": 4,
+  "max": 20,
+  "edad": "10+",
+  "propio": true,
+  "descripcion": "Por equipos, con un solo celu. Hacé adivinar la palabra sin decir las prohibidas de la carta; alguien del otro equipo vigila. Elegís la dificultad: 4, 5 o 6 prohibidas.",
+  "url": "juegos/nisetocurra/",
+  "icono": "🤐",
+  "colores": [
+   "#ffd23f",
+   "#ff3b3b"
+  ],
+  "lema": "Explicala sin decir lo que diría cualquiera"
+ },
+ {
+  "nombre": "Ni se te ocurra +18",
+  "tipo": "Palabras",
+  "min": 4,
+  "max": 20,
+  "edad": "18+",
+  "propio": true,
+  "descripcion": "Las mismas palabras prohibidas, con cartas de sexo, joda y alcohol. Solo si todos en la ronda son mayores de 18.",
+  "url": "juegos/nisetocurra/?adultos=1",
+  "icono": "🔞",
+  "colores": [
+   "#ff3b3b",
+   "#1a0a0a"
+  ],
+  "lema": "Explicala sin decir lo que estás pensando"
+ },
+ {
   "nombre": "Dados",
   "tipo": "Herramientas",
   "min": 1,
