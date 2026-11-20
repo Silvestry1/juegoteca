@@ -142,6 +142,12 @@ a.volver{color:var(--sub);text-align:center;font-size:.9rem}
     </div>
   </div>
 
+  <div class="caja">
+    <h3>Mis cartas</h3>
+    <p class="nota" id="misTxt"></p>
+    <button class="sec" id="misCartas">✏️ Agregar o sacar cartas</button>
+  </div>
+
   <div class="caja reglas">
     <h3>Cómo se juega</h3>
     <ul>
@@ -193,6 +199,7 @@ a.volver{color:var(--sub);text-align:center;font-size:.9rem}
   </div>
   <button class="grande" id="arrancar">¡Ya! Arrancar el reloj</button>
   <button class="sec chico" id="cambiar">Cambiar consigna (no la conozco)</button>
+  <button class="sec chico" id="sacarCarta">🗑️ Sacar esta carta del mazo para siempre</button>
 </section>
 
 <!-- JUEGO -->
@@ -245,6 +252,7 @@ a.volver{color:var(--sub);text-align:center;font-size:.9rem}
   <a class="volver" href="../../">← Volver a la Juegoteca</a>
 </section>
 
+<script src="../comun/cartas-propias.js"></script>
 <script>
 /* ===== Consignas (originales, ATP) ===== */
 const MAZO={
@@ -399,10 +407,43 @@ MAZO.tar.adultos=[
  ["Picante","Like a virgin","Madonna"],["Picante","Hips don't lie","Shakira"],["Picante","Marcha nupcial","la de los casamientos"]
 ];
 
-/* ===== Mazo unificado ===== */
+/* ===== Mazo unificado (oficiales + cartas propias del celu) ===== */
+const idCarta=(m,pal)=>MAZO[m].nombre+": "+pal;
 for(const m of ["dib","mim","tar"]){
   const M=MAZO[m];
-  M.todas=[...M.cartas.map(c=>({c,n:"f",a:false})),...M.dificiles.map(c=>({c,n:"d",a:false})),...M.adultos.map(c=>({c,n:c[3]==="d"?"d":"f",a:true}))];
+  M.oficiales=[...M.cartas.map(c=>({c,n:"f",a:false})),...M.dificiles.map(c=>({c,n:"d",a:false})),...M.adultos.map(c=>({c,n:c[3]==="d"?"d":"f",a:true}))];
+  M.oficiales.forEach(x=>x.id=idCarta(m,x.c[1]));
+  M.todas=M.oficiales;
+}
+const mis=CartasPropias({
+  juego:"mostralo",nombre:"Mostralo como puedas",
+  campos:[
+    {k:"modo",t:"Cómo se muestra",tipo:"opciones",req:true,ops:[["dib","✏️ Dibujar"],["mim","🙌 Mímica"],["tar","🎵 Tararear"]]},
+    {k:"dif",t:"Dificultad",tipo:"opciones",req:true,ops:[["f","Fácil"],["d","Difícil"]]},
+    {k:"edad",t:"Contenido",tipo:"opciones",req:true,ops:[["atp","Para todos"],["adu","🔞 +18"]]},
+    {k:"pal",t:"Consigna",tipo:"texto",req:true,max:40,ph:"Ej.: El Eternauta"},
+    {k:"cat",t:"Categoría",tipo:"texto",max:20,ph:"Ej.: Serie, Objeto, Canción"},
+    {k:"pista",t:"Aclaración",tipo:"texto",max:40,ph:"Ej.: la de Netflix",ayuda:"Para tararear conviene poner el artista."}
+  ],
+  clave:c=>idCarta(c.modo,c.pal),
+  resumen:c=>MAZO[c.modo].icono+" "+c.pal+(c.pista?" ("+c.pista+")":""),
+  oficiales:()=>["dib","mim","tar"].flatMap(m=>MAZO[m].oficiales.map(x=>({id:x.id,txt:MAZO[m].icono+" "+x.c[1]+(x.a?" · +18":"")}))),
+  alCambiar:()=>{rearmar();pintaMisCartas()}
+});
+function rearmar(){
+  const oc=mis.ocultas(),prop=mis.activas();
+  for(const m of ["dib","mim","tar"]){
+    const M=MAZO[m];
+    M.todas=M.oficiales.filter(x=>!oc.has(mis.norm(x.id))).concat(
+      prop.filter(p=>p.modo===m).map(p=>({c:[p.cat||"Carta propia",p.pal,p.pista],n:p.dif,a:p.edad==="adu",propia:true,id:idCarta(m,p.pal)})));
+    if(!M.todas.length)M.todas=M.oficiales;
+  }
+}
+function pintaMisCartas(){
+  const n=mis.contar();
+  $("#misTxt").textContent=n.propias||n.ocultas?
+    "Tenés "+n.activas+" carta"+(n.activas===1?"":"s")+" propia"+(n.activas===1?"":"s")+" en el mazo"+(n.ocultas?" y "+n.ocultas+" oficial"+(n.ocultas===1?"":"es")+" sacada"+(n.ocultas===1?"":"s"):"")+".":
+    "Sumá tus consignas o sacá las que no te gustan. Quedan en este celu.";
 }
 
 /* ===== Estado ===== */
@@ -489,10 +530,11 @@ function pozo(m){
 }
 function sacar(m){
   const idx=pozo(m);
-  let libres=idx.filter(i=>!S.usados[m].includes(i));
-  if(!libres.length){S.usados[m]=S.usados[m].filter(i=>!idx.includes(i));libres=idx}
+  const T=MAZO[m].todas,ids=idx.map(i=>T[i].id);
+  let libres=idx.filter(i=>!S.usados[m].includes(T[i].id));
+  if(!libres.length){S.usados[m]=S.usados[m].filter(u=>!ids.includes(u));libres=idx}
   const i=libres[Math.floor(Math.random()*libres.length)];
-  S.usados[m].push(i);guardar();return MAZO[m].todas[i];
+  S.usados[m].push(T[i].id);guardar();return T[i];
 }
 let cartaObj=null;
 const valor=()=>S.dif==="fd"&&cartaObj&&cartaObj.n==="d"?2:1;
@@ -504,13 +546,16 @@ function mostrarCarta(m){
   $("#cCat").textContent=cartaAct[0];$("#cPal").textContent=cartaAct[1];
   $("#cPista").textContent=cartaAct[2]?"("+cartaAct[2]+")":"";
   const v=valor();
-  $("#cNivel").textContent=(cartaObj.a?"🔞 +18 · ":"")+(cartaObj.n==="d"?"Difícil":"Fácil")+(v>1?" · vale 2 puntos":"");
+  $("#cNivel").textContent=(cartaObj.propia?"✏️ Propia · ":"")+(cartaObj.a?"🔞 +18 · ":"")+(cartaObj.n==="d"?"Difícil":"Fácil")+(v>1?" · vale 2 puntos":"");
+  $("#sacarCarta").style.display=cartaObj.propia?"none":"block";
   $("#cNivel").className="nivel"+(cartaObj.a?" adu":"");
   let regla=M.regla;if(m==="dib"&&S.soporte==="papel")regla+=" Agarrá papel y lapicera.";
   $("#cRegla").textContent=regla;
   ir("pCarta");
 }
 $("#cambiar").onclick=()=>mostrarCarta(modoAct);
+$("#sacarCarta").onclick=()=>{mis.ocultar(cartaObj.id);mostrarCarta(modoAct)};
+$("#misCartas").onclick=()=>mis.abrir();
 
 /* ===== Reloj ===== */
 let fin=0,intervalo=null,lock=null;
@@ -611,7 +656,9 @@ function soltarPantalla(){try{lock&&lock.release();lock=null}catch(e){}}
 /* ===== Arranque ===== */
 function inicio(){
   const d=cargar();
-  if(d){S=Object.assign(S,d);S.usados=Object.assign({dib:[],mim:[],tar:[]},d.usados||{})}
+  if(d){S=Object.assign(S,d);S.usados=Object.assign({dib:[],mim:[],tar:[]},d.usados||{});
+    for(const m in S.usados)if(!Array.isArray(S.usados[m])||S.usados[m].some(x=>typeof x!=="string"))S.usados[m]=[]} // antes se guardaban posiciones
+  rearmar();pintaMisCartas();
   marcarConfig();pintaEquipos();
   $("#seguir").style.display=S.enCurso?"block":"none";
   ir("pInicio");

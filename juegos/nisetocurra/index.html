@@ -136,6 +136,12 @@ a.volver{color:var(--sub);text-align:center;font-size:.9rem}
     </div>
   </div>
 
+  <div class="caja">
+    <h3>Mis cartas</h3>
+    <p class="nota" id="misTxt"></p>
+    <button class="sec" id="misCartas">✏️ Agregar o sacar cartas</button>
+  </div>
+
   <div class="caja reglas">
     <h3>Cómo se juega</h3>
     <ul>
@@ -219,6 +225,7 @@ a.volver{color:var(--sub);text-align:center;font-size:.9rem}
   <a class="volver" href="../../">← Volver a la Juegoteca</a>
 </section>
 
+<script src="../comun/cartas-propias.js"></script>
 <script>
 /* ===== Cartas originales =====
    Formato: "PALABRA: prohibida1, prohibida2, ..., prohibida6"
@@ -532,7 +539,42 @@ Puteada: insulto, malas palabras, grosería, enojo, garabato, puta
 Si nos organizamos, cogemos todos: cantito, organizar, todos, coger, política, frase
 `;
 function parsear(txt,z){return txt.trim().split("\n").map(l=>{const i=l.indexOf(":");return{p:l.slice(0,i).trim(),x:l.slice(i+1).split(",").map(s=>s.trim()).filter(Boolean),z}})}
-const MAZO={atp:parsear(ATP,"atp"),adulto:parsear(ADULTO,"adulto")};
+const OFICIAL={atp:parsear(ATP,"atp"),adulto:parsear(ADULTO,"adulto")};
+const MAZO={atp:OFICIAL.atp,adulto:OFICIAL.adulto};
+const mis=CartasPropias({
+  juego:"nisetocurra",nombre:"Ni se te ocurra",
+  campos:[
+    {k:"z",t:"Mazo",tipo:"opciones",req:true,ops:[["atp","ATP"],["adulto","🔞 +18"]]},
+    {k:"p",t:"Palabra a adivinar",tipo:"texto",req:true,max:30,ph:"Ej.: Medialuna"},
+    {k:"x",t:"Palabras prohibidas",tipo:"texto",req:true,max:160,ph:"Ej.: factura, panadería, desayuno, manteca, grasa, café",
+     ayuda:"Separadas por coma, de la más obvia a la menos obvia. Mínimo 4; con 6 sirve también en Brutal."}
+  ],
+  clave:c=>c.p,
+  resumen:c=>c.p+": "+c.x,
+  validar:c=>{
+    const x=c.x.split(",").map(w=>w.trim()).filter(Boolean);
+    if(x.length<4)return "Poné al menos 4 prohibidas, separadas por coma.";
+    if(x.length>6)return "Máximo 6 prohibidas.";
+    if(x.some(w=>mis.norm(w)===mis.norm(c.p)))return "La palabra no puede estar entre las prohibidas.";
+    c.x=x.join(", ");return null;
+  },
+  oficiales:()=>OFICIAL.atp.concat(OFICIAL.adulto).map(c=>({id:c.p,txt:c.p+(c.z==="adulto"?" · +18":"")})),
+  alCambiar:()=>{rearmar();pintaMisCartas()}
+});
+function rearmar(){
+  const oc=mis.ocultas(),prop=mis.activas();
+  for(const z of ["atp","adulto"]){
+    MAZO[z]=OFICIAL[z].filter(c=>!oc.has(mis.norm(c.p))).concat(
+      prop.filter(c=>c.z===z).map(c=>({p:c.p,x:c.x.split(",").map(w=>w.trim()).filter(Boolean),z,propia:true})));
+    if(!MAZO[z].length)MAZO[z]=OFICIAL[z];
+  }
+}
+function pintaMisCartas(){
+  const n=mis.contar();
+  $("#misTxt").textContent=n.propias||n.ocultas?
+    "Tenés "+n.activas+" carta"+(n.activas===1?"":"s")+" propia"+(n.activas===1?"":"s")+" en el mazo"+(n.ocultas?" y "+n.ocultas+" oficial"+(n.ocultas===1?"":"es")+" sacada"+(n.ocultas===1?"":"s"):"")+".":
+    "Sumá tus palabras o sacá las que no te gustan. Quedan en este celu.";
+}
 
 const DIF={
  normal:{n:4,libres:Infinity,falta:1,txt:"4 prohibidas por carta. Pasar es gratis.",regla:"Pasar no resta. Falta: −1."},
@@ -569,6 +611,7 @@ grupo("#difs","d",v=>S.dif=v);
 grupo("#tiempos","t",v=>S.tiempo=+v);
 grupo("#metas","g",v=>S.meta=+v);
 $("#mayor").onclick=()=>{S.mayor=!S.mayor;marcarConfig()};
+$("#misCartas").onclick=()=>mis.abrir();
 
 function marcarConfig(){
   $$("#mazos button").forEach(b=>b.classList.toggle("on",b.dataset.z===S.mazo));
@@ -615,7 +658,7 @@ function mostrar(){
   const d=DIF[S.dif];
   $("#cPal").textContent=cartaAct.p;
   $("#cProh").innerHTML=cartaAct.x.slice(0,d.n).map(w=>`<li>${esc(w)}</li>`).join("");
-  $("#cTag").textContent=cartaAct.z==="adulto"?"+18":"ATP";
+  $("#cTag").textContent=(cartaAct.z==="adulto"?"+18":"ATP")+(cartaAct.propia?" · ✏️ PROPIA":"");
   $("#carta").classList.toggle("mas18",cartaAct.z==="adulto");
 }
 function puntosRonda(){
@@ -721,7 +764,7 @@ function soltarPantalla(){try{lock&&lock.release();lock=null}catch(e){}}
 function inicio(){
   const d=cargar();
   if(d){S=Object.assign(S,d);if(!Array.isArray(S.usados))S.usados=[]}
-  marcarConfig();pintaEquipos();
+  rearmar();pintaMisCartas();marcarConfig();pintaEquipos();
   $("#seguir").style.display=S.enCurso?"block":"none";
   ir("pInicio");
 }
