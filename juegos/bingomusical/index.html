@@ -81,6 +81,27 @@ details summary{cursor:pointer;font-weight:700;color:var(--txt)}
 .veredicto{text-align:center;font-size:1.5rem;font-weight:900}
 .veredicto.si{color:var(--ok)}
 .veredicto.no{color:var(--mal)}
+.estim{margin:0;padding:10px 12px;border-radius:10px;background:#42e8e01a;color:var(--txt);font-size:.95rem;line-height:1.45}
+.estim b{color:var(--acc2)}
+.stepper input{flex:1}
+.stepper button{width:56px;font-size:1.4rem}
+.ronda{display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--card);border-radius:14px;padding:10px}
+.ronda small{color:var(--sub);font-weight:700;letter-spacing:1px;font-size:.8rem}
+.ronda b{font-size:2.6rem;letter-spacing:8px;color:var(--acc2)}
+.hoja{background:#fff;color:#111;border-radius:14px;padding:22px 16px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px}
+.hoja h1{color:#7c3aed;text-shadow:none}
+.hoja .grandote{font-size:1.25rem;font-weight:700}
+.hoja .chico{font-size:.8rem;color:#555}
+#qrFijo{line-height:0}
+#qrFijo img,#qrFijo canvas{max-width:min(80vw,380px);height:auto}
+@media print{
+  body{background:#fff}
+  .pant{display:none!important}
+  #pImprimir{display:flex!important;padding:0}
+  .noimp{display:none!important}
+  .hoja{border-radius:0;padding:20mm 10mm}
+  #qrFijo img,#qrFijo canvas{max-width:none;width:min(120mm,80vw)!important;height:auto!important}
+}
 .ampliar{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));background:#000d;color:#fff;border-radius:12px;padding:12px;text-align:center;font-weight:700;display:none;max-width:608px;margin:0 auto}
 .ampliar.on{display:block}
 </style>
@@ -102,7 +123,7 @@ details summary{cursor:pointer;font-weight:700;color:var(--txt)}
   <div class="caja reglas">
     <h3>Cómo se juega</h3>
     <ul>
-      <li>El que pone la música abre <b>Pongo la música</b>, carga la playlist y muestra el <b>QR</b>. Cada uno lo escanea y le toca un cartón distinto.</li>
+      <li>El que pone la música abre <b>Pongo la música</b>, carga la playlist y muestra el <b>QR</b>. Cada uno lo escanea y le toca un cartón distinto. Si querés, imprimí un <b>QR fijo</b> para la mesa: sirve para todas las rondas y cada uno pone el código de ronda que aparece en la pantalla del anfitrión.</li>
       <li>El juego elige el próximo tema al azar; el anfitrión lo pone en su app (YouTube Music, Spotify o TIDAL) y lo deja sonar un rato, sin decir el nombre.</li>
       <li>Los jugadores marcan en su celu el tema que reconocen. Ojo: <b>en el cartón aparece solo el título</b>.</li>
       <li><b>Línea:</b> fila, columna o diagonal completa. <b>Bingo:</b> cartón lleno.</li>
@@ -149,20 +170,39 @@ details summary{cursor:pointer;font-weight:700;color:var(--txt)}
   </div>
 
   <div class="caja">
-    <h3>3 · Cartón</h3>
-    <div class="opc" id="optTam">
-      <button data-v="3">3×3<br><small>rápido</small></button>
-      <button data-v="4">4×4<br><small>normal</small></button>
-      <button data-v="5">5×5<br><small>largo</small></button>
+    <h3>3 · Duración y cartón</h3>
+    <h3>Jugadores</h3>
+    <div class="fila stepper"><button id="jugMenos" style="flex:none">−</button><input type="text" id="jugadores" inputmode="numeric" style="text-align:center;font-size:1.3rem;font-weight:800"><button id="jugMas" style="flex:none">+</button></div>
+    <h3>Cuánto suena cada tema</h3>
+    <div class="opc" id="optSeg">
+      <button data-v="30">30 s</button><button data-v="45">45 s</button><button data-v="60">1 min</button><button data-v="90">1½ min</button>
     </div>
-    <h3>Temas en juego</h3>
-    <div class="opc" id="optCant">
-      <button data-v="30">30</button>
-      <button data-v="45">45</button>
-      <button data-v="60">60</button>
-      <button data-v="0">Todos</button>
+    <div class="opc" id="optModo">
+      <button data-v="auto">Automático</button>
+      <button data-v="manual">A mano</button>
     </div>
-    <p class="nota">Si la lista tiene más, se eligen al azar. Con menos temas sale más rápido; con más, el QR se pone más denso.</p>
+    <div id="cajaAuto" class="caja" style="padding:0;background:none">
+      <h3>¿Cuánto querés que dure hasta el bingo?</h3>
+      <div class="opc" id="optDur">
+        <button data-v="15">15′</button><button data-v="20">20′</button><button data-v="30">30′</button><button data-v="45">45′</button><button data-v="60">60′</button>
+      </div>
+    </div>
+    <div id="cajaManual" class="caja" style="padding:0;background:none" hidden>
+      <h3>Cartón</h3>
+      <div class="opc" id="optTam">
+        <button data-v="3">3×3</button>
+        <button data-v="4">4×4</button>
+        <button data-v="5">5×5</button>
+      </div>
+      <h3>Temas en juego</h3>
+      <div class="opc" id="optCant">
+        <button data-v="30">30</button>
+        <button data-v="45">45</button>
+        <button data-v="60">60</button>
+        <button data-v="0">Todos</button>
+      </div>
+    </div>
+    <p class="estim" id="estim"></p>
     <h3>Abrir los temas en</h3>
     <div class="opc" id="optApp">
       <button data-v="ytm">YouTube Music</button>
@@ -178,13 +218,16 @@ details summary{cursor:pointer;font-weight:700;color:var(--txt)}
 <!-- ANFITRIÓN -->
 <section class="pant" id="pHost">
   <h2>Repartí los cartones</h2>
-  <p class="sub">Que cada uno escanee con la cámara. A cada celu le toca un cartón distinto.</p>
+  <div class="ronda"><small>CÓDIGO DE RONDA</small><b id="rondaCod">----</b><small id="rondaInfo"></small></div>
+  <p class="sub">Que cada uno escanee con la cámara. Si usan el QR impreso, les pide este código.</p>
   <div id="qr"></div>
   <p class="nota" id="qrNota" style="text-align:center"></p>
   <div class="fila">
     <button id="compartir">📤 Mandar link</button>
     <button id="verQr">Ocultar QR</button>
   </div>
+  <button id="irImprimir">🖨️ QR fijo para imprimir</button>
+  <p class="nota" id="impresoNota" style="text-align:center"></p>
 
   <div class="tema" id="tema"><div class="n" id="temaN">TODAVÍA NO SONÓ NADA</div><div class="t" id="temaT">Tocá «Siguiente tema»</div><div class="a" id="temaA"></div></div>
   <a class="boton" id="abrirTema" target="_blank" rel="noopener" hidden>▶ Abrir en YouTube Music</a>
@@ -199,7 +242,7 @@ details summary{cursor:pointer;font-weight:700;color:var(--txt)}
     <input type="text" id="buscar" placeholder="Buscar tema…" autocomplete="off">
     <div class="lista" id="hostLista"></div>
   </div>
-  <button class="peligro" id="nuevaPartida">Nueva partida (cartones nuevos)</button>
+  <button class="peligro" id="nuevaPartida">Nueva ronda (cartones nuevos, misma lista)</button>
   <a class="volver" href="#" data-ir="pInicio">← Volver</a>
 </section>
 
@@ -218,6 +261,7 @@ details summary{cursor:pointer;font-weight:700;color:var(--txt)}
 <!-- MI CARTÓN -->
 <section class="pant" id="pCarton">
   <h2>Mi cartón</h2>
+  <p class="sub" id="miRonda"></p>
   <div class="carton" id="miCarton"></div>
   <p class="nota" style="text-align:center">Tocá un tema cuando suene; tocalo de nuevo para desmarcar. Mantené apretado para leer el título entero.</p>
   <p class="veredicto" id="aviso"></p>
@@ -234,6 +278,36 @@ details summary{cursor:pointer;font-weight:700;color:var(--txt)}
     </div>
   </div>
   <a class="volver" href="../../">← Volver a la Juegoteca</a>
+</section>
+
+<!-- CÓDIGO DE RONDA (jugador que entró por el QR impreso) -->
+<section class="pant" id="pRonda">
+  <h1>Bingo<br>musical</h1>
+  <p class="sub" id="rondaLista"></p>
+  <div class="caja">
+    <h3>Código de ronda</h3>
+    <p class="nota">Lo muestra en su pantalla el que pone la música. Cambia en cada ronda.</p>
+    <div class="fila">
+      <input type="text" class="cod" id="rondaIn" maxlength="4" autocomplete="off" autocapitalize="characters" placeholder="CÓDIGO">
+      <button class="grande" id="rondaBtn" style="flex:none">Entrar</button>
+    </div>
+    <p class="error" id="rondaErr"></p>
+  </div>
+  <a class="volver" href="../../">← Volver a la Juegoteca</a>
+</section>
+
+<!-- QR PARA IMPRIMIR -->
+<section class="pant" id="pImprimir">
+  <div class="hoja">
+    <h1>🎶 Bingo musical</h1>
+    <p class="grandote">Escaneá con la cámara del celu</p>
+    <div id="qrFijo"></div>
+    <p class="grandote">y poné el <b>código de ronda</b><br>que te dice el que pone la música</p>
+    <p class="chico" id="qrFijoInfo"></p>
+  </div>
+  <p class="nota noimp" id="qrFijoNota" style="text-align:center"></p>
+  <button class="grande noimp" id="imprimir">🖨️ Imprimir o guardar PDF</button>
+  <button class="noimp" id="volverHost2">← Volver a la música</button>
 </section>
 
 <section class="pant" id="pRoto">
@@ -280,14 +354,15 @@ function normalizar(c){return (c||"").toUpperCase().replace(/[^A-Z0-9]/g,"").rep
 function codigoValido(c){return c.length===5&&[...c].every(ch=>LETRAS.includes(ch))}
 function codigoNuevo(n){const b=new Uint32Array(n||5);crypto.getRandomValues(b);return [...b].map(x=>LETRAS[x%LETRAS.length]).join("")}
 
-/* ---------- partida en el link (#p=...) ----------
-   Contenido: "1\n<tamaño>\n<idPartida>\n<título>\n<título>..." comprimido (deflate) y en base64url. */
+/* ---------- lista en el link (#p=...&r=RONDA) ----------
+   #p= lleva solo la lista de títulos ("2\n<título>\n<título>..."), comprimida (deflate) y en base64url.
+   Como no cambia entre rondas, el mismo link sirve para un QR impreso.
+   &r= es el código de ronda (4 caracteres): define tamaño del cartón, cuántos temas entran y cuáles. */
 const b64=u8=>{let s="";for(let i=0;i<u8.length;i+=8192)s+=String.fromCharCode.apply(null,u8.subarray(i,i+8192));return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")};
 const deb64=s=>{s=s.replace(/-/g,"+").replace(/_/g,"/");const b=atob(s);const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u};
 async function pasarPor(u8,stream){return new Uint8Array(await new Response(new Blob([u8]).stream().pipeThrough(stream)).arrayBuffer())}
-async function empaquetar(p){
-  const txt=["1",p.g,p.id,...p.titulos].join("\n");
-  const u8=new TextEncoder().encode(txt);
+async function empaquetar(titulos){
+  const u8=new TextEncoder().encode(["2",...titulos].join("\n"));
   if("CompressionStream" in window){try{return "z"+b64(await pasarPor(u8,new CompressionStream("deflate-raw")))}catch(e){}}
   return "t"+b64(u8);
 }
@@ -295,31 +370,97 @@ async function desempaquetar(s){
   let u8=deb64(s.slice(1));
   if(s[0]==="z")u8=await pasarPor(u8,new DecompressionStream("deflate-raw"));
   const l=new TextDecoder().decode(u8).split("\n");
-  if(l[0]!=="1")throw new Error("versión");
-  const p={g:+l[1],id:l[2],titulos:l.slice(3)};
-  if(![3,4,5].includes(p.g)||!p.id||p.titulos.length<celdas(p.g))throw new Error("datos");
-  return p;
+  if(l[0]!=="2"||l.length<12)throw new Error("datos");
+  return l.slice(1);
 }
 const celdas=g=>g===5?24:g*g;
-const urlPartida=pk=>location.href.split("#")[0].split("?")[0]+"#p="+pk;
+const MAX_LISTA=120;
+const urlLista=pk=>location.href.split("#")[0].split("?")[0]+"#p="+pk;
+const urlRonda=(pk,r)=>urlLista(pk)+"&r="+r;
+const huella=titulos=>{let h=semilla("lista:"+titulos.join("\n"));let s="";for(let i=0;i<4;i++){s+=LETRAS[h%32];h=Math.floor(h/32)}return s};
 
-/* cartón: índices de temas en orden de grilla; en 5×5 el centro es libre (-1) */
+/* código de ronda: 4 caracteres de LETRAS = número v = (g-3) + 3·n + 768·azar */
+function rondaNueva(g,n){
+  const v=(g-3)+3*n+768*Math.floor(azar()*1365);
+  let s="",x=v;for(let i=0;i<4;i++){s=LETRAS[x%32]+s;x=Math.floor(x/32)}
+  return s;
+}
+function leerRonda(cod){
+  if(!/^[A-Z0-9]{4}$/.test(cod)||![...cod].every(c=>LETRAS.includes(c)))return null;
+  let v=0;for(const c of cod)v=v*32+LETRAS.indexOf(c);
+  return {g:v%3+3,n:Math.floor(v/3)%256};
+}
+/* arma la ronda: qué temas entran (sorteados con el código) y en qué orden */
+function rondaDe(todos,cod){
+  const rr=leerRonda(cod);
+  if(!rr||rr.n<celdas(rr.g)||rr.n>todos.length)return null;
+  const idx=mezclar(todos.map((_,i)=>i),mulberry32(semilla("pool:"+cod))).slice(0,rr.n).sort((a,b)=>a-b);
+  return {g:rr.g,id:cod,idx,titulos:idx.map(i=>todos[i])};
+}
+
+/* cartón: índices de temas (de la ronda) en orden de grilla; en 5×5 el centro es libre (-1) */
 function generarCarton(p,cod){
   const r=mulberry32(semilla("bm:"+p.id+":"+cod));
   const idx=mezclar(p.titulos.map((_,i)=>i),r).slice(0,celdas(p.g));
   if(p.g===5)idx.splice(12,0,-1);
   return idx;
 }
+const LINEAS={};
 function lineas(g){
+  if(LINEAS[g])return LINEAS[g];
   const L=[];
   for(let i=0;i<g;i++){L.push([...Array(g)].map((_,k)=>i*g+k));L.push([...Array(g)].map((_,k)=>k*g+i))}
   L.push([...Array(g)].map((_,k)=>k*g+k));L.push([...Array(g)].map((_,k)=>k*g+g-1-k));
-  return L;
+  return LINEAS[g]=L;
 }
 function estado(p,carton,tiene){
   const ok=carton.map(i=>i<0||tiene(i));
   const llenas=lineas(p.g).filter(l=>l.every(k=>ok[k]));
   return {ok,llenas,lleno:ok.every(Boolean)};
+}
+
+/* ---------- duración estimada ----------
+   Un cartón de k temas sobre N se llena en el tema t con P(T ≤ t) = C(t,k)/C(N,k).
+   Con J jugadores el bingo sale en el mínimo: E[T] ≈ Σ_{t=0}^{N-1} (1 - C(t,k)/C(N,k))^J. */
+function bingoEsperado(N,k,J){
+  let e=0;
+  for(let t=0;t<N;t++){let F=0;if(t>=k){F=1;for(let j=0;j<k;j++)F*=(t-j)/(N-j)}e+=Math.pow(1-F,J)}
+  return e;
+}
+/* simulación para mostrar línea y bingo con cartones de verdad */
+function simular(N,g,J,veces){
+  const k=celdas(g),L=lineas(g),pos=new Array(N),pool=[...Array(N).keys()],celda=new Array(g*g);
+  let sl=0,sb=0;
+  for(let v=0;v<veces;v++){
+    for(let i=0;i<N;i++)pos[i]=i+1;
+    for(let i=N-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=pos[i];pos[i]=pos[j];pos[j]=t}
+    let ml=1e9,mb=1e9;
+    for(let p=0;p<J;p++){
+      for(let i=0;i<k;i++){const j=i+Math.floor(Math.random()*(N-i));const t=pool[i];pool[i]=pool[j];pool[j]=t}
+      let c=0;for(let q=0;q<g*g;q++){if(g===5&&q===12)celda[q]=0;else celda[q]=pos[pool[c++]]}
+      let b=0;for(let q=0;q<g*g;q++)if(celda[q]>b)b=celda[q];
+      let l=1e9;for(const ln of L){let m=0;for(const q of ln)if(celda[q]>m)m=celda[q];if(m<l)l=m}
+      if(l<ml)ml=l;if(b<mb)mb=b;
+    }
+    sl+=ml;sb+=mb;
+  }
+  return {linea:sl/veces,bingo:sb/veces};
+}
+/* elige tamaño y cantidad de temas para acercarse a la duración pedida */
+function elegirAuto(total,J,minutos,seg){
+  const objetivo=minutos*60/seg; // temas que entran en ese tiempo
+  const max=Math.min(total,255);let mejor=null;
+  for(const g of [4,5,3]){
+    let b=null;
+    for(let N=Math.max(celdas(g)+6,Math.ceil(celdas(g)*1.75));N<=max;N++){
+      const e=bingoEsperado(N,celdas(g),J),err=Math.abs(e-objetivo)/objetivo;
+      if(!b||err<b.err)b={g,n:N,err};
+    }
+    if(!b)continue;
+    if(b.err<=.12)return b;
+    if(!mejor||b.err<mejor.err)mejor=b;
+  }
+  return mejor;
 }
 function dibujarCarton(cont,p,cod,carton,opc){
   opc=opc||{};cont.innerHTML="";
@@ -454,55 +595,119 @@ $("plCargar").addEventListener("click",async()=>{
 });
 
 /* ---------- armar ---------- */
-const tam=opciones($("optTam"),"bm.tam","4");
-const cant=opciones($("optCant"),"bm.cant","45");
+const modo=opciones($("optModo"),"bm.modo","auto",()=>{pintarModo();estimar()});
+const dur=opciones($("optDur"),"bm.dur","30",()=>estimar());
+const seg=opciones($("optSeg"),"bm.seg","60",()=>estimar());
+const tam=opciones($("optTam"),"bm.tam","4",()=>estimar());
+const cant=opciones($("optCant"),"bm.cant","45",()=>estimar());
 const app=opciones($("optApp"),"bm.app","ytm",()=>{if(host)pintarHost(false)});
+let jugadores=Math.max(2,Math.min(60,+leer("bm.jug",8)||8));
+function pintarJug(){$("jugadores").value=jugadores;guardar("bm.jug",jugadores)}
+$("jugMenos").addEventListener("click",()=>{jugadores=Math.max(2,jugadores-1);pintarJug();estimar()});
+$("jugMas").addEventListener("click",()=>{jugadores=Math.min(60,jugadores+1);pintarJug();estimar()});
+$("jugadores").addEventListener("input",()=>{const v=parseInt($("jugadores").value,10);if(v>=2&&v<=60){jugadores=v;guardar("bm.jug",v);estimar()}});
+function pintarModo(){$("cajaAuto").hidden=modo()!=="auto";$("cajaManual").hidden=modo()==="auto"}
+pintarJug();pintarModo();
 
-let host=leer("bm.host",null); // {pk,p,artistas[],salieron[]}
+let host=leer("bm.host",null); // {pk,todos[],artistas[],ronda,p,salieron[],impreso}
+if(host&&!Array.isArray(host.todos))host=null;
+
+/* lista limpia: sin repetidos, títulos cortos, tope MAX_LISTA */
+function listaLimpia(){
+  const vistos=new Set(),temas=[];
+  for(const r of renglones()){
+    const x=partirRenglon(r);x.t=x.t.replace(/\n/g," ").slice(0,60);
+    const k=x.t.toLowerCase();if(!x.t||vistos.has(k))continue;vistos.add(k);temas.push(x);
+  }
+  return temas;
+}
+/* tamaño y cantidad según el modo */
+function plan(total){
+  if(modo()==="auto"){const a=elegirAuto(total,jugadores,+dur(),+seg());return a&&{g:a.g,n:a.n}}
+  const g=+tam(),n=+cant()?Math.min(+cant(),total):total;
+  return n>=celdas(g)+6?{g,n}:null;
+}
+const minutos=t=>Math.max(1,Math.round(t*(+seg())/60));
+function estimar(){
+  const e=$("estim"),total=Math.min(listaLimpia().length,MAX_LISTA);
+  if(total<15){e.innerHTML="Cargá al menos 15 temas para calcular la duración.";return}
+  const pl=plan(total);
+  if(!pl){e.innerHTML=`Con ${total} temas no alcanza para ese cartón. Probá uno más chico o «Automático».`;return}
+  const s=simular(pl.n,pl.g,jugadores,300);
+  let txt=`Cartón <b>${pl.g}×${pl.g}</b> con <b>${pl.n} temas</b> en juego. Con ${jugadores} jugadores, la primera línea sale cerca del tema <b>${Math.round(s.linea)}</b> (~${minutos(s.linea)} min) y el bingo cerca del tema <b>${Math.round(s.bingo)}</b> (~${minutos(s.bingo)} min).`;
+  if(modo()==="auto"){
+    const d=+dur(),m=minutos(s.bingo);
+    if(m<d*.8)txt+=` Con esta lista no llega a ${d} min: sumá temas o dejá sonar más cada uno.`;
+    else if(m>d*1.25)txt+=` Con tantos jugadores sale más largo de lo pedido: pasá los temas más rápido.`;
+  }
+  e.innerHTML=txt;
+}
+infoLista=(f=>function(){f();estimar()})(infoLista);
+$("lista").addEventListener("input",()=>estimar());
 
 $("armar").addEventListener("click",async()=>{
   const err=$("armarError");err.textContent="";
-  const vistos=new Set();let temas=[];
-  for(const r of renglones()){
-    const x=partirRenglon(r);x.t=x.t.slice(0,60);
-    const k=x.t.toLowerCase();if(!x.t||vistos.has(k))continue;vistos.add(k);temas.push(x);
-  }
-  const g=+tam(),max=+cant(),min=celdas(g)+6;
-  if(temas.length<min){err.textContent=`Para cartones de ${g}×${g} hacen falta al menos ${min} temas distintos (ahora hay ${temas.length}). Lo ideal es el doble de casillas o más.`;return}
-  if(max&&temas.length>max){const r=mulberry32(Math.floor(azar()*4294967296));temas=mezclar(temas,r).slice(0,max)}
-  const p={g,id:codigoNuevo(4),titulos:temas.map(x=>x.t.replace(/\n/g," "))};
-  host={pk:await empaquetar(p),p,artistas:temas.map(x=>x.a),salieron:[]};
+  let temas=listaLimpia();
+  if(temas.length<15){err.textContent=`Hacen falta al menos 15 temas distintos (ahora hay ${temas.length}).`;return}
+  let aviso="";
+  if(temas.length>MAX_LISTA){aviso=`Quedaron los primeros ${MAX_LISTA} temas de ${temas.length} para que el QR se pueda escanear.`;temas=temas.slice(0,MAX_LISTA)}
+  const pl=plan(temas.length);
+  if(!pl){err.textContent=`Con ${temas.length} temas no alcanza para ese cartón. Probá uno más chico o «Automático».`;return}
+  const todos=temas.map(x=>x.t),pk=await empaquetar(todos);
+  const cod=rondaNueva(pl.g,pl.n),p=rondaDe(todos,cod);
+  host={pk,todos,artistas:temas.map(x=>x.a),ronda:cod,p,salieron:[],impreso:host&&host.impreso||null,aviso};
   guardar("bm.host",host);
   pintarHost(false);irA("pHost");pintarQR();
 });
 
 /* ---------- anfitrión ---------- */
 let qrVisible=true;
+function dibujarQR(cont,url,ancho){
+  cont.innerHTML="";
+  if(typeof QRCode==="undefined")return "sin";
+  try{new QRCode(cont,{text:url,width:ancho,height:ancho,correctLevel:url.length>1400?QRCode.CorrectLevel.L:QRCode.CorrectLevel.M});return "ok"}
+  catch(e){cont.innerHTML="";return "largo"}
+}
 function pintarQR(){
-  const c=$("qr");c.innerHTML="";
-  const url=urlPartida(host.pk);
+  const c=$("qr"),url=urlRonda(host.pk,host.ronda);
   c.hidden=!qrVisible;$("verQr").textContent=qrVisible?"Ocultar QR":"Mostrar QR";
-  if(typeof QRCode==="undefined"){c.hidden=true;$("qrNota").textContent="Sin internet no se puede dibujar el QR. Usá «Mandar link».";return}
-  try{new QRCode(c,{text:url,width:340,height:340,correctLevel:url.length>1400?QRCode.CorrectLevel.L:QRCode.CorrectLevel.M});
-    $("qrNota").textContent=url.length>1700?"El QR quedó denso: acercá bien el celu o usá «Mandar link». Con menos temas en juego queda más simple.":`Partida ${host.p.id} · ${host.p.titulos.length} temas · cartón ${host.p.g}×${host.p.g}`;
-  }catch(e){c.hidden=true;$("qrNota").textContent="La lista es demasiado larga para un QR. Usá «Mandar link» o elegí menos temas en juego."}
+  const r=dibujarQR(c,url,340);
+  if(r==="sin"){c.hidden=true;$("qrNota").textContent="Sin internet no se puede dibujar el QR. Usá «Mandar link»."}
+  else if(r==="largo"){c.hidden=true;$("qrNota").textContent="La lista es demasiado larga para un QR. Usá «Mandar link»."}
+  else $("qrNota").textContent=(host.aviso?host.aviso+" ":"")+(url.length>1700?"El QR quedó denso: acercá bien el celu o usá «Mandar link».":"");
+  const imp=$("impresoNota");
+  if(!host.impreso)imp.textContent="Imprimilo una vez y sirve para todas las rondas mientras no cambies la lista.";
+  else if(host.impreso===host.pk)imp.textContent=`✔ El QR impreso (lista ${huella(host.todos)}) sirve para esta ronda.`;
+  else imp.textContent="⚠ Cambiaste la lista: el QR que imprimiste antes ya no sirve. Imprimí uno nuevo.";
 }
 $("verQr").addEventListener("click",()=>{qrVisible=!qrVisible;pintarQR()});
 $("compartir").addEventListener("click",async()=>{
-  const url=urlPartida(host.pk);
+  const url=urlRonda(host.pk,host.ronda);
   try{if(navigator.share){await navigator.share({title:"Bingo musical",text:"Tu cartón para el bingo musical:",url});return}}catch(e){if(e.name==="AbortError")return}
   try{await navigator.clipboard.writeText(url);$("compartir").textContent="✔ Link copiado";setTimeout(()=>$("compartir").textContent="📤 Mandar link",2000)}catch(e){prompt("Copiá este link:",url)}
 });
+$("irImprimir").addEventListener("click",()=>{
+  const url=urlLista(host.pk),r=dibujarQR($("qrFijo"),url,380);
+  $("qrFijoInfo").textContent=`Lista ${huella(host.todos)} · ${host.todos.length} temas · silvestry1.github.io/juegoteca`;
+  $("qrFijoNota").textContent=r==="ok"?(url.length>1700?"El QR es denso: imprimilo grande (12 cm o más).":"Sirve para todas las rondas mientras no cambies la lista."):"No se pudo dibujar el QR (¿sin internet o lista muy larga?).";
+  host.impreso=host.pk;guardar("bm.host",host);
+  irA("pImprimir");
+});
+$("imprimir").addEventListener("click",()=>window.print());
+$("volverHost2").addEventListener("click",()=>{pintarHost(false);irA("pHost");pintarQR()});
 function linkTema(i){
-  const t=host.p.titulos[i],a=host.artistas[i]||"",q=encodeURIComponent((t+" "+a).trim()),v=videos[t];
+  const t=host.p.titulos[i],a=host.artistas[host.p.idx[i]]||"",q=encodeURIComponent((t+" "+a).trim()),v=videos[t];
   if(app()==="sp")return {u:"https://open.spotify.com/search/"+q,n:"Spotify"};
   if(app()==="td")return {u:"https://tidal.com/search?q="+q,n:"TIDAL"};
   return {u:v?"https://music.youtube.com/watch?v="+v:"https://music.youtube.com/search?q="+q,n:"YouTube Music"};
 }
+const artistaDe=i=>host.artistas[host.p.idx[i]]||"";
 function pintarHost(animar){
   const s=host.salieron,ult=s[s.length-1],n=host.p.titulos.length;
+  $("rondaCod").textContent=host.ronda;
+  $("rondaInfo").textContent=`Cartón ${host.p.g}×${host.p.g} · ${n} temas en juego`;
   if(ult!=null){
-    $("temaN").textContent=`TEMA ${s.length} DE ${n}`;$("temaT").textContent=host.p.titulos[ult];$("temaA").textContent=host.artistas[ult]||"";
+    $("temaN").textContent=`TEMA ${s.length} DE ${n}`;$("temaT").textContent=host.p.titulos[ult];$("temaA").textContent=artistaDe(ult);
     const l=linkTema(ult);$("abrirTema").href=l.u;$("abrirTema").textContent="▶ Abrir en "+l.n;$("abrirTema").hidden=false;
   }else{$("temaN").textContent="TODAVÍA NO SONÓ NADA";$("temaT").textContent="Tocá «Siguiente tema»";$("temaA").textContent="";$("abrirTema").hidden=true}
   if(animar){const t=$("tema");t.classList.remove("cae");void t.offsetWidth;t.classList.add("cae")}
@@ -514,12 +719,12 @@ function pintarHost(animar){
 function pintarLista(){
   const f=$("buscar").value.trim().toLowerCase(),orden=new Map(host.salieron.map((x,k)=>[x,k+1]));
   const L=$("hostLista");L.innerHTML="";
-  host.p.titulos.map((t,i)=>i).filter(i=>!f||(host.p.titulos[i]+" "+(host.artistas[i]||"")).toLowerCase().includes(f))
+  host.p.titulos.map((t,i)=>i).filter(i=>!f||(host.p.titulos[i]+" "+artistaDe(i)).toLowerCase().includes(f))
   .sort((a,b)=>host.p.titulos[a].localeCompare(host.p.titulos[b],"es"))
   .forEach(i=>{
     const b=document.createElement("button");const k=orden.get(i);
     if(k)b.className="sale";
-    b.innerHTML=`<i>${k?"#"+k:"·"}</i><span>${esc(host.p.titulos[i])}${host.artistas[i]?` <small>${esc(host.artistas[i])}</small>`:""}</span>`;
+    b.innerHTML=`<i>${k?"#"+k:"·"}</i><span>${esc(host.p.titulos[i])}${artistaDe(i)?` <small>${esc(artistaDe(i))}</small>`:""}</span>`;
     b.addEventListener("click",()=>{
       const pos=host.salieron.indexOf(i);
       if(pos>=0)host.salieron.splice(pos,1);else host.salieron.push(i);
@@ -535,7 +740,7 @@ $("siguiente").addEventListener("click",()=>{
   host.salieron.push(quedan[Math.floor(azar()*quedan.length)]);guardar("bm.host",host);pintarHost(true);
 });
 $("deshacer").addEventListener("click",()=>{host.salieron.pop();guardar("bm.host",host);pintarHost(false)});
-confirmable($("nuevaPartida"),()=>{irA("pArmar")});
+confirmable($("nuevaPartida"),()=>{infoLista();irA("pArmar")});
 
 /* ---------- verificar ---------- */
 function verificar(){
@@ -552,7 +757,7 @@ function verificar(){
   const cel=g.children;e.llenas.flat().forEach(k=>cel[k].classList.add("lineaok"));
   const faltan=carton.filter(i=>i>=0&&!set.has(i));
   const det=document.createElement("p");det.className="sub";
-  det.textContent=(faltan.length?`Le faltan ${faltan.length}.`:"Sonaron todos sus temas.")+` · Van ${host.salieron.length} temas. En verde lo que ya sonó.`;
+  det.textContent=(faltan.length?`Le faltan ${faltan.length}.`:"Sonaron todos sus temas.")+` · Van ${host.salieron.length} temas. En verde lo que ya sonó. Si su cartón no coincide con el de su celu, está en otra ronda.`;
   res.append(v,c,det);
 }
 $("abrirVerif").addEventListener("click",()=>{$("verifRes").innerHTML="";$("verifCod").value="";irA("pVerif");$("verifCod").focus()});
@@ -561,10 +766,12 @@ $("verifCod").addEventListener("keydown",e=>{if(e.key==="Enter")verificar()});
 $("volverHost").addEventListener("click",()=>{pintarHost(false);irA("pHost")});
 
 /* ---------- jugador ---------- */
-let jug=null,mio=null; // jug: partida del link; mio: {id,cod,marcas[]}
-function cartonNuevo(cod){mio={id:jug.p.id,pk:jug.pk,cod:cod||codigoNuevo(),marcas:[]};guardar("bm.carton",mio)}
+let jug=null,mio=null; // jug: {pk,todos,p}; mio: {pk,ronda,cod,marcas[]}
+function cartonNuevo(cod){mio={pk:jug.pk,ronda:jug.p.id,cod:cod||codigoNuevo(),marcas:[]};guardar("bm.carton",mio)}
 function pintarMio(){
   const p=jug.p,carton=generarCarton(p,mio.cod),marcas=new Set(mio.marcas);
+  $("miRonda").innerHTML=`Ronda <b>${esc(p.id)}</b> · ${p.titulos.length} temas · <a href="#" id="otraRonda">¿empezó otra ronda?</a>`;
+  $("otraRonda").addEventListener("click",e=>{e.preventDefault();pedirRonda()});
   dibujarCarton($("miCarton"),p,mio.cod,carton,{
     marcado:i=>marcas.has(i),
     alTocar:(i,d)=>{if(marcas.has(i))marcas.delete(i);else marcas.add(i);mio.marcas=[...marcas];guardar("bm.carton",mio);d.classList.toggle("marca",marcas.has(i));avisar(p,carton,marcas)}
@@ -586,26 +793,45 @@ function cargar(){
 }
 $("cargarBtn").addEventListener("click",cargar);
 $("cargarCod").addEventListener("keydown",e=>{if(e.key==="Enter")cargar()});
-async function abrirJugador(pk){
-  try{jug={pk,p:await desempaquetar(pk)}}
+function entrarRonda(cod){
+  const p=rondaDe(jug.todos,cod);if(!p)return false;
+  jug.p=p;
+  const g=leer("bm.carton",null);
+  if(g&&g.pk===jug.pk&&g.ronda===cod&&codigoValido(g.cod))mio=g;else cartonNuevo();
+  history.replaceState(null,"","#p="+jug.pk+"&r="+cod);
+  pintarMio();irA("pCarton");return true;
+}
+function pedirRonda(){
+  $("rondaLista").textContent=`Lista ${huella(jug.todos)} · ${jug.todos.length} temas`;
+  $("rondaIn").value="";$("rondaErr").textContent="";irA("pRonda");$("rondaIn").focus();
+}
+function rondaIngresada(){
+  const cod=normalizar($("rondaIn").value);$("rondaIn").value=cod;
+  if(!entrarRonda(cod))$("rondaErr").textContent="Ese código no es de esta lista. Fijate bien o pedile al anfitrión que te lo repita.";
+}
+$("rondaBtn").addEventListener("click",rondaIngresada);
+$("rondaIn").addEventListener("keydown",e=>{if(e.key==="Enter")rondaIngresada()});
+async function abrirJugador(pk,ronda){
+  try{jug={pk,todos:await desempaquetar(pk),p:null}}
   catch(e){$("rotoMsg").textContent=("DecompressionStream" in window)?"No se pudo leer la partida. Pedile al anfitrión que te pase el QR de nuevo.":"Tu navegador es muy viejo para abrir este link. Probá con Chrome o actualizá el celu.";irA("pRoto");return}
-  const guardado=leer("bm.carton",null);
-  if(guardado&&guardado.id===jug.p.id&&codigoValido(guardado.cod))mio=guardado;else cartonNuevo();
-  if(location.hash.slice(3)!==pk)history.replaceState(null,"","#p="+pk);
-  pintarMio();irA("pCarton");
+  if(ronda&&entrarRonda(ronda))return;
+  const g=leer("bm.carton",null);
+  if(!ronda&&g&&g.pk===pk&&g.ronda&&entrarRonda(g.ronda))return;
+  pedirRonda();
 }
 
 /* ---------- arranque ---------- */
 $("irArmar").addEventListener("click",()=>{infoLista();irA("pArmar")});
 $("irSeguir").addEventListener("click",()=>{pintarHost(false);irA("pHost");pintarQR()});
-$("irMio").addEventListener("click",()=>{const m=leer("bm.carton",null);if(m&&m.pk)abrirJugador(m.pk)});
+$("irMio").addEventListener("click",()=>{const m=leer("bm.carton",null);if(m&&m.pk)abrirJugador(m.pk,m.ronda)});
+const leerHash=()=>location.hash.match(/^#p=([zt][A-Za-z0-9_-]+)(?:&r=([A-Za-z0-9]{4}))?$/);
 (function(){
-  if(host&&host.p){$("irSeguir").hidden=false;$("seguirInfo").textContent=`Partida ${host.p.id} · ${host.p.titulos.length} temas · sonaron ${host.salieron.length}`}
-  const m=leer("bm.carton",null);if(m&&m.pk)$("irMio").hidden=false;
-  const h=location.hash.match(/^#p=([zt][A-Za-z0-9_-]+)$/);
-  if(h)abrirJugador(h[1]);
+  if(host&&host.p){$("irSeguir").hidden=false;$("seguirInfo").textContent=`Ronda ${host.ronda} · ${host.p.titulos.length} temas · sonaron ${host.salieron.length}`}
+  const m=leer("bm.carton",null);if(m&&m.pk&&m.ronda)$("irMio").hidden=false;
+  const h=leerHash();
+  if(h)abrirJugador(h[1],h[2]&&normalizar(h[2]));
 })();
-window.addEventListener("hashchange",()=>{const h=location.hash.match(/^#p=([zt][A-Za-z0-9_-]+)$/);if(h&&(!jug||jug.pk!==h[1]))abrirJugador(h[1])});
+window.addEventListener("hashchange",()=>{const h=leerHash();if(h&&(!jug||jug.pk!==h[1]||(h[2]&&(!jug.p||jug.p.id!==normalizar(h[2])))))abrirJugador(h[1],h[2]&&normalizar(h[2]))});
 </script>
 <script>if("serviceWorker" in navigator)navigator.serviceWorker.register("../../sw.js",{scope:"../../"});</script>
 </body>
