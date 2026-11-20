@@ -6,7 +6,7 @@
   "max": 20,
   "edad": "6+",
   "propio": true,
-  "descripcion": "Por equipos, con un solo celu. La ruleta decide si la consigna se muestra dibujando, con mímica o tarareando. Si tu equipo no adivina a tiempo, los demás pueden robar el punto.",
+  "descripcion": "Por equipos, con un solo celu. La ruleta decide si la consigna se muestra dibujando, con mímica o tarareando. Elegís la dificultad al empezar. Si tu equipo no adivina a tiempo, los demás pueden robar el punto.",
   "url": "juegos/mostralo/",
   "icono": "🎭",
   "colores": [
@@ -14,6 +14,22 @@
    "#7b4dff"
   ],
   "lema": "Dibujo, mímica o tarareo: lo decide la ruleta"
+ },
+ {
+  "nombre": "Mostralo como puedas +18",
+  "tipo": "Dibujar",
+  "min": 4,
+  "max": 20,
+  "edad": "18+",
+  "propio": true,
+  "descripcion": "La misma ruleta de dibujo, mímica o tarareo, con consignas picantes y de doble sentido para la previa. Solo si todos en la ronda son mayores de 18.",
+  "url": "juegos/mostralo/?adultos=1",
+  "icono": "🌶️",
+  "colores": [
+   "#e8413b",
+   "#2d0b2e"
+  ],
+  "lema": "Lo mismo, pero sin filtro"
  },
  {
   "nombre": "skribbl.io",
