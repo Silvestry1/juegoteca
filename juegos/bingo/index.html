@@ -74,6 +74,9 @@ a.volver{color:var(--sub);text-align:center;font-size:.9rem}
 .veredicto.si{color:var(--ok)}
 .veredicto.no{color:var(--mal)}
 </style>
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
 </head>
 <body>
 
@@ -356,5 +359,6 @@ if(modo==="carton")$("irCarton").click();
 else if(modo==="bolillero")$("irBolillero").click();
 if("speechSynthesis" in window)speechSynthesis.getVoices();
 </script>
+<script>if("serviceWorker" in navigator)navigator.serviceWorker.register("../../sw.js",{scope:"../../"});</script>
 </body>
 </html>

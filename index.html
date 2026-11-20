@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Juegoteca</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#120e1c">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Juegoteca">
 <style>
 :root{--bg:#120e1c;--estante:#2a1d14;--txt:#f5f1ff;--sub:#b3abcc;--acc:#ffc23d;--chip:#2c2540}
 *{box-sizing:border-box}
@@ -55,13 +63,32 @@ dialog .acciones{display:flex;gap:8px;margin-top:12px}
 dialog .acciones>*{flex:1;border:0;border-radius:10px;padding:12px;font-weight:700;font-size:1rem;text-decoration:none}
 dialog a{background:#111;color:var(--acc)}
 dialog button{background:#e8e3f5;color:#111}
+.botones{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.botones .btnqr{margin-top:0}
+.btninst{background:var(--chip);color:var(--txt)}
+.aviso{margin:8px auto 0;max-width:520px;background:#3a1b1b;color:#ffd6d6;border-radius:10px;padding:8px 12px;font-size:.88rem;display:none}
+body.offline .aviso{display:block}
+.caja.sinred .frente{filter:grayscale(.85) brightness(.7)}
+.sinred-tag{position:relative;align-self:flex-start;margin-bottom:5px;background:#e8413b;color:#fff;font-size:.6rem;font-weight:900;padding:2px 7px;border-radius:4px;letter-spacing:1px;text-transform:uppercase}
+.dorso a.off{background:#bbb;color:#444;pointer-events:none}
+#ayuda{max-width:420px;text-align:left}
+#ayuda h2{margin:0 0 8px;font-size:1.2rem;text-align:center}
+#ayuda h3{margin:14px 0 4px;font-size:1rem}
+#ayuda ol{margin:0;padding-left:20px;line-height:1.45;font-size:.92rem}
+#ayuda p{font-size:.85rem;color:#555;margin:12px 0 0}
+dialog .acciones button.prim{background:#111;color:var(--acc)}
+@media (display-mode: standalone),(display-mode: fullscreen){.btninst{display:none}}
 </style>
 </head>
 <body>
 <header>
   <div class="cartel"><h1>🎬 Juegoteca</h1></div>
   <p>Elegí una caja, dala vuelta y a jugar</p>
-  <button class="btnqr" id="abrirQR">📱 Mostrar QR</button>
+  <div class="botones">
+    <button class="btnqr" id="abrirQR">📱 Mostrar QR</button>
+    <button class="btnqr btninst" id="abrirAyuda">📲 Instalar</button>
+  </div>
+  <div class="aviso" id="aviso">Sin conexión: los juegos <b>Hecho en casa</b> andan igual. Los demás necesitan internet.</div>
 </header>
 <div class="filtros" id="filtros"></div>
 <div class="cant"><label for="n">Somos</label><input id="n" type="number" min="1" inputmode="numeric" placeholder="—"><span>personas</span></div>
@@ -73,6 +100,27 @@ dialog button{background:#e8e3f5;color:#111}
   <div class="acciones">
     <a href="qr-juegoteca.png" download="qr-juegoteca.png">⬇️ Descargar</a>
     <button id="cerrarQR">Cerrar</button>
+  </div>
+</dialog>
+
+<dialog id="ayuda">
+  <h2>📲 Instalar la Juegoteca</h2>
+  <h3>Android (Chrome)</h3>
+  <ol>
+    <li>Tocá el menú <b>⋮</b> arriba a la derecha.</li>
+    <li>Elegí <b>Instalar aplicación</b> o <b>Agregar a pantalla principal</b>.</li>
+    <li>Confirmá. Queda el ícono del dado en el inicio.</li>
+  </ol>
+  <h3>iPhone (Safari)</h3>
+  <ol>
+    <li>Abrí la Juegoteca en <b>Safari</b> (es donde siempre funciona).</li>
+    <li>Tocá <b>Compartir</b> (el cuadrado con la flecha para arriba).</li>
+    <li>Bajá y elegí <b>Agregar a inicio</b>. Tocá <b>Agregar</b>.</li>
+  </ol>
+  <p>Con abrir la Juegoteca una vez con internet, los juegos <b>Hecho en casa</b> quedan guardados y después andan sin conexión. Los cambios nuevos se bajan solos cuando vuelve la señal.</p>
+  <div class="acciones">
+    <button id="instalarYa" class="prim" hidden>Instalar ahora</button>
+    <button id="cerrarAyuda">Cerrar</button>
   </div>
 </dialog>
 
@@ -104,20 +152,21 @@ function pinta(){
   $("#lista").innerHTML=vis.map(g=>{
     const [c1,c2]=g.colores||["#444","#111"];const c=calif(g);
     const ilus=g.imagen?`<img src="${esc(g.imagen)}" alt="" style="width:100%;height:100%;object-fit:cover">`:`<div>${esc(g.icono||"🎲")}</div>`;
-    return `<article class="caja" tabindex="0" aria-label="${esc(g.nombre)}">
+    const off=!g.propio&&!navigator.onLine;
+    return `<article class="caja${off?" sinred":""}" tabindex="0" aria-label="${esc(g.nombre)}">
       <div class="giro">
         <div class="cara frente" style="background:linear-gradient(160deg,${esc(c1)},${esc(c2)})">
           <div class="lomo"><span>JUEGOTECA</span></div>
           <div class="top"><div class="calif ${clsCalif(c)}">${c}</div><div class="jug">👥 ${jugadores(g)}</div></div>
           <div class="ilus">${ilus}</div>
-          ${g.propio?'<div class="casa">★ Hecho en casa</div>':""}<div class="titulo">${esc(g.nombre)}</div>
+          ${g.propio?'<div class="casa">★ Hecho en casa</div>':off?'<div class="sinred-tag">Requiere internet</div>':""}<div class="titulo">${esc(g.nombre)}</div>
           <div class="lema">${esc(g.lema||g.tipo)}</div>
         </div>
         <div class="cara dorso">
           <h2>${esc(g.nombre)}</h2>
           <div class="ficha"><span>${esc(g.tipo)}</span><span>👥 ${jugadores(g)}</span><span>${c==="VAR"?"Edad: varía":"Edad "+esc(g.edad)}</span></div>
           <p>${esc(g.descripcion)}</p>
-          <a href="${esc(g.url)}"${g.propio?"":' target="_blank" rel="noopener"'}>▶ JUGAR</a>
+          ${off?'<a class="off" aria-disabled="true">📡 REQUIERE INTERNET</a>':`<a href="${esc(g.url)}"${g.propio?"":' target="_blank" rel="noopener"'}>▶ JUGAR</a>`}
           <small>Tocá para dar vuelta</small>
         </div>
       </div>
@@ -133,6 +182,18 @@ $("#lista").addEventListener("keydown",e=>{
 $("#abrirQR").onclick=()=>$("#qr").showModal();
 $("#cerrarQR").onclick=()=>$("#qr").close();
 $("#qr").addEventListener("click",e=>{if(e.target.id==="qr")$("#qr").close();});
+// Sin conexión
+function red(){document.body.classList.toggle("offline",!navigator.onLine);if(juegos.length)pinta();}
+addEventListener("online",red);addEventListener("offline",red);red();
+// Instalación
+let pedido=null;
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();pedido=e;$("#instalarYa").hidden=false;});
+addEventListener("appinstalled",()=>{pedido=null;$("#instalarYa").hidden=true;$("#ayuda").close();});
+$("#abrirAyuda").onclick=()=>$("#ayuda").showModal();
+$("#cerrarAyuda").onclick=()=>$("#ayuda").close();
+$("#ayuda").addEventListener("click",e=>{if(e.target.id==="ayuda")$("#ayuda").close();});
+$("#instalarYa").onclick=async()=>{if(!pedido)return;pedido.prompt();await pedido.userChoice;pedido=null;$("#instalarYa").hidden=true;};
+if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 fetch("juegos.json",{cache:"no-store"}).then(r=>r.json()).then(d=>{
   juegos=d;
   const tipos=["Todos",...new Set(d.map(g=>g.tipo))];

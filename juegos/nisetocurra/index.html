@@ -87,6 +87,9 @@ a.volver{color:var(--sub);text-align:center;font-size:.9rem}
 .quien button.on{background:var(--acc);color:var(--neg)}
 .podio{font-size:4rem;text-align:center}
 </style>
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
 </head>
 <body>
 
@@ -724,5 +727,6 @@ function inicio(){
 }
 inicio();
 </script>
+<script>if("serviceWorker" in navigator)navigator.serviceWorker.register("../../sw.js",{scope:"../../"});</script>
 </body>
 </html>
