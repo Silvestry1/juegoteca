@@ -87,6 +87,9 @@ a.volver{color:var(--sub);text-align:center;font-size:1rem;padding:6px}
 .hist li .r{font-weight:900;color:var(--acc);font-size:1rem;flex:none}
 .hist .nada{color:var(--sub);text-align:center;background:none}
 </style>
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -369,5 +372,6 @@ document.addEventListener("keydown",e=>{
 ponerModo(modo==="rol"?"rol":"simple");
 pintaSimple(false);pintaRol(false);pintaHist();
 </script>
+<script>if("serviceWorker" in navigator)navigator.serviceWorker.register("../../sw.js",{scope:"../../"});</script>
 </body>
 </html>

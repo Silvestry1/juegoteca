@@ -58,6 +58,9 @@ a.volver{color:var(--sub);text-align:center;font-size:.9rem}
 .gano{color:var(--ok)}.perdio{color:var(--mal)}
 .oculto{display:none!important}
 </style>
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
 </head>
 <body>
 <main>
@@ -339,5 +342,6 @@ function setModo(m){
 $("#tabLibre").onclick=()=>setModo("libre");$("#tabCasino").onclick=()=>setModo("casino");
 setModo(new URLSearchParams(location.search).get("modo")==="casino"?"casino":"libre");
 </script>
+<script>if("serviceWorker" in navigator)navigator.serviceWorker.register("../../sw.js",{scope:"../../"});</script>
 </body>
 </html>
