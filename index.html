@@ -17,7 +17,7 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 header{padding:20px 16px 6px;text-align:center;position:relative}
-.cartel{display:inline-block;padding:6px 18px;border:3px solid var(--acc);border-radius:10px;box-shadow:0 0 18px #ffc23d66,inset 0 0 12px #ffc23d33}
+.cartel{display:inline-block;text-decoration:none;padding:6px 18px;border:3px solid var(--acc);border-radius:10px;box-shadow:0 0 18px #ffc23d66,inset 0 0 12px #ffc23d33}
 h1{margin:0;font-size:2.1rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc);text-shadow:0 0 10px #ffc23d88}
 header p{margin:8px 0 0;color:var(--sub)}
 .btnqr{margin-top:12px;border:0;border-radius:999px;padding:10px 18px;background:var(--acc);color:#1b1400;font-weight:700;font-size:1rem}
@@ -77,12 +77,34 @@ body.offline .aviso{display:block}
 #ayuda ol{margin:0;padding-left:20px;line-height:1.45;font-size:.92rem}
 #ayuda p{font-size:.85rem;color:#555;margin:12px 0 0}
 dialog .acciones button.prim{background:#111;color:var(--acc)}
+/* caja + y juegos locales */
+.caja.nueva{cursor:pointer}
+.caja.nueva .cara{background:rgba(255,255,255,.05);border:2px dashed #ffc23d88;box-shadow:none;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--sub);text-align:center;padding:10px}
+.caja.nueva .cara b{font-size:4rem;line-height:1;color:var(--acc);font-weight:300}
+.caja.nueva .cara span{font-weight:800;text-transform:uppercase;letter-spacing:1px;font-size:.85rem;color:var(--txt)}
+.caja.nueva .cara small{font-size:.7rem}
+.caja.nueva:active .cara{background:rgba(255,194,61,.12)}
+.loc-tag{position:relative;align-self:flex-start;margin-bottom:5px;background:#e8e3f5;color:#1b1400;font-size:.6rem;font-weight:900;padding:2px 7px;border-radius:4px;letter-spacing:1px;text-transform:uppercase}
+.dorso .extra{display:flex;gap:6px}
+.dorso .extra button{flex:1;border:0;border-radius:6px;padding:7px 4px;font-size:.72rem;font-weight:700;background:#ddd6c4;color:#222}
+#agregar{max-width:420px;text-align:left;max-height:calc(100dvh - 32px);overflow:auto}
+#agregar h2{margin:0 0 10px;text-align:center;font-size:1.2rem}
+.pestanas{display:flex;gap:6px;margin-bottom:12px}
+.pestanas button{flex:1;border:0;border-radius:10px;padding:10px;font-weight:700;background:#eee9f7;color:#333;font-size:.95rem}
+.pestanas button.on{background:#111;color:var(--acc)}
+#agregar label{display:block;font-size:.8rem;font-weight:700;color:#444;margin:10px 0 4px}
+#agregar input,#agregar select,#agregar textarea{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:1rem;font-family:inherit;background:#fff;color:#111}
+#agregar textarea{min-height:64px;resize:vertical}
+#agregar .fila{display:flex;gap:8px}#agregar .fila>div{flex:1}
+#agregar .nota{font-size:.78rem;color:#666;margin:8px 0 0;line-height:1.35}
+#agregar .error{color:#b3261e;font-size:.85rem;font-weight:700;margin-top:8px}
 @media (display-mode: standalone),(display-mode: fullscreen){.btninst{display:none}}
 </style>
 </head>
 <body>
 <header>
-  <div class="cartel"><h1>🎬 Juegoteca</h1></div>
+  <a class="cartel" href="./" title="Volver al inicio"><h1>🎬 Juegoteca</h1></a>
   <p>Elegí una caja, dala vuelta y a jugar</p>
   <div class="botones">
     <button class="btnqr" id="abrirQR">📱 Mostrar QR</button>
@@ -93,7 +115,7 @@ dialog .acciones button.prim{background:#111;color:var(--acc)}
 <div class="filtros" id="filtros"></div>
 <div class="cant"><label for="n">Somos</label><input id="n" type="number" min="1" inputmode="numeric" placeholder="—"><span>personas</span></div>
 <main id="lista"></main>
-<footer>Para agregar un juego, editá <code>juegos.json</code> en GitHub.</footer>
+<footer>Los juegos que agregás con <b>+</b> quedan guardados solo en este celu.</footer>
 
 <dialog id="qr">
   <img src="qr-juegoteca.png" alt="Código QR de la Juegoteca" width="592" height="812">
@@ -101,6 +123,41 @@ dialog .acciones button.prim{background:#111;color:var(--acc)}
     <a href="qr-juegoteca.png" download="qr-juegoteca.png">⬇️ Descargar</a>
     <button id="cerrarQR">Cerrar</button>
   </div>
+</dialog>
+
+<dialog id="agregar">
+  <h2>➕ Agregar un juego</h2>
+  <div class="pestanas"><button type="button" data-p="link" class="on">🔗 Pegar link</button><button type="button" data-p="archivos">📁 Subir archivos</button></div>
+  <form id="formAgregar" novalidate>
+    <div data-panel="link">
+      <label for="aUrl">Link del juego</label>
+      <input id="aUrl" type="url" inputmode="url" placeholder="https://..." autocomplete="off">
+    </div>
+    <div data-panel="archivos" hidden>
+      <label for="aArch">Archivos del juego (.html y, si tiene, sus .js, .css e imágenes)</label>
+      <input id="aArch" type="file" multiple accept=".html,.htm,.js,.mjs,.css,.json,.txt,image/*,audio/*,video/*,font/*,.woff,.woff2,.ttf">
+      <p class="nota">Elegí todos juntos. Se unen en un solo juego y quedan guardados en este celu, así que andan sin internet.</p>
+    </div>
+    <label for="aNombre">Nombre</label>
+    <input id="aNombre" required maxlength="40" placeholder="Cómo se llama">
+    <div class="fila">
+      <div><label for="aTipo">Tipo</label><input id="aTipo" list="tiposLista" placeholder="Ej.: Palabras"><datalist id="tiposLista"></datalist></div>
+      <div><label for="aIcono">Ícono</label><input id="aIcono" maxlength="4" value="🎮"></div>
+    </div>
+    <div class="fila">
+      <div><label for="aMin">Mín. jug.</label><input id="aMin" type="number" min="1" inputmode="numeric"></div>
+      <div><label for="aMax">Máx. jug.</label><input id="aMax" type="number" min="1" inputmode="numeric"></div>
+      <div><label for="aEdad">Edad</label><select id="aEdad"><option>ATP</option><option>+13</option><option>+16</option><option>+18</option></select></div>
+    </div>
+    <label for="aDesc">Cómo se juega</label>
+    <textarea id="aDesc" maxlength="300" placeholder="Una o dos líneas"></textarea>
+    <div class="error" id="aError" hidden></div>
+    <p class="nota">Queda solo en este celu. Para que lo vean todos, después tocá <b>📋 Copiar ficha</b> en la caja y pasásela al dueño de la Juegoteca.</p>
+    <div class="acciones">
+      <button type="submit" class="prim" id="aGuardar">Agregar</button>
+      <button type="button" id="cerrarAgregar">Cancelar</button>
+    </div>
+  </form>
 </dialog>
 
 <dialog id="ayuda">
@@ -124,6 +181,7 @@ dialog .acciones button.prim{background:#111;color:var(--acc)}
   </div>
 </dialog>
 
+<script src="locales.js"></script>
 <script>
 let juegos=[],tipo="Todos";
 const $=s=>document.querySelector(s);
@@ -147,7 +205,8 @@ function calif(g){
 function clsCalif(c){return c==="+13"?"mas":c==="+16"?"mas16":c==="+18"?"mas18":""}
 function pinta(){
   const n=parseInt($("#n").value);
-  const vis=juegos.filter(g=>(tipo==="Todos"||g.tipo===tipo)&&
+  const todos=juegos.concat(Locales.lista());
+  const vis=todos.filter(g=>(tipo==="Todos"||g.tipo===tipo)&&
     (!n||((g.min==null||n>=g.min)&&(g.max==null||n<=g.max))));
   $("#lista").innerHTML=vis.map(g=>{
     const [c1,c2]=g.colores||["#444","#111"];const c=calif(g);
@@ -159,7 +218,7 @@ function pinta(){
           <div class="lomo"><span>JUEGOTECA</span></div>
           <div class="top"><div class="calif ${clsCalif(c)}">${c}</div><div class="jug">👥 ${jugadores(g)}</div></div>
           <div class="ilus">${ilus}</div>
-          ${g.propio?'<div class="casa">★ Hecho en casa</div>':off?'<div class="sinred-tag">Requiere internet</div>':""}<div class="titulo">${esc(g.nombre)}</div>
+          ${g.local?'<div class="loc-tag">📲 En este celu</div>':g.propio?'<div class="casa">★ Hecho en casa</div>':off?'<div class="sinred-tag">Requiere internet</div>':""}<div class="titulo">${esc(g.nombre)}</div>
           <div class="lema">${esc(g.lema||g.tipo)}</div>
         </div>
         <div class="cara dorso">
@@ -167,16 +226,29 @@ function pinta(){
           <div class="ficha"><span>${esc(g.tipo)}</span><span>👥 ${jugadores(g)}</span><span>${c==="VAR"?"Edad: varía":"Edad "+esc(g.edad)}</span></div>
           <p>${esc(g.descripcion)}</p>
           ${off?'<a class="off" aria-disabled="true">📡 REQUIERE INTERNET</a>':`<a href="${esc(g.url)}"${g.propio?"":' target="_blank" rel="noopener"'}>▶ JUGAR</a>`}
+          ${g.local?`<div class="extra">${g.url.startsWith("jugar.html")?"":`<button type="button" data-copiar="${esc(g.id)}">📋 Copiar ficha</button>`}<button type="button" data-quitar="${esc(g.id)}">🗑 Quitar</button></div>`:""}
           <small>Tocá para dar vuelta</small>
         </div>
       </div>
-    </article>`}).join("")||"<p class='vacio'>No hay juegos para ese filtro.</p>";
+    </article>`}).join("")+`<article class="caja nueva" tabindex="0" role="button" aria-label="Agregar un juego" id="cajaMas">
+      <div class="giro"><div class="cara"><b>+</b><span>Agregar juego</span><small>Pegá un link o subí los archivos</small></div></div>
+    </article>`;
 }
-$("#lista").addEventListener("click",e=>{
+$("#lista").addEventListener("click",async e=>{
   if(e.target.closest("a"))return;
+  if(e.target.closest("#cajaMas")){abrirAgregar();return;}
+  const q=e.target.closest("[data-quitar]");
+  if(q){const j=Locales.lista().find(x=>x.id===q.dataset.quitar);
+    if(j&&confirm(`¿Quitar "${j.nombre}" de este celu?`)){await Locales.quitar(j.id);pinta();}return;}
+  const cp=e.target.closest("[data-copiar]");
+  if(cp){const j=Locales.lista().find(x=>x.id===cp.dataset.copiar);if(!j)return;
+    const {id,local,...ficha}=j;const txt=JSON.stringify(ficha,null,2);
+    try{await navigator.clipboard.writeText(txt);cp.textContent="✔ Copiada";}catch{prompt("Copiá la ficha:",txt);}
+    return;}
   const c=e.target.closest(".caja"); if(c) c.classList.toggle("vuelta");
 });
 $("#lista").addEventListener("keydown",e=>{
+  if((e.key==="Enter"||e.key===" ")&&e.target.id==="cajaMas"){e.preventDefault();abrirAgregar();return;}
   if((e.key==="Enter"||e.key===" ")&&e.target.classList.contains("caja")){e.preventDefault();e.target.classList.toggle("vuelta");}
 });
 $("#abrirQR").onclick=()=>$("#qr").showModal();
@@ -193,6 +265,46 @@ $("#abrirAyuda").onclick=()=>$("#ayuda").showModal();
 $("#cerrarAyuda").onclick=()=>$("#ayuda").close();
 $("#ayuda").addEventListener("click",e=>{if(e.target.id==="ayuda")$("#ayuda").close();});
 $("#instalarYa").onclick=async()=>{if(!pedido)return;pedido.prompt();await pedido.userChoice;pedido=null;$("#instalarYa").hidden=true;};
+// Agregar juegos
+let modoAgregar="link";
+const COLORES=[["#ff6b6b","#ffd93d"],["#6c5ce7","#00cec9"],["#0984e3","#2d3436"],["#e17055","#fdcb6e"],["#218c74","#1e272e"],["#8e44ad","#f39c12"],["#eb4d4b","#f0932b"],["#1e3799","#38ada9"]];
+function pestana(p){modoAgregar=p;
+  document.querySelectorAll("#agregar .pestanas button").forEach(b=>b.classList.toggle("on",b.dataset.p===p));
+  document.querySelectorAll("#agregar [data-panel]").forEach(d=>d.hidden=d.dataset.panel!==p);
+  $("#aError").hidden=true;}
+function abrirAgregar(){
+  $("#formAgregar").reset();$("#aIcono").value="🎮";pestana("link");
+  $("#tiposLista").innerHTML=[...new Set(juegos.concat(Locales.lista()).map(g=>g.tipo))].map(t=>`<option value="${esc(t)}">`).join("");
+  $("#agregar").showModal();}
+document.querySelector("#agregar .pestanas").onclick=e=>{const p=e.target.closest("button")?.dataset.p;if(p)pestana(p);};
+$("#cerrarAgregar").onclick=()=>$("#agregar").close();
+$("#aArch").onchange=()=>{const h=[...$("#aArch").files].find(f=>/\.html?$/i.test(f.name));
+  if(h&&!/^index\./i.test(h.name)&&!$("#aNombre").value)$("#aNombre").value=h.name.replace(/\.html?$/i,"").replace(/[-_]+/g," ").slice(0,40);};
+function error(t){$("#aError").textContent=t;$("#aError").hidden=false;}
+$("#formAgregar").onsubmit=async e=>{
+  e.preventDefault();$("#aError").hidden=true;
+  const nombre=$("#aNombre").value.trim();
+  const ed=$("#aEdad").value;const min=parseInt($("#aMin").value),max=parseInt($("#aMax").value);
+  const juego={nombre,tipo:$("#aTipo").value.trim()||"Otros",min:isNaN(min)?null:min,max:isNaN(max)?null:max,
+    edad:ed==="ATP"?"ATP":ed.slice(1)+"+",calificacion:ed,descripcion:$("#aDesc").value.trim()||"Juego agregado desde este celu.",
+    icono:$("#aIcono").value.trim()||"🎮",colores:COLORES[Math.floor(Math.random()*COLORES.length)],lema:"Agregado por la casa"};
+  try{
+    let html=null;
+    if(modoAgregar==="link"){
+      let u=$("#aUrl").value.trim();if(u&&!/^https?:\/\//i.test(u))u="https://"+u;
+      try{const x=new URL(u);if(!/^https?:$/.test(x.protocol)||!x.hostname.includes("."))throw 0;juego.url=x.href;}catch{return error("Pegá un link válido (https://...).");}
+      if(!nombre)juego.nombre=new URL(juego.url).hostname.replace(/^www\./,"");
+    }else{
+      const fs=$("#aArch").files;if(!fs.length)return error("Elegí los archivos del juego.");
+      $("#aGuardar").disabled=true;$("#aGuardar").textContent="Guardando…";
+      const p=await Locales.empaquetar(fs);html=p.html;if(!nombre)juego.nombre=p.titulo.slice(0,40)||"Juego nuevo";
+    }
+    await Locales.agregar(juego,html);
+    $("#agregar").close();pinta();
+    setTimeout(()=>document.getElementById("cajaMas")?.scrollIntoView({behavior:"smooth",block:"center"}),50);
+  }catch(err){error(err.message||"No se pudo guardar el juego.");}
+  finally{$("#aGuardar").disabled=false;$("#aGuardar").textContent="Agregar";}
+};
 if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 fetch("juegos.json",{cache:"no-store"}).then(r=>r.json()).then(d=>{
   juegos=d;

@@ -833,6 +833,7 @@ const leerHash=()=>location.hash.match(/^#p=([zt][A-Za-z0-9_-]+)(?:&r=([A-Za-z0-
 })();
 window.addEventListener("hashchange",()=>{const h=leerHash();if(h&&(!jug||jug.pk!==h[1]||(h[2]&&(!jug.p||jug.p.id!==normalizar(h[2])))))abrirJugador(h[1],h[2]&&normalizar(h[2]))});
 </script>
+<script src="../../inicio.js"></script>
 <script>if("serviceWorker" in navigator)navigator.serviceWorker.register("../../sw.js",{scope:"../../"});</script>
 </body>
 </html>
