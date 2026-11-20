@@ -33,3 +33,4 @@ Si no sabés la cantidad de jugadores, poné `null` en `min` o `max`.
 Viven en `juegos/<nombre>/` y se juegan con un solo celular, sin servidor. En `juegos.json` llevan `"propio": true` (abren en la misma pestaña y muestran la etiqueta "Hecho en casa").
 
 - `juegos/mostralo/`: **Mostralo como puedas**. Dibujo, mímica o tarareo por equipos; las consignas están en el objeto `MAZO` del `index.html`.
+- `juegos/dados/`: **Dados**. Lanzador de dados (d4 a d100 o caras a elección), con modificador, dados fijos e historial guardado en el celular. Categoría "Herramientas".
