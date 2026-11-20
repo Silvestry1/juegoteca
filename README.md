@@ -34,4 +34,4 @@ Viven en `juegos/<nombre>/` y se juegan con un solo celular, sin servidor. En `j
 
 - `juegos/mostralo/`: **Mostralo como puedas**. Dibujo, mímica o tarareo por equipos; las consignas están en el objeto `MAZO` del `index.html`.
 - `juegos/dados/`: **Dados**. Lanzador de dados (d4 a d100 o caras a elección), con modificador, dados fijos e historial guardado en el celular. Categoría "Herramientas".
-- `juegos/nisetocurra/`: **Ni se te ocurra**. Palabras prohibidas por equipos, con dificultad Normal/Difícil/Brutal (4, 5 o 6 prohibidas) y mazo ATP, +18 o mezcla (`?adultos=1` arranca con el mazo +18). Las cartas están en las constantes `ATP` y `ADULTO` del `index.html`, una por línea: `Palabra: prohibida1, ..., prohibida6`.
+- `juegos/nisetocurra/`: **Ni se te ocurra**. Palabras prohibidas por equipos, con dificultad Normal/Difícil/Brutal (4, 5 o 6 prohibidas) y mazo ATP, +18 o mezcla. Las cartas están en las constantes `ATP` y `ADULTO` del `index.html`, una por línea: `Palabra: prohibida1, ..., prohibida6`.
