@@ -31,6 +31,9 @@ button.sec{background:#ffffff14}
 button:disabled{opacity:.4}
 .chico{padding:8px 12px;font-size:.9rem}
 a.volver{color:var(--sub);text-align:center;font-size:.9rem}
+.nota{margin:0;font-size:.85rem;color:var(--sub)}
+.nivel{display:inline-block;margin-top:10px;font-size:.75rem;font-weight:800;padding:3px 8px;border-radius:6px;background:#1a1030;color:#fff8ec}
+.nivel.adu{background:#e8413b}
 .reglas{font-size:.92rem;color:var(--sub)}
 .reglas b{color:var(--txt)}
 .reglas ul{margin:6px 0 0;padding-left:18px}
@@ -105,6 +108,19 @@ a.volver{color:var(--sub);text-align:center;font-size:.9rem}
   </div>
 
   <div class="caja">
+    <h3>Dificultad</h3>
+    <div class="chips" id="dificultad">
+      <button data-d="f">Fácil</button><button data-d="d" class="on">Difícil</button><button data-d="fd">Mezcla</button>
+    </div>
+    <p class="nota">En Mezcla, las difíciles valen 2 puntos.</p>
+    <h3>Contenido</h3>
+    <div class="chips" id="contenido">
+      <button data-a="atp" class="on">Para todos</button><button data-a="adu">Solo +18</button><button data-a="mix">Mezcla</button>
+    </div>
+    <p class="nota" id="aviso18" style="display:none">🔞 Consignas picantes y de doble sentido. Solo si todos en la ronda son mayores de 18.</p>
+  </div>
+
+  <div class="caja">
     <h3>Dibujar en</h3>
     <div class="chips" id="soporte">
       <button data-s="pantalla" class="on">📱 La pantalla</button>
@@ -128,7 +144,7 @@ a.volver{color:var(--sub);text-align:center;font-size:.9rem}
     <ul>
       <li>Cada turno juega <b>una persona</b> de un equipo. Le pasan el celu y solo ella mira la consigna.</li>
       <li>La ruleta dice cómo mostrarla: <b class="dib">dibujando</b> (sin letras ni números), con <b class="mim">mímica</b> (sin hablar ni hacer ruido) o <b class="tar">tarareando</b> (sin letra: solo "na-na", "tu-ru" o silbando).</li>
-      <li>Si su equipo adivina antes de que se acabe el tiempo, suma 1 punto.</li>
+      <li>Si su equipo adivina antes de que se acabe el tiempo, suma el punto (2 si la consigna es difícil y se juega en Mezcla).</li>
       <li>Si se acaba el tiempo, los otros equipos tienen <b>un intento</b> cada uno para robar el punto.</li>
       <li>En cada turno pasa otra persona, para que todos jueguen.</li>
     </ul>
@@ -168,6 +184,7 @@ a.volver{color:var(--sub);text-align:center;font-size:.9rem}
       <div class="cat" id="cCat"></div>
       <div class="pal" id="cPal"></div>
       <div class="pista" id="cPista"></div>
+      <div class="nivel" id="cNivel"></div>
     </div>
     <p class="regla" id="cRegla"></p>
   </div>
@@ -292,16 +309,95 @@ tar:{nombre:"Tararear",icono:"🎵",color:"var(--tar)",hex:"#a78bfa",
  ]}
 };
 
+/* ===== Consignas difíciles (para todos) ===== */
+MAZO.dib.dificiles=[
+ ["Concepto","Gravedad"],["Concepto","Insomnio"],["Concepto","Nostalgia"],["Concepto","Democracia"],["Concepto","Contraseña"],["Concepto","Déjà vu"],
+ ["Concepto","Efecto dominó"],["Concepto","Eco"],["Concepto","Reciclaje"],["Concepto","Huso horario"],["Concepto","Fotosíntesis"],["Concepto","Evolución"],
+ ["Concepto","Inflación"],["Concepto","Celos"],["Concepto","Vértigo"],["Concepto","Mentira"],["Concepto","Libertad"],["Concepto","Cansancio"],
+ ["Concepto","Señal de wifi"],["Concepto","Embotellamiento"],["Concepto","Eclipse"],["Concepto","Agujero negro"],["Concepto","Big Bang"],["Concepto","ADN"],
+ ["Lugar","Obelisco"],["Lugar","Cataratas del Iguazú"],["Lugar","Glaciar Perito Moreno"],["Lugar","Torre Eiffel"],["Lugar","Catedral de La Plata"],
+ ["Lugar","Aeropuerto"],["Lugar","Hospital"],["Lugar","Biblioteca"],["Lugar","Cementerio"],["Lugar","Peaje"],
+ ["Animal","Ornitorrinco"],["Animal","Camaleón"],["Animal","Ciempiés"],["Animal","Medusa"],["Animal","Mantis religiosa"],["Animal","Ñandú"],["Animal","Yacaré"],
+ ["Cosa","Reloj de arena"],["Cosa","Microscopio"],["Cosa","Paracaídas"],["Cosa","Submarino"],["Cosa","Escalera mecánica"],["Cosa","Brújula"],
+ ["Cosa","Imán"],["Cosa","Hormiguero"],["Cosa","Tela de araña"],["Cosa","Molino de viento"],["Cosa","Enchufe"],["Cosa","Código QR"],["Cosa","Ajedrez"]
+];
+MAZO.mim.dificiles=[
+ ["Película","Titanic"],["Película","El Rey León"],["Película","Jurassic Park"],["Película","Volver al futuro"],["Película","Toy Story"],
+ ["Película","El Padrino"],["Película","Matrix"],["Película","Rocky"],["Película","Esperando la carroza"],["Película","Relatos salvajes"],
+ ["Película","Nueve reinas"],["Película","El secreto de sus ojos"],["Película","Buscando a Nemo"],["Película","E.T."],["Película","Shrek"],["Película","Avatar"],
+ ["Refrán","Más vale pájaro en mano que cien volando"],["Refrán","Al que madruga Dios lo ayuda"],["Refrán","En casa de herrero, cuchillo de palo"],
+ ["Refrán","Camarón que se duerme se lo lleva la corriente"],["Refrán","Perro que ladra no muerde"],["Refrán","Ojos que no ven, corazón que no siente"],
+ ["Refrán","A caballo regalado no se le miran los dientes"],["Refrán","El que se quema con leche ve una vaca y llora"],["Refrán","No hay mal que por bien no venga"],
+ ["Situación","Hacerse el dormido para no lavar los platos"],["Situación","Darte cuenta de que dejaste la hornalla prendida"],["Situación","Entrevista de trabajo"],
+ ["Situación","Atender un número desconocido"],["Situación","Rendir un final sin haber estudiado"],["Situación","Mudarse a un quinto piso sin ascensor"],
+ ["Situación","Se corta la luz en medio de una película"],["Situación","Trámite en la ventanilla equivocada"],["Situación","Pisar un Lego descalzo"],
+ ["Situación","Mandar un mensaje al grupo equivocado"],["Situación","Aterrizaje con turbulencia"],["Situación","Pedir el último pedazo de pizza"],
+ ["Oficio","Escribano"],["Oficio","Sommelier"],["Oficio","Controlador aéreo"],["Oficio","Apicultor"],["Oficio","Traductor simultáneo"],["Oficio","Domador de leones"]
+];
+MAZO.tar.dificiles=[
+ ["Clásica","Bolero","Ravel"],["Clásica","La primavera","Vivaldi, Las cuatro estaciones"],["Clásica","Habanera","Bizet, Carmen"],["Clásica","Marcha Radetzky","Strauss"],
+ ["Clásica","El Danubio azul","Strauss"],["Clásica","Quinta Sinfonía","Beethoven"],["Clásica","Pequeña serenata nocturna","Mozart"],["Clásica","Marcha turca","Mozart"],
+ ["Argentina","Alfonsina y el mar",""],["Argentina","Adiós Nonino","Astor Piazzolla"],["Argentina","Oblivion","Astor Piazzolla"],["Argentina","Balderrama",""],
+ ["Argentina","Crimen","Gustavo Cerati"],["Argentina","Cuando pase el temblor","Soda Stereo"],["Argentina","Flaca","Andrés Calamaro"],
+ ["Argentina","Demoliendo hoteles","Charly García"],["Argentina","Rezo por vos","Charly García"],["Argentina","Eiti Leda","Serú Girán"],
+ ["Argentina","Mariposa Tecknicolor","Fito Páez"],["Argentina","Spaghetti del rock","Divididos"],["Argentina","Mañana en el Abasto","Sumo"],
+ ["Argentina","Ji ji ji","Patricio Rey y sus Redonditos de Ricota"],["Argentina","La balsa","Los Gatos"],["Argentina","El cóndor pasa",""],
+ ["Mundo","Hotel California","Eagles"],["Mundo","Sweet child o' mine","Guns N' Roses"],["Mundo","Smells like teen spirit","Nirvana"],
+ ["Mundo","Take on me","a-ha"],["Mundo","Africa","Toto"],["Mundo","Dancing queen","ABBA"],["Mundo","Smooth criminal","Michael Jackson"],
+ ["Mundo","Livin' la vida loca","Ricky Martin"],["Mundo","Gangnam style","PSY"],["Mundo","Barbie girl","Aqua"],["Mundo","Toxic","Britney Spears"],
+ ["Mundo","Hey Jude","The Beatles"],["Mundo","Imagine","John Lennon"],["Mundo","Another brick in the wall","Pink Floyd"],
+ ["Película o juego","Tema de El Padrino",""],["Película o juego","Tema de Indiana Jones",""],["Película o juego","Tema de Jurassic Park",""],
+ ["Película o juego","Tema de Rocky",""],["Película o juego","Cinema Paradiso",""],["Película o juego","Melodía del Tetris",""],
+ ["Película o juego","Super Mario (tema principal)",""],["Película o juego","El bueno, el malo y el feo",""],["Película o juego","Tema de James Bond",""]
+];
+
+/* ===== Mazo +18 (cuarto elemento "d" = difícil) ===== */
+MAZO.dib.adultos=[
+ ["Noche","Resaca"],["Noche","Boliche"],["Noche","Fernet con coca"],["Noche","Vino en caja"],["Noche","Previa"],["Noche","Porro"],
+ ["Noche","Test de alcoholemia","","d"],["Noche","Despedida de soltero","","d"],["Noche","Pogo","","d"],
+ ["Pareja","Telo"],["Pareja","Preservativo"],["Pareja","Lencería"],["Pareja","Tanga"],["Pareja","Chupón en el cuello"],["Pareja","Corpiño"],
+ ["Pareja","Esposas con peluche"],["Pareja","Jacuzzi"],["Pareja","Cama de agua"],["Pareja","Juguete erótico"],["Pareja","Viagra"],
+ ["Pareja","Kamasutra","","d"],["Pareja","Match en una app de citas","","d"],["Pareja","Mensaje del ex a las 3 de la mañana","","d"],
+ ["Pareja","Prueba de embarazo","","d"],["Pareja","Celos de pareja","","d"],["Pareja","Amante escondido en el ropero","","d"],
+ ["Pareja","Stripper"],["Pareja","Caño de pole dance"],["Pareja","Tatuaje en la cola","","d"],["Pareja","Desnudo artístico","","d"]
+];
+MAZO.mim.adultos=[
+ ["Noche","Volver en pedo a casa sin hacer ruido"],["Noche","Chapar en el boliche"],["Noche","Encarar a alguien en la barra"],
+ ["Noche","Vomitar en el baño del boliche"],["Noche","Resaca del domingo"],["Noche","Pasar el control de alcoholemia"],
+ ["Noche","Walk of shame: volver con la ropa de ayer","","d"],["Noche","Despertarte al lado de alguien que no recordás","","d"],
+ ["Pareja","Desabrochar un corpiño con una mano"],["Pareja","Hacer un striptease"],["Pareja","Bailar en el caño"],["Pareja","Ponerse un preservativo"],
+ ["Pareja","Fingir un orgasmo"],["Pareja","Ducha de a dos"],["Pareja","Beso francés"],["Pareja","Depilación con cera"],["Pareja","Lap dance"],
+ ["Pareja","Entrar al sex shop disimulando","","d"],["Pareja","Que te encuentren tus viejos in fraganti","","d"],
+ ["Pareja","Esconderse de los suegros","","d"],["Pareja","Mandar una foto subida de tono y arrepentirte","","d"],
+ ["Pareja","Primera cita incómoda","","d"],["Pareja","Coquetear con el mozo para que te descuente","","d"],
+ ["Pareja","Quedarse sin batería en la cita","","d"],["Pareja","Hacer el amor en un auto chico","","d"],["Pareja","Pedir la cuenta en el telo","","d"]
+];
+MAZO.tar.adultos=[
+ ["Picante","Sex bomb","Tom Jones"],["Picante","Like a virgin","Madonna"],["Picante","You can leave your hat on","Joe Cocker, la del striptease"],
+ ["Picante","Je t'aime... moi non plus","Serge Gainsbourg y Jane Birkin","d"],["Picante","Let's talk about sex","Salt-N-Pepa","d"],
+ ["Picante","Sexual healing","Marvin Gaye","d"],["Picante","Sexy and I know it","LMFAO"],["Picante","Hips don't lie","Shakira"],
+ ["Picante","Bombón asesino","Los Palmeras"],["Picante","Safaera","Bad Bunny","d"],["Picante","Tusa","Karol G"],["Picante","Me porto bonito","Bad Bunny"],
+ ["Picante","Baby one more time","Britney Spears"],["Picante","Careless whisper","George Michael, el saxo"],["Picante","Lady marmalade","Labelle","d"],
+ ["Previa","Gasolina","Daddy Yankee"],["Previa","La pollera amarilla","Gladys, la Bomba Tucumana"],["Previa","Fiesta pagana","Mägo de Oz","d"],["Previa","Y dale alegría a mi corazón","Fito Páez"],
+ ["Previa","Por qué te vas","Jeanette, la del despecho"],["Previa","Tu cárcel","Marco Antonio Solís / Enanitos Verdes","d"]
+];
+
+/* ===== Mazo unificado ===== */
+for(const m of ["dib","mim","tar"]){
+  const M=MAZO[m];
+  M.todas=[...M.cartas.map(c=>({c,n:"f",a:false})),...M.dificiles.map(c=>({c,n:"d",a:false})),...M.adultos.map(c=>({c,n:c[3]==="d"?"d":"f",a:true}))];
+}
+
 /* ===== Estado ===== */
 const COLORES=["#ff6b6b","#4ecdc4","#ffc23d","#a78bfa","#3ddc84","#ff9f43"];
 const NOMBRES=["Los Garabatos","Las Estatuas","Los Silbadores","Los Mudos","Los Artistas","Los Afinados"];
-let S={equipos:[{n:NOMBRES[0],p:0},{n:NOMBRES[1],p:0}],modos:["dib","mim","tar"],soporte:"pantalla",tiempo:60,meta:8,turno:0,usados:{dib:[],mim:[],tar:[]},enCurso:false};
+let S={equipos:[{n:NOMBRES[0],p:0},{n:NOMBRES[1],p:0}],modos:["dib","mim","tar"],soporte:"pantalla",tiempo:60,meta:8,turno:0,usados:{dib:[],mim:[],tar:[]},dif:"d",cont:"atp",enCurso:false};
 let modoAct=null,cartaAct=null;
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function guardar(){try{localStorage.setItem("mostralo",JSON.stringify(S))}catch(e){}}
-function cargar(){try{const d=JSON.parse(localStorage.getItem("mostralo"));if(d&&d.equipos)return d}catch(e){}return null}
+function guardar(){try{localStorage.setItem("mostralo2",JSON.stringify(S))}catch(e){}}
+function cargar(){try{const d=JSON.parse(localStorage.getItem("mostralo2"));if(d&&d.equipos)return d}catch(e){}return null}
 function ir(id){$$(".pant").forEach(p=>p.classList.toggle("on",p.id===id));window.scrollTo(0,0)}
 
 /* ===== Configuración ===== */
@@ -315,6 +411,8 @@ $("#menosEq").onclick=()=>{S.equipos.pop();pintaEquipos()};
 function grupo(sel,attr,fn){$(sel).addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
   $$(sel+" button").forEach(x=>x.classList.toggle("on",x===b));fn(b.dataset[attr])})}
 grupo("#soporte","s",v=>S.soporte=v);
+grupo("#dificultad","d",v=>S.dif=v);
+grupo("#contenido","a",v=>{S.cont=v;S.usados={dib:[],mim:[],tar:[]};$("#aviso18").style.display=v==="atp"?"none":"block"});
 grupo("#tiempos","t",v=>S.tiempo=+v);
 grupo("#metas","g",v=>S.meta=+v);
 $("#modos").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
@@ -326,6 +424,9 @@ function marcarConfig(){
   $$("#soporte button").forEach(b=>b.classList.toggle("on",b.dataset.s===S.soporte));
   $$("#tiempos button").forEach(b=>b.classList.toggle("on",+b.dataset.t===S.tiempo));
   $$("#metas button").forEach(b=>b.classList.toggle("on",+b.dataset.g===S.meta));
+  $$("#dificultad button").forEach(b=>b.classList.toggle("on",b.dataset.d===S.dif));
+  $$("#contenido button").forEach(b=>b.classList.toggle("on",b.dataset.a===S.cont));
+  $("#aviso18").style.display=S.cont==="atp"?"none":"block";
 }
 
 $("#empezar").onclick=()=>{
@@ -362,19 +463,32 @@ function girar(){
     else{t.textContent=MAZO[elegido].nombre;t.classList.add(elegido);vibrar(80);setTimeout(()=>mostrarCarta(elegido),1100)}
   })();
 }
-function sacar(m){
-  const total=MAZO[m].cartas.length;
-  if(S.usados[m].length>=total)S.usados[m]=[];
-  let idx;do{idx=Math.floor(Math.random()*total)}while(S.usados[m].includes(idx));
-  S.usados[m].push(idx);guardar();return MAZO[m].cartas[idx];
+function pozo(m){
+  const T=MAZO[m].todas;
+  const okA=x=>S.cont==="mix"||(S.cont==="adu")===x.a;
+  let idx=T.map((x,i)=>i).filter(i=>okA(T[i])&&S.dif.includes(T[i].n));
+  if(!idx.length)idx=T.map((x,i)=>i).filter(i=>okA(T[i]));
+  return idx;
 }
+function sacar(m){
+  const idx=pozo(m);
+  let libres=idx.filter(i=>!S.usados[m].includes(i));
+  if(!libres.length){S.usados[m]=S.usados[m].filter(i=>!idx.includes(i));libres=idx}
+  const i=libres[Math.floor(Math.random()*libres.length)];
+  S.usados[m].push(i);guardar();return MAZO[m].todas[i];
+}
+let cartaObj=null;
+const valor=()=>S.dif==="fd"&&cartaObj&&cartaObj.n==="d"?2:1;
 function mostrarCarta(m){
-  modoAct=m;cartaAct=sacar(m);
+  modoAct=m;cartaObj=sacar(m);cartaAct=cartaObj.c;
   const M=MAZO[m];
   $("#cModo").textContent=M.icono+" "+M.nombre;$("#cModo").className="modo "+m;
   $("#carta").style.setProperty("--c",M.hex);
   $("#cCat").textContent=cartaAct[0];$("#cPal").textContent=cartaAct[1];
   $("#cPista").textContent=cartaAct[2]?"("+cartaAct[2]+")":"";
+  const v=valor();
+  $("#cNivel").textContent=(cartaObj.a?"🔞 +18 · ":"")+(cartaObj.n==="d"?"Difícil":"Fácil")+(v>1?" · vale 2 puntos":"");
+  $("#cNivel").className="nivel"+(cartaObj.a?" adu":"");
   let regla=M.regla;if(m==="dib"&&S.soporte==="papel")regla+=" Agarrá papel y lapicera.";
   $("#cRegla").textContent=regla;
   ir("pCarta");
@@ -405,7 +519,7 @@ function tick(){
   if(resta<=0){pararReloj();tic(220,.6);vibrar([200,100,200]);resultado(false)}
 }
 function pararReloj(){clearInterval(intervalo);intervalo=null;soltarPantalla()}
-$("#acerto").onclick=()=>{pararReloj();sumar(eqAct());tic(990,.15);vibrar(60)};
+$("#acerto").onclick=()=>{pararReloj();sumar(eqAct(),valor());tic(990,.15);vibrar(60)};
 $("#rendirse").onclick=()=>{pararReloj();resultado(true)};
 
 /* espiar consigna */
@@ -428,9 +542,9 @@ function resultado(rendido){
   ir("pRes");
 }
 $("#quien").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
-  const k=+b.dataset.k;if(k>=0)sumar(k);else siguiente()});
+  const k=+b.dataset.k;if(k>=0)sumar(k,valor());else siguiente()});
 
-function sumar(k){S.equipos[k].p++;guardar();siguiente()}
+function sumar(k,v=1){S.equipos[k].p+=v;guardar();siguiente()}
 function siguiente(){
   S.turno++;guardar();
   // se cierra al terminar una vuelta completa, así todos los equipos juegan la misma cantidad de turnos
@@ -481,6 +595,7 @@ function soltarPantalla(){try{lock&&lock.release();lock=null}catch(e){}}
 function inicio(){
   const d=cargar();
   if(d){S=Object.assign(S,d);S.usados=Object.assign({dib:[],mim:[],tar:[]},d.usados||{})}
+  if(new URLSearchParams(location.search).has("adultos")&&!S.enCurso){S.cont="adu";S.dif="fd"}
   marcarConfig();pintaEquipos();
   $("#seguir").style.display=S.enCurso?"block":"none";
   ir("pInicio");
