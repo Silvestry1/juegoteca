@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14110f">
+<title>Ni Se Te Ocurra</title>
+<style>
+:root{--bg:#14110f;--card:#251f1b;--txt:#fff6e9;--sub:#cdbfae;--acc:#ffd23f;--rojo:#ff3b3b;--ok:#3ddc84;--pas:#8aa4ff;--neg:#1a1512}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior:none}
+.pant{display:none;min-height:100%;padding:16px 16px calc(16px + env(safe-area-inset-bottom));flex-direction:column;gap:14px;max-width:560px;margin:0 auto}
+.pant.on{display:flex}
+.logo{text-align:center;margin-top:6px}
+.logo h1{display:inline-block;margin:0;font-size:2rem;line-height:1;text-transform:uppercase;letter-spacing:1px;background:var(--acc);color:var(--neg);padding:8px 14px;transform:rotate(-2deg);box-shadow:6px 6px 0 var(--rojo)}
+.logo .cinta{display:block;margin:12px auto 0;width:max-content;background:repeating-linear-gradient(45deg,var(--rojo) 0 12px,#111 12px 24px);color:#fff;font-weight:900;font-size:.8rem;letter-spacing:3px;padding:4px 10px;transform:rotate(1.5deg)}
+h2{margin:0;font-size:1.3rem;text-align:center}
+p{margin:0;line-height:1.4}
+.sub{color:var(--sub);text-align:center}
+.caja{background:var(--card);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.caja h3{margin:0;font-size:.85rem;text-transform:uppercase;letter-spacing:1px;color:var(--sub)}
+.nota{font-size:.85rem;color:var(--sub)}
+.fila{display:flex;gap:8px;align-items:center}
+.fila input[type=text]{flex:1;min-width:0}
+input[type=text]{padding:10px;border-radius:10px;border:2px solid #ffffff22;background:#00000033;color:var(--txt);font-size:1rem}
+.punto{width:16px;height:16px;border-radius:50%;flex:none;display:inline-block}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{flex:1;min-width:80px}
+button{font:inherit;border:0;border-radius:12px;padding:12px 14px;background:#ffffff1a;color:var(--txt);font-weight:600;cursor:pointer}
+button.on{background:var(--acc);color:var(--neg)}
+button.grande{padding:16px;font-size:1.15rem;font-weight:800;background:var(--acc);color:var(--neg)}
+button.sec{background:#ffffff14}
+button:disabled{opacity:.4}
+.chico{padding:8px 12px;font-size:.9rem}
+.mayor{display:flex;gap:10px;align-items:center;text-align:left;background:#ff3b3b22;border:2px solid var(--rojo)}
+.mayor.on{background:var(--rojo);color:#fff}
+a.volver{color:var(--sub);text-align:center;font-size:.9rem}
+.reglas{font-size:.92rem;color:var(--sub)}
+.reglas b{color:var(--txt)}
+.reglas ul{margin:6px 0 0;padding-left:18px}
+.reglas li{margin:4px 0}
+.tabla{display:flex;flex-direction:column;gap:6px}
+.tabla div{display:flex;justify-content:space-between;align-items:center;background:#00000033;border-radius:10px;padding:10px 12px;font-weight:700}
+.tabla div.turno{outline:3px solid var(--acc)}
+.tabla span.pts{font-size:1.3rem}
+.centro{flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;text-align:center}
+.equipo{font-size:2.2rem;font-weight:900}
+.ojo{font-size:4rem}
+/* juego */
+#pJuego{gap:10px;height:100%}
+.barra{display:flex;gap:10px;align-items:center}
+.reloj{font-size:2.2rem;font-weight:900;font-variant-numeric:tabular-nums;min-width:4.4rem;text-align:center}
+.reloj.poco{color:var(--rojo);animation:lat 1s infinite}
+@keyframes lat{50%{transform:scale(1.15)}}
+.progreso{flex:1;height:10px;background:#ffffff1a;border-radius:99px;overflow:hidden}
+.progreso i{display:block;height:100%;background:var(--acc);width:100%}
+.marcador{font-weight:900;font-size:1.1rem;min-width:3rem;text-align:right}
+.carta{flex:1;background:#fff6e9;color:#1a1512;border-radius:18px;padding:18px 16px;display:flex;flex-direction:column;justify-content:center;gap:12px;box-shadow:0 10px 30px #0008;border-top:14px solid var(--acc);position:relative;overflow:hidden}
+.carta.mas18{border-top-color:var(--rojo)}
+.carta .tag{position:absolute;top:8px;right:10px;font-size:.7rem;font-weight:900;letter-spacing:1px;color:#8a7a68}
+.carta .pal{font-size:2.2rem;font-weight:900;line-height:1.05;text-align:center;margin:10px 0 4px;text-transform:uppercase;word-break:break-word}
+.carta .linea{height:0;border-top:3px dashed #1a151233}
+.carta .ojo-lab{font-size:.75rem;text-transform:uppercase;letter-spacing:2px;color:var(--rojo);text-align:center;font-weight:900}
+.prohib{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.prohib li{font-size:1.35rem;font-weight:800;text-align:center;padding:6px 8px;border-radius:8px;background:#ff3b3b14;color:#7a1010}
+.prohib li::before{content:"🚫 ";font-size:1rem}
+.reglaJ{font-size:.85rem;text-align:center;color:var(--sub)}
+.acc3{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.acc3 .bok{grid-column:1/3;background:var(--ok);color:#06210f;font-weight:900;font-size:1.25rem;padding:18px}
+.acc3 .bpas{background:var(--pas);color:#0b1440;font-weight:800}
+.acc3 .bmal{background:var(--rojo);color:#fff;font-weight:800}
+.flash{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .25s}
+.flash.ok{background:#3ddc8455;opacity:1;transition:none}
+.flash.mal{background:#ff3b3b66;opacity:1;transition:none}
+.flash.pas{background:#8aa4ff44;opacity:1;transition:none}
+/* resumen */
+.lista{display:flex;flex-direction:column;gap:6px}
+.lista button{display:flex;justify-content:space-between;align-items:center;text-align:left;padding:12px}
+.lista button .est{font-size:1.2rem;flex:none;margin-left:8px}
+.lista button.ok{background:#3ddc8422}
+.lista button.mal{background:#ff3b3b2a}
+.lista button.pas{background:#8aa4ff22}
+.total{font-size:1.5rem;font-weight:900;text-align:center}
+.quien{display:flex;flex-direction:column;gap:8px}
+.quien button{padding:12px;text-align:left;display:flex;align-items:center;gap:10px}
+.quien button.on{background:var(--acc);color:var(--neg)}
+.podio{font-size:4rem;text-align:center}
+</style>
+</head>
+<body>
+
+<!-- INICIO -->
+<section class="pant on" id="pInicio">
+  <div class="logo"><h1>Ni se te ocurra</h1><span class="cinta">PALABRAS PROHIBIDAS</span></div>
+  <p class="sub">Hacé que tu equipo adivine la palabra sin decir lo que diría cualquiera.</p>
+
+  <div class="caja">
+    <h3>Equipos</h3>
+    <div id="listaEq" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div class="fila"><button class="sec chico" id="masEq">＋ Equipo</button><button class="sec chico" id="menosEq">－ Equipo</button></div>
+  </div>
+
+  <div class="caja">
+    <h3>Mazo</h3>
+    <div class="chips" id="mazos">
+      <button data-z="atp" class="on">ATP</button>
+      <button data-z="adulto">+18</button>
+      <button data-z="mezcla">Mezcla</button>
+    </div>
+    <p class="nota" id="notaMazo"></p>
+    <button class="mayor" id="mayor" style="display:none"><span id="mayorIco">⬜</span><span>Confirmo que todos los que juegan son mayores de 18.</span></button>
+  </div>
+
+  <div class="caja">
+    <h3>Dificultad</h3>
+    <div class="chips" id="difs">
+      <button data-d="normal">Normal</button>
+      <button data-d="dificil" class="on">Difícil</button>
+      <button data-d="brutal">Brutal</button>
+    </div>
+    <p class="nota" id="notaDif"></p>
+  </div>
+
+  <div class="caja">
+    <h3>Tiempo por turno</h3>
+    <div class="chips" id="tiempos">
+      <button data-t="45">45 s</button><button data-t="60" class="on">60 s</button><button data-t="90">90 s</button>
+    </div>
+    <h3>Gana el primero en llegar a</h3>
+    <div class="chips" id="metas">
+      <button data-g="10">10</button><button data-g="20" class="on">20</button><button data-g="30">30</button>
+    </div>
+  </div>
+
+  <div class="caja reglas">
+    <h3>Cómo se juega</h3>
+    <ul>
+      <li>En cada turno, <b>una persona</b> de un equipo agarra el celu y le hace adivinar a su equipo todas las palabras que pueda antes de que se termine el tiempo.</li>
+      <li>No puede decir <b>la palabra</b>, ni <b>las prohibidas</b> de la carta, ni pedazos o derivados de ellas (si está prohibido "cocina", tampoco vale "cocinar"), ni traducirlas, ni deletrear, ni decir "suena como" o "rima con".</li>
+      <li>Alguien de <b>otro equipo</b> se pone atrás y mira la pantalla. Si escucha una prohibida, se aprieta <b>🚫 Falta</b>: resta 1 y pasa a la carta siguiente.</li>
+      <li>✅ <b>Adivinaron</b> suma 1. ⏭ <b>Pasar</b> salta la carta (según la dificultad, puede costar 1 punto).</li>
+      <li>Si suena el final con una carta en juego, los otros equipos tienen <b>un intento</b> para robarla.</li>
+      <li>La partida se cierra al terminar una vuelta completa, cuando un equipo pasó la meta.</li>
+    </ul>
+  </div>
+
+  <button class="grande" id="empezar">▶ Empezar</button>
+  <button class="sec" id="seguir" style="display:none">↻ Seguir la partida anterior</button>
+  <a class="volver" href="../../">← Volver a la Juegoteca</a>
+</section>
+
+<!-- PASAR -->
+<section class="pant" id="pPasar">
+  <div class="tabla" id="tabla"></div>
+  <div class="centro">
+    <div class="ojo">🤐</div>
+    <p class="sub">Le toca explicar a</p>
+    <div class="equipo" id="eqTurno"></div>
+    <p>Pasale el celu a quien explica.<br>Alguien de <b>otro equipo</b> se pone atrás para vigilar.<br>El equipo que adivina, <b>no mire</b>.</p>
+  </div>
+  <button class="grande" id="listo">Estamos listos, arrancar</button>
+  <button class="sec chico" id="terminar">Terminar partida</button>
+</section>
+
+<!-- JUEGO -->
+<section class="pant" id="pJuego">
+  <div class="barra">
+    <div class="reloj" id="reloj">60</div>
+    <div class="progreso"><i id="prog"></i></div>
+    <div class="marcador" id="marc">0</div>
+  </div>
+  <div class="carta" id="carta">
+    <div class="tag" id="cTag"></div>
+    <div class="pal" id="cPal"></div>
+    <div class="linea"></div>
+    <div class="ojo-lab">Ni se te ocurra decir</div>
+    <ul class="prohib" id="cProh"></ul>
+  </div>
+  <p class="reglaJ" id="reglaJ"></p>
+  <div class="acc3">
+    <button class="bok" id="bOk">✅ ¡Adivinaron!</button>
+    <button class="bpas" id="bPas">⏭ Pasar</button>
+    <button class="bmal" id="bMal">🚫 Falta</button>
+  </div>
+</section>
+<div class="flash" id="flash"></div>
+
+<!-- RESUMEN -->
+<section class="pant" id="pRes">
+  <h2 id="rTit">¡Tiempo!</h2>
+  <div class="caja" id="cajaRobo" style="display:none">
+    <h3>Carta en juego cuando sonó</h3>
+    <p style="font-size:1.4rem;font-weight:900;text-align:center;text-transform:uppercase" id="rRobo"></p>
+    <p class="nota">Los otros equipos tienen un intento cada uno. ¿Alguien la robó?</p>
+    <div class="quien" id="quien"></div>
+  </div>
+  <div class="caja">
+    <h3>Cartas del turno</h3>
+    <p class="nota">Tocá una carta para corregirla si se apretó mal (✅ → ⏭ → 🚫).</p>
+    <div class="lista" id="lista"></div>
+    <div class="total" id="rTotal"></div>
+  </div>
+  <button class="grande" id="confirmar">Anotar y seguir</button>
+</section>
+
+<!-- FIN -->
+<section class="pant" id="pFin">
+  <div class="centro">
+    <div class="podio">🏆</div>
+    <h2>Ganó</h2>
+    <div class="equipo" id="ganador"></div>
+    <div class="tabla" id="tablaFin"></div>
+  </div>
+  <button class="grande" id="otra">Jugar otra</button>
+  <a class="volver" href="../../">← Volver a la Juegoteca</a>
+</section>
+
+<script>
+/* ===== Cartas originales =====
+   Formato: "PALABRA: prohibida1, prohibida2, ..., prohibida6"
+   Las prohibidas van de la más obvia a la menos obvia. Normal muestra 4, Difícil 5, Brutal 6. */
+const ATP=`
+Mate: yerba, bombilla, termo, cebar, calabaza, amargo
+Asado: carne, parrilla, domingo, chorizo, fuego, achuras
+Colectivo: bondi, parada, chofer, SUBE, boleto, línea
+Dulce de leche: alfajor, vaca, untar, frasco, panqueque, argentino
+Alfajor: chocolate, maicena, dulce de leche, galletita, kiosco, tapa
+Empanada: carne, horno, repulgue, docena, masa, tucumana
+Fernet: coca, Córdoba, amargo, trago, hielo, vaso
+Choripán: chorizo, pan, cancha, parrilla, chimichurri, sándwich
+Feriado: día, trabajo, descanso, puente, lunes, calendario
+Aguinaldo: sueldo, diciembre, plata, medio, junio, trabajo
+Inflación: precio, aumento, plata, dólar, economía, peso
+Subte: tren, túnel, estación, Buenos Aires, línea, vagón
+Siesta: dormir, tarde, almuerzo, cama, descanso, sueño
+Mundial: fútbol, copa, Messi, selección, cuatro años, Qatar
+Tango: baile, Gardel, bandoneón, Buenos Aires, milonga, pareja
+Gaucho: campo, caballo, poncho, pampa, Martín Fierro, mate
+Obelisco: Buenos Aires, 9 de Julio, monumento, Corrientes, alto, festejo
+Catedral: iglesia, misa, torre, plaza, gótica, cura
+Calesita: sortija, caballito, vuelta, plaza, chicos, música
+Rayuela: tiza, saltar, cielo, piedra, cuadrado, juego
+Ajedrez: rey, reina, tablero, peón, jaque, mate
+Truco: cartas, envido, retruco, quiero, flor, ancho
+Paraguas: lluvia, mojar, abrir, sombrilla, agua, mango
+Ascensor: piso, edificio, subir, bajar, botón, escalera
+Espejo: reflejo, mirar, vidrio, cara, baño, imagen
+Almohada: cama, dormir, cabeza, funda, pluma, sueño
+Despertador: alarma, mañana, reloj, sonar, dormir, levantarse
+Heladera: frío, cocina, comida, freezer, hielo, puerta
+Microondas: calentar, cocina, minuto, comida, plato, girar
+Control remoto: tele, canal, botón, pilas, sillón, cambiar
+Wifi: internet, contraseña, señal, conexión, router, red
+Contraseña: clave, secreta, número, cuenta, olvidar, entrar
+Selfie: foto, celular, cara, cámara, sacar, Instagram
+Meme: gracioso, imagen, internet, chiste, grupo, viral
+Spoiler: final, película, serie, contar, arruinar, sorpresa
+Podcast: radio, escuchar, audio, episodio, programa, hablar
+Influencer: redes, seguidores, Instagram, famoso, publicidad, TikTok
+Algoritmo: computadora, programa, pasos, red social, matemática, recomendar
+Captcha: robot, imagen, semáforo, demostrar, página, letras
+Audio de WhatsApp: mensaje, voz, escuchar, largo, celular, mandar
+Clavar el visto: leer, mensaje, azul, ignorar, tilde, responder
+Batería: celular, carga, cargador, porcentaje, enchufe, pila
+Eclipse: sol, luna, sombra, oscuro, tapar, astronomía
+Agujero negro: espacio, estrella, gravedad, luz, universo, absorber
+Gravedad: caer, Newton, peso, fuerza, Tierra, manzana
+Fotosíntesis: planta, luz, sol, hoja, clorofila, oxígeno
+Volcán: lava, montaña, erupción, fuego, cráter, ceniza
+Terremoto: temblor, tierra, sismo, mover, Richter, edificio
+Tornado: viento, remolino, girar, tormenta, huracán, Estados Unidos
+Arco iris: colores, lluvia, sol, siete, cielo, duende
+Eco: repetir, voz, montaña, cueva, sonido, gritar
+Sombra: sol, luz, oscuro, cuerpo, seguir, negro
+Nostalgia: pasado, extrañar, recuerdo, tristeza, antes, infancia
+Burocracia: trámite, papel, oficina, Estado, fila, sello
+Procrastinar: después, dejar, tarea, mañana, postergar, vago
+Déjà vu: antes, repetir, vivido, francés, sensación, sueño
+Insomnio: dormir, noche, sueño, despierto, cama, ovejas
+Vergüenza: cara, rojo, colorado, pena, ridículo, sonrojar
+Celos: pareja, envidia, novio, desconfianza, otro, posesivo
+Karma: volver, destino, bueno, malo, castigo, budismo
+Ironía: sarcasmo, contrario, decir, chiste, burla, tono
+Paciencia: esperar, calma, tiempo, nervios, tranquilo, virtud
+Silencio: ruido, callado, sonido, hablar, biblioteca, shh
+Horóscopo: signo, zodíaco, estrella, futuro, diario, Leo
+Hipocondríaco: enfermo, médico, miedo, síntoma, Google, remedio
+Tobogán: plaza, deslizar, bajar, chicos, escalera, agua
+Piñata: cumpleaños, palo, romper, golosinas, colgar, vendar
+Mudanza: casa, caja, camión, cambiar, flete, departamento
+Casamiento: boda, novia, anillo, iglesia, fiesta, vestido
+Cumpleaños: torta, velas, años, regalo, feliz, fiesta
+Velorio: muerto, cajón, llorar, entierro, flores, familia
+Herencia: muerto, testamento, plata, familia, abuelo, recibir
+Jubilación: viejo, trabajo, edad, retirar, ANSES, abuelo
+Dentista: muela, diente, boca, caries, consultorio, torno
+Vacuna: pinchazo, inyección, aguja, brazo, enfermedad, virus
+Fiebre: temperatura, termómetro, enfermo, calor, grados, gripe
+Hipo: susto, agua, aire, garganta, saltar, sonido
+Estornudo: salud, nariz, achís, alergia, pañuelo, gripe
+Bostezo: sueño, boca, abrir, aburrido, cansado, contagioso
+Cosquillas: reír, pies, panza, risa, dedos, sensible
+Pesadilla: sueño, miedo, noche, dormir, monstruo, despertar
+Fantasma: muerto, sábana, espíritu, casa, asustar, blanco
+Vampiro: sangre, colmillo, Drácula, murciélago, ajo, noche
+Sirena: mar, pez, cola, mujer, cantar, ambulancia
+Dinosaurio: extinto, grande, fósil, reptil, meteorito, Jurassic
+Pingüino: frío, Antártida, ave, blanco, negro, hielo
+Camaleón: color, cambiar, lagarto, lengua, reptil, camuflaje
+Carpincho: roedor, agua, Nordelta, grande, capibara, animal
+Hornero: pájaro, nido, barro, ave, nacional, casa
+Murciélago: noche, volar, cueva, Batman, ciego, vampiro
+Mosquito: picar, verano, sangre, zumbido, repelente, dengue
+Cucaracha: insecto, bicho, asco, cocina, matar, sucio
+Elefante: trompa, grande, gris, orejas, colmillos, África
+Jirafa: cuello, largo, alto, manchas, África, árbol
+Pulpo: tentáculo, ocho, mar, brazos, tinta, calamar
+Tiburón: mar, dientes, aleta, pez, atacar, peligroso
+Superhéroe: poderes, capa, volar, salvar, villano, Marvel
+Pirata: barco, parche, tesoro, loro, mar, pata de palo
+Mago: truco, conejo, galera, varita, magia, desaparecer
+Payaso: circo, nariz, roja, reír, chistes, zapatos
+Astronauta: espacio, luna, cohete, NASA, traje, gravedad
+Bombero: fuego, incendio, manguera, camión, sirena, apagar
+Árbitro: fútbol, silbato, tarjeta, partido, cobrar, juez
+Cartero: carta, correo, sobre, entregar, paquete, timbre
+Detective: misterio, investigar, lupa, crimen, pista, Sherlock
+Espía: secreto, agente, misión, Bond, espiar, 007
+Robot: máquina, metal, artificial, inteligencia, programa, humano
+Inteligencia artificial: robot, computadora, máquina, pensar, programa, ChatGPT
+Extraterrestre: marciano, ovni, planeta, nave, verde, espacio
+Pirámide: Egipto, faraón, momia, triángulo, desierto, piedra
+Torre Eiffel: París, Francia, hierro, alta, monumento, turismo
+Cataratas del Iguazú: agua, Misiones, Brasil, Garganta del Diablo, cascada, saltos
+Glaciar: hielo, Perito Moreno, frío, Calafate, montaña, derretir
+Desierto: arena, calor, camello, seco, Sahara, oasis
+Isla: agua, mar, rodeada, náufrago, playa, tierra
+Camping: carpa, fogón, aire libre, dormir, bolsa, naturaleza
+Aeropuerto: avión, vuelo, valija, embarque, pasaje, Ezeiza
+Pasaporte: viaje, documento, país, sello, aeropuerto, migraciones
+Biblioteca: libros, silencio, leer, préstamo, estantes, estudiar
+Museo: arte, cuadro, historia, exposición, visita, guía
+Hospital: médico, enfermo, guardia, enfermera, cama, ambulancia
+Cárcel: preso, celda, rejas, delito, policía, condena
+Cementerio: muerto, tumba, cruz, flores, enterrar, Recoleta
+Supermercado: compras, changuito, góndola, caja, precio, oferta
+Kiosco: golosinas, esquina, cigarrillos, alfajor, comprar, chicle
+Farmacia: remedio, receta, pastilla, médico, cruz, ibuprofeno
+Gimnasio: pesas, ejercicio, músculo, entrenar, cinta, abdominales
+Recreo: escuela, patio, timbre, jugar, descanso, clase
+Examen: prueba, estudiar, nota, aprobar, pregunta, profesor
+Navidad: Papá Noel, regalo, árbol, diciembre, pan dulce, 25
+Año Nuevo: brindis, diciembre, 31, fuegos artificiales, doce, campanadas
+Carnaval: disfraz, febrero, comparsa, espuma, Brasil, baile
+Halloween: disfraz, calabaza, octubre, dulce, truco, bruja
+Reyes Magos: camello, enero, regalo, zapato, pasto, Melchor
+Bruja: escoba, sombrero, hechizo, caldero, magia, verruga
+Dragón: fuego, volar, alas, escamas, princesa, monstruo
+Unicornio: cuerno, caballo, arco iris, mágico, blanco, fantasía
+Zombi: muerto, cerebro, caminar, morder, apocalipsis, vivo
+Momia: Egipto, vendas, faraón, pirámide, muerto, sarcófago
+Penal: arquero, gol, patear, punto, falta, área
+Offside: posición, adelantado, línea, fútbol, bandera, juez
+VAR: árbitro, video, revisar, fútbol, pantalla, cobrar
+Ping pong: paleta, mesa, pelotita, red, tenis, China
+Bicicleta: pedal, rueda, cadena, andar, bici, manubrio
+Semáforo: rojo, verde, amarillo, luz, esquina, cruzar
+Peaje: pagar, ruta, autopista, barrera, auto, cabina
+Tatuaje: tinta, piel, aguja, dibujo, brazo, permanente
+Barba: pelo, cara, hombre, afeitar, bigote, mentón
+Peluca: pelo, falso, cabeza, disfraz, calvo, pelado
+Anteojos: ver, ojos, lentes, vista, marco, óptica
+Brújula: norte, aguja, dirección, perdido, orientar, mapa
+Lupa: aumentar, grande, vidrio, detective, ver, pequeño
+Telescopio: estrella, ver, lejos, luna, espacio, astronomía
+Microscopio: pequeño, célula, laboratorio, ver, bacteria, lente
+Imán: atraer, metal, heladera, polo, hierro, pegar
+Vela: fuego, cera, luz, mecha, cumpleaños, apagón
+Apagón: luz, corte, oscuro, vela, electricidad, verano
+Fósforo: fuego, prender, caja, cabeza, palito, encendedor
+Escoba: barrer, piso, bruja, palo, limpiar, pala
+Lavarropas: ropa, lavar, sucia, jabón, centrifugar, máquina
+Plancha: ropa, arrugas, calor, camisa, vapor, planchar
+Pochoclo: maíz, cine, microondas, sal, explotar, dulce
+Karaoke: cantar, canción, micrófono, letra, pantalla, desafinar
+Ruleta: casino, apostar, número, rojo, negro, girar
+Lotería: número, ganar, premio, sorteo, billete, suerte
+Ojotas: pie, chancletas, sandalias, playa, verano, dedo
+Abuela: nieto, vieja, madre, familia, tejer, ravioles
+Suegra: pareja, madre, esposa, marido, familia, novio
+Mellizos: gemelos, dos, hermanos, iguales, parto, nacer
+Secreto: contar, guardar, nadie, saber, oculto, confiar
+Mentira: verdad, mentir, falso, Pinocho, nariz, engañar
+Chisme: contar, vecina, rumor, hablar, otro, enterarse
+Promesa: cumplir, jurar, palabra, prometer, futuro, compromiso
+Excusa: pretexto, motivo, llegar tarde, justificar, mentira, razón
+Suerte: azar, trébol, ganar, fortuna, casualidad, buena
+Asado con amigos: carne, juntada, parrilla, domingo, vino, fuego
+Previa de un examen: estudiar, nervios, noche, prueba, apuntes, café
+Fila del banco: esperar, número, cajero, plata, turno, trámite
+Vecino ruidoso: música, departamento, pared, quejarse, fiesta, edificio
+Grupo de la familia: WhatsApp, mensaje, tía, cadena, audio, silenciar
+Dieta: comer, adelgazar, kilos, ensalada, nutricionista, lunes
+Lunes: semana, trabajo, domingo, día, empezar, odiar
+Domingo: semana, asado, día, descanso, misa, lunes
+Tormenta: lluvia, rayo, trueno, nube, viento, relámpago
+Granizo: hielo, piedra, lluvia, auto, techo, tormenta
+Niebla: ver, blanco, mañana, ruta, nube, humedad
+Humedad: agua, calor, pelo, pegajoso, aire, transpirar
+Ventilador: aire, aspas, calor, verano, girar, techo
+Mosquitero: mosquito, red, cama, ventana, tela, picar
+`;
+const ADULTO=`
+Resaca: alcohol, día siguiente, tomar, dolor de cabeza, borracho, ibuprofeno
+Previa: boliche, tomar, antes, casa, amigos, salir
+Boliche: bailar, noche, música, entrada, patovica, salir
+Patovica: boliche, puerta, seguridad, grandote, entrar, lista
+Telo: hotel, pareja, turno, hora, sexo, habitación
+Chongo: amante, casual, sexo, pareja, novio, levantar
+Preservativo: forro, condón, sexo, protección, látex, farmacia
+Despedida de soltero: casamiento, amigos, stripper, última, noche, novio
+Stripper: desnudar, bailar, caño, ropa, show, despedida
+Cuernos: infiel, engañar, pareja, otro, gorra, traición
+Amante: infiel, secreto, pareja, otro, cuernos, esconder
+Ex tóxico: pareja, novio, anterior, volver, celos, bloquear
+Tinder: app, cita, match, deslizar, foto, levantar
+Sexting: mensaje, foto, desnudo, celular, caliente, mandar
+Nude: foto, desnudo, celular, mandar, cuerpo, inglés
+Mañanero: mañana, sexo, despertar, cama, pareja, temprano
+Kamasutra: posiciones, sexo, India, libro, pareja, posturas
+Juguete sexual: vibrador, sex shop, placer, pilas, consolador, cajón
+Sex shop: juguete, local, comprar, lencería, vibrador, sexo
+Lencería: ropa interior, encaje, bombacha, sexy, corpiño, tanga
+Tanga: bombacha, cola, ropa interior, hilo, playa, chiquita
+Orgasmo: placer, sexo, clímax, acabar, fingir, gemir
+Gemido: sexo, sonido, placer, gemir, vecino, ruido
+Fingir un orgasmo: simular, actuar, sexo, placer, acabar, mentir
+Viagra: pastilla, azul, erección, viejo, sexo, farmacia
+Trío: tres, sexo, pareja, cama, fantasía, uno más
+Fantasía sexual: deseo, imaginar, sueño, cama, pareja, secreto
+Esposas peludas: policía, manos, cama, atar, metal, juego
+Strip póker: cartas, desnudar, ropa, perder, prenda, apostar
+Chupón: beso, cuello, marca, morado, chupar, tapar
+Franela: tocar, manosear, caricia, previa, besar, pareja
+Chapar: besar, lengua, boca, transar, boliche, pareja
+Calentura: ganas, sexo, deseo, caliente, excitar, calor
+Porno: película, sexo, video, internet, actriz, adulto
+OnlyFans: fotos, suscripción, pagar, contenido, desnudo, página
+Sugar daddy: viejo, rico, plata, joven, regalos, mantener
+Divorcio: separar, casamiento, abogado, ex, matrimonio, juicio
+En pedo: borracho, alcohol, tomar, mamado, resaca, noche
+Vino en caja: tetra, barato, cartón, tinto, alcohol, Toro
+Porro: marihuana, fumar, faso, armar, humo, cogollo
+Pedo: gas, olor, culo, ruido, panza, aire
+Culo: cola, nalga, trasero, orto, sentarse, cachete
+Tetas: pecho, busto, senos, corpiño, lolas, mujer
+Pito: pene, chota, verga, poronga, miembro, hombre
+Coger: sexo, garchar, hacer el amor, cama, acostarse, pareja
+Paja: masturbar, mano, solo, porno, hacerse, sacudir
+Cita a ciegas: conocer, desconocido, primera, amigo, presentar, ver
+Primera cita: conocer, salir, nervios, cena, beso, pareja
+Ghosting: desaparecer, fantasma, responder, mensaje, ignorar, visto
+Friendzone: amigo, gustar, rechazo, pareja, zona, solo
+Noche de bodas: casamiento, esposos, cama, primera, luna de miel, sexo
+Luna de miel: casamiento, viaje, recién casados, pareja, vacaciones, Caribe
+Swinger: intercambio, parejas, sexo, club, otro, mezclar
+Exhibicionista: mostrar, desnudo, público, gabardina, partes, calle
+Voyeur: mirar, espiar, ventana, excitar, escondido, ver
+Depilación: cera, pelo, sacar, dolor, piernas, láser
+Vasectomía: hombre, operación, hijos, cortar, urólogo, esterilizar
+Test de embarazo: rayita, positivo, bebé, farmacia, pis, atraso
+Pastilla del día después: anticonceptivo, farmacia, sexo, embarazo, emergencia, mañana
+Amigovio: amigo, novio, sexo, casual, compromiso, pareja
+Despecho: ex, venganza, dolor, corazón, borrachera, canción
+Revisar el celular de la pareja: mensajes, chat, contraseña, celos, desconfianza, espiar
+Resaca moral: vergüenza, arrepentirse, noche anterior, borracho, culpa, día después
+Afrodisíaco: excitar, ostras, comida, deseo, sexo, chocolate
+Bondage: atar, cuerdas, sumisión, sexo, nudo, cama
+Dominatrix: látigo, cuero, sumisa, mandar, tacos, sado
+Cucharita: abrazo, cama, espalda, dormir, pareja, atrás
+Crisis de los 40: edad, cuarenta, años, moto, joven, cambio
+Boludo: che, amigo, tonto, pelotudo, insulto, argentino
+Puteada: insulto, malas palabras, grosería, enojo, garabato, puta
+Nalgada: cola, palmada, pegar, culo, mano, sonar
+Cerveza: birra, espuma, alcohol, vaso, rubia, lata
+Borrachera: alcohol, tomar, en pedo, mamado, vino, resaca
+Ex en el boliche: pareja, anterior, encuentro, bailar, noche, cruzarse
+Mensaje de las 4 de la mañana: madrugada, ex, borracho, mandar, celular, noche
+`;
+function parsear(txt,z){return txt.trim().split("\n").map(l=>{const i=l.indexOf(":");return{p:l.slice(0,i).trim(),x:l.slice(i+1).split(",").map(s=>s.trim()).filter(Boolean),z}})}
+const MAZO={atp:parsear(ATP,"atp"),adulto:parsear(ADULTO,"adulto")};
+
+const DIF={
+ normal:{n:4,libres:Infinity,falta:1,txt:"4 prohibidas por carta. Pasar es gratis.",regla:"Pasar no resta. Falta: −1."},
+ dificil:{n:5,libres:1,falta:1,txt:"5 prohibidas por carta. Un pase gratis por turno; cada pase extra resta 1.",regla:"1 pase gratis; después cada pase −1. Falta: −1."},
+ brutal:{n:6,libres:0,falta:2,txt:"6 prohibidas por carta. Cada pase resta 1, cada falta resta 2 y no se puede hacer gestos: manos quietas.",regla:"Manos quietas. Pase −1. Falta −2."}
+};
+const NOTA_MAZO={atp:"Palabras para cualquier mesa.",adulto:"Humor adulto entre amigos: sexo, joda y alcohol. Solo para mayores de 18.",mezcla:"Mezcla las ATP con las +18. Solo para mayores de 18."};
+
+/* ===== Estado ===== */
+const COLORES=["#ffd23f","#ff3b3b","#3ddc84","#8aa4ff","#ff9f43","#d68bff"];
+const NOMBRES=["Los Callados","Las Lenguas Sueltas","Los Sin Filtro","Los Mudos","Los Charlatanes","Los Censurados"];
+let S={equipos:[{n:NOMBRES[0],p:0},{n:NOMBRES[1],p:0}],mazo:"atp",dif:"dificil",tiempo:60,meta:20,turno:0,usados:[],mayor:false,enCurso:false};
+let ronda=[],cartaAct=null,porTiempo=false,robo=-1;
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function guardar(){try{localStorage.setItem("nisetocurra",JSON.stringify(S))}catch(e){}}
+function cargar(){try{const d=JSON.parse(localStorage.getItem("nisetocurra"));if(d&&d.equipos)return d}catch(e){}return null}
+function ir(id){$$(".pant").forEach(p=>p.classList.toggle("on",p.id===id));window.scrollTo(0,0)}
+const necesitaMayor=()=>S.mazo!=="atp";
+
+/* ===== Configuración ===== */
+function pintaEquipos(){
+  $("#listaEq").innerHTML=S.equipos.map((e,i)=>`<div class="fila"><span class="punto" style="background:${COLORES[i]}"></span><input type="text" maxlength="22" data-i="${i}" value="${esc(e.n)}" aria-label="Nombre del equipo ${i+1}"></div>`).join("");
+  $("#masEq").disabled=S.equipos.length>=6;$("#menosEq").disabled=S.equipos.length<=2;
+}
+$("#listaEq").addEventListener("input",e=>{const i=e.target.dataset.i;if(i!=null)S.equipos[i].n=e.target.value});
+$("#masEq").onclick=()=>{S.equipos.push({n:NOMBRES[S.equipos.length],p:0});pintaEquipos()};
+$("#menosEq").onclick=()=>{S.equipos.pop();pintaEquipos()};
+function grupo(sel,attr,fn){$(sel).addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  $$(sel+" button").forEach(x=>x.classList.toggle("on",x===b));fn(b.dataset[attr]);marcarConfig()})}
+grupo("#mazos","z",v=>{S.mazo=v});
+grupo("#difs","d",v=>S.dif=v);
+grupo("#tiempos","t",v=>S.tiempo=+v);
+grupo("#metas","g",v=>S.meta=+v);
+$("#mayor").onclick=()=>{S.mayor=!S.mayor;marcarConfig()};
+
+function marcarConfig(){
+  $$("#mazos button").forEach(b=>b.classList.toggle("on",b.dataset.z===S.mazo));
+  $$("#difs button").forEach(b=>b.classList.toggle("on",b.dataset.d===S.dif));
+  $$("#tiempos button").forEach(b=>b.classList.toggle("on",+b.dataset.t===S.tiempo));
+  $$("#metas button").forEach(b=>b.classList.toggle("on",+b.dataset.g===S.meta));
+  $("#notaMazo").textContent=NOTA_MAZO[S.mazo];
+  $("#notaDif").textContent=DIF[S.dif].txt;
+  $("#mayor").style.display=necesitaMayor()?"flex":"none";
+  $("#mayor").classList.toggle("on",S.mayor);$("#mayorIco").textContent=S.mayor?"☑️":"⬜";
+  $("#empezar").disabled=necesitaMayor()&&!S.mayor;
+}
+
+$("#empezar").onclick=()=>{
+  if(necesitaMayor()&&!S.mayor)return;
+  S.equipos.forEach((e,i)=>{e.n=e.n.trim()||("Equipo "+(i+1));e.p=0});
+  S.turno=0;S.enCurso=true;desbloquearAudio();guardar();pasar();
+};
+$("#seguir").onclick=()=>{desbloquearAudio();pasar()};
+
+/* ===== Turnos ===== */
+const eqAct=()=>S.turno%S.equipos.length;
+function pintaTabla(sel,resaltar){
+  $(sel).innerHTML=S.equipos.map((e,i)=>`<div class="${i===resaltar?"turno":""}"><span><span class="punto" style="vertical-align:middle;margin-right:8px;background:${COLORES[i]}"></span>${esc(e.n)}</span><span class="pts">${e.p}</span></div>`).join("");
+}
+function pasar(){
+  const i=eqAct();pintaTabla("#tabla",i);
+  $("#eqTurno").textContent=S.equipos[i].n;$("#eqTurno").style.color=COLORES[i];
+  ir("pPasar");
+}
+$("#terminar").onclick=()=>{S.enCurso=false;guardar();inicio()};
+$("#listo").onclick=arrancar;
+
+function pozo(){return S.mazo==="atp"?MAZO.atp:S.mazo==="adulto"?MAZO.adulto:MAZO.atp.concat(MAZO.adulto)}
+function sacar(){
+  const todas=pozo();
+  let libres=todas.filter(c=>!S.usados.includes(c.p));
+  if(!libres.length){S.usados=S.usados.filter(p=>!todas.some(c=>c.p===p));libres=todas}
+  const c=libres[Math.floor(Math.random()*libres.length)];
+  S.usados.push(c.p);guardar();return c;
+}
+function mostrar(){
+  cartaAct=sacar();
+  const d=DIF[S.dif];
+  $("#cPal").textContent=cartaAct.p;
+  $("#cProh").innerHTML=cartaAct.x.slice(0,d.n).map(w=>`<li>${esc(w)}</li>`).join("");
+  $("#cTag").textContent=cartaAct.z==="adulto"?"+18":"ATP";
+  $("#carta").classList.toggle("mas18",cartaAct.z==="adulto");
+}
+function puntosRonda(){
+  const d=DIF[S.dif];let pases=0,t=0;
+  ronda.forEach(r=>{if(r.e==="ok")t++;else if(r.e==="mal")t-=d.falta;else{pases++;if(pases>d.libres)t--}});
+  return t;
+}
+function pintaBotonPasar(){
+  const d=DIF[S.dif],pases=ronda.filter(r=>r.e==="pas").length;
+  $("#bPas").textContent=pases<d.libres?(d.libres===Infinity?"⏭ Pasar":"⏭ Pasar (gratis)"):"⏭ Pasar (−1)";
+  $("#marc").textContent=(puntosRonda()>0?"+":"")+puntosRonda();
+}
+
+/* ===== Reloj ===== */
+let fin=0,intervalo=null,lock=null,ultimoSeg=null;
+function arrancar(){
+  ronda=[];porTiempo=false;robo=-1;
+  $("#reglaJ").textContent=DIF[S.dif].regla;
+  mostrar();pintaBotonPasar();ir("pJuego");
+  fin=Date.now()+S.tiempo*1000;ultimoSeg=null;tick();intervalo=setInterval(tick,200);
+  pedirPantalla();tic(660,.12);
+}
+function tick(){
+  const resta=Math.max(0,fin-Date.now()),s=Math.ceil(resta/1000);
+  $("#reloj").textContent=s;$("#reloj").classList.toggle("poco",s<=10);
+  $("#prog").style.width=(resta/(S.tiempo*1000)*100)+"%";
+  if(s!==ultimoSeg){ultimoSeg=s;if(s<=5&&s>0)tic(660,.08)}
+  if(resta<=0){pararReloj();tic(220,.6);vibrar([200,100,200]);porTiempo=true;resumen()}
+}
+function pararReloj(){clearInterval(intervalo);intervalo=null;soltarPantalla()}
+let traba=0;
+function marcar(e){
+  if(!intervalo||Date.now()<traba)return; // evita doble toque
+  traba=Date.now()+350;
+  ronda.push({c:cartaAct,e});
+  const f=$("#flash");f.className="flash "+e;requestAnimationFrame(()=>requestAnimationFrame(()=>f.className="flash"));
+  if(e==="ok"){tic(990,.12);vibrar(40)}else if(e==="mal"){tic(180,.3);vibrar([80,40,80])}else tic(520,.06);
+  mostrar();pintaBotonPasar();
+}
+$("#bOk").onclick=()=>marcar("ok");
+$("#bPas").onclick=()=>marcar("pas");
+$("#bMal").onclick=()=>marcar("mal");
+
+/* ===== Resumen ===== */
+const ICO={ok:"✅",pas:"⏭",mal:"🚫"},SIG={ok:"pas",pas:"mal",mal:"ok"};
+function resumen(){
+  const i=eqAct();
+  $("#rTit").textContent="¡Tiempo, "+S.equipos[i].n+"!";
+  $("#rTit").style.color=COLORES[i];
+  if(porTiempo&&cartaAct){
+    $("#cajaRobo").style.display="flex";
+    $("#rRobo").textContent=cartaAct.p;
+    pintaRobo();
+  }else $("#cajaRobo").style.display="none";
+  pintaLista();ir("pRes");
+}
+function pintaRobo(){
+  const i=eqAct();
+  $("#quien").innerHTML=S.equipos.map((e,k)=>k===i?"":`<button data-k="${k}" class="${robo===k?"on":""}"><span class="punto" style="background:${COLORES[k]}"></span>La robó ${esc(e.n)} (+1)</button>`).join("")+
+    `<button data-k="-1" class="${robo===-1?"on":""}">Nadie</button>`;
+}
+$("#quien").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;robo=+b.dataset.k;pintaRobo()});
+function pintaLista(){
+  $("#lista").innerHTML=ronda.length?ronda.map((r,k)=>`<button data-k="${k}" class="${r.e}"><span>${esc(r.c.p)}</span><span class="est">${ICO[r.e]}</span></button>`).join(""):'<p class="nota">No pasó ninguna carta.</p>';
+  const t=puntosRonda();
+  $("#rTotal").textContent=S.equipos[eqAct()].n+": "+(t>0?"+":"")+t+(t===1||t===-1?" punto":" puntos");
+}
+$("#lista").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const r=ronda[+b.dataset.k];r.e=SIG[r.e];pintaLista()});
+$("#confirmar").onclick=()=>{
+  const i=eqAct();
+  S.equipos[i].p+=puntosRonda();
+  if(robo>=0)S.equipos[robo].p++;
+  siguiente();
+};
+function siguiente(){
+  S.turno++;guardar();
+  if(S.turno%S.equipos.length===0){
+    const max=Math.max(...S.equipos.map(e=>e.p));
+    const lideres=S.equipos.filter(e=>e.p===max);
+    if(max>=S.meta&&lideres.length===1){terminar(lideres[0]);return}
+  }
+  pasar();
+}
+function terminar(g){
+  S.enCurso=false;guardar();
+  $("#ganador").textContent=g.n;$("#ganador").style.color=COLORES[S.equipos.indexOf(g)];
+  pintaTabla("#tablaFin",S.equipos.indexOf(g));ir("pFin");vibrar([100,60,100,60,300]);
+  [523,659,784,1046].forEach((f,i)=>setTimeout(()=>tic(f,.18),i*160));
+}
+$("#otra").onclick=inicio;
+
+/* ===== Sonido, vibración y pantalla encendida ===== */
+let ac=null;
+function desbloquearAudio(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume()}catch(e){}}
+function tic(f,dur){if(!ac)return;try{const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type="triangle";
+  g.gain.setValueAtTime(.25,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+dur);
+  o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+dur)}catch(e){}}
+function vibrar(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
+async function pedirPantalla(){try{lock=await navigator.wakeLock?.request("screen")}catch(e){}}
+function soltarPantalla(){try{lock&&lock.release();lock=null}catch(e){}}
+
+/* ===== Arranque ===== */
+function inicio(){
+  const d=cargar();
+  if(d){S=Object.assign(S,d);if(!Array.isArray(S.usados))S.usados=[]}
+  if(new URLSearchParams(location.search).has("adultos")&&!S.enCurso){S.mazo="adulto"}
+  marcarConfig();pintaEquipos();
+  $("#seguir").style.display=S.enCurso?"block":"none";
+  ir("pInicio");
+}
+inicio();
+</script>
+</body>
+</html>
