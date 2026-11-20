@@ -27,3 +27,9 @@ Editá `juegos.json` y sumá un bloque así (separado por coma del anterior):
 `edad` define la calificación de la caja: menos de 13 = ATP, 13 = +13, 16 = +16, 18 = +18. Opcional: `"imagen": "ruta/a/imagen.png"` reemplaza al ícono.
 
 Si no sabés la cantidad de jugadores, poné `null` en `min` o `max`.
+
+## Juegos propios
+
+Viven en `juegos/<nombre>/` y se juegan con un solo celular, sin servidor. En `juegos.json` llevan `"propio": true` (abren en la misma pestaña y muestran la etiqueta "Hecho en casa").
+
+- `juegos/mostralo/`: **Mostralo como puedas**. Dibujo, mímica o tarareo por equipos; las consignas están en el objeto `MAZO` del `index.html`.

@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a1030">
+<title>Mostralo Como Puedas</title>
+<style>
+:root{--bg:#1a1030;--card:#2a1d4a;--txt:#fff8ec;--sub:#c9bfe6;--acc:#ffc23d;--dib:#ff6b6b;--mim:#4ecdc4;--tar:#a78bfa;--ok:#3ddc84;--mal:#ff5c5c}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior:none}
+.pant{display:none;min-height:100%;padding:16px 16px calc(16px + env(safe-area-inset-bottom));flex-direction:column;gap:14px;max-width:560px;margin:0 auto}
+.pant.on{display:flex}
+h1{margin:4px 0 0;font-size:1.9rem;line-height:1.05;text-transform:uppercase;color:var(--acc);text-shadow:0 0 12px #ffc23d66;text-align:center}
+h2{margin:0;font-size:1.3rem;text-align:center}
+p{margin:0;line-height:1.4}
+.sub{color:var(--sub);text-align:center}
+.caja{background:var(--card);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.caja h3{margin:0;font-size:.85rem;text-transform:uppercase;letter-spacing:1px;color:var(--sub)}
+.fila{display:flex;gap:8px;align-items:center}
+.fila input[type=text]{flex:1;min-width:0}
+input[type=text]{padding:10px;border-radius:10px;border:2px solid #ffffff22;background:#00000033;color:var(--txt);font-size:1rem}
+.punto{width:16px;height:16px;border-radius:50%;flex:none}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{flex:1;min-width:70px}
+button{font:inherit;border:0;border-radius:12px;padding:12px 14px;background:#ffffff1a;color:var(--txt);font-weight:600;cursor:pointer}
+button.on{background:var(--acc);color:#1b1400}
+button.grande{padding:16px;font-size:1.15rem;font-weight:800;background:var(--acc);color:#1b1400}
+button.sec{background:#ffffff14}
+button:disabled{opacity:.4}
+.chico{padding:8px 12px;font-size:.9rem}
+a.volver{color:var(--sub);text-align:center;font-size:.9rem}
+.reglas{font-size:.92rem;color:var(--sub)}
+.reglas b{color:var(--txt)}
+.reglas ul{margin:6px 0 0;padding-left:18px}
+.reglas li{margin:4px 0}
+/* tablero */
+.tabla{display:flex;flex-direction:column;gap:6px}
+.tabla div{display:flex;justify-content:space-between;align-items:center;background:#00000033;border-radius:10px;padding:10px 12px;font-weight:700}
+.tabla div.turno{outline:3px solid var(--acc)}
+.tabla span.pts{font-size:1.3rem}
+/* pasar */
+.centro{flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;text-align:center}
+.equipo{font-size:2.2rem;font-weight:900}
+.ojo{font-size:4rem}
+/* ruleta */
+.ruleta{font-size:6rem;width:200px;height:200px;margin:0 auto;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,#ffffff30,#ffffff08 70%);border:6px solid #ffffff22;transition:border-color .2s}
+.modo{font-size:2rem;font-weight:900;text-transform:uppercase;min-height:2.4rem}
+.dib{color:var(--dib)}.mim{color:var(--mim)}.tar{color:var(--tar)}
+/* carta */
+.carta{background:#fff8ec;color:#1a1030;border-radius:18px;padding:22px 16px;text-align:center;box-shadow:0 10px 30px #0008;border-top:14px solid var(--c,#ffc23d)}
+.carta .cat{font-size:.8rem;text-transform:uppercase;letter-spacing:2px;color:#6b5c8f}
+.carta .pal{font-size:2.1rem;font-weight:900;line-height:1.1;margin:8px 0}
+.carta .pista{font-size:.95rem;color:#6b5c8f}
+.regla{font-size:.95rem;text-align:center;color:var(--sub)}
+/* juego */
+#pJuego{padding:10px 10px calc(10px + env(safe-area-inset-bottom));gap:10px;height:100%}
+.barra{display:flex;gap:8px;align-items:center}
+.reloj{font-size:2rem;font-weight:900;font-variant-numeric:tabular-nums;min-width:4.2rem;text-align:center}
+.reloj.poco{color:var(--mal);animation:lat 1s infinite}
+@keyframes lat{50%{transform:scale(1.15)}}
+.progreso{flex:1;height:10px;background:#ffffff1a;border-radius:99px;overflow:hidden}
+.progreso i{display:block;height:100%;background:var(--acc);width:100%}
+.espiar{user-select:none;-webkit-user-select:none;touch-action:none}
+.oculta{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center}
+.oculta .modoGrande{font-size:5rem}
+.peek{background:#fff8ec;color:#1a1030;border-radius:12px;padding:10px;text-align:center;font-weight:900;font-size:1.4rem;display:none}
+.peek.on{display:block}
+#lienzoCaja{flex:1;position:relative;background:#fff;border-radius:12px;overflow:hidden;display:none;min-height:240px}
+#lienzo{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.herr{display:none;gap:6px}
+.herr button{flex:1;padding:10px 6px}
+.herr .col{border:3px solid transparent}
+.herr .col.on{border-color:var(--acc);background:#ffffff1a}
+.acc2{display:flex;gap:8px}
+.acc2 button{flex:1}
+.btnok{background:var(--ok);color:#06210f;font-weight:900;font-size:1.1rem;padding:16px}
+/* resultado */
+.quien{display:flex;flex-direction:column;gap:8px}
+.quien button{padding:14px;font-size:1.05rem;text-align:left;display:flex;align-items:center;gap:10px}
+.podio{font-size:4rem;text-align:center}
+</style>
+</head>
+<body>
+
+<!-- INICIO -->
+<section class="pant on" id="pInicio">
+  <h1>Mostralo<br>como puedas</h1>
+  <p class="sub">Dibujá, actuá o tarareá. La ruleta decide.</p>
+
+  <div class="caja">
+    <h3>Equipos</h3>
+    <div id="listaEq" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div class="fila"><button class="sec chico" id="masEq">＋ Equipo</button><button class="sec chico" id="menosEq">－ Equipo</button></div>
+  </div>
+
+  <div class="caja">
+    <h3>Qué puede salir en la ruleta</h3>
+    <div class="chips" id="modos">
+      <button data-m="dib" class="on">✏️ Dibujar</button>
+      <button data-m="mim" class="on">🙌 Mímica</button>
+      <button data-m="tar" class="on">🎵 Tararear</button>
+    </div>
+  </div>
+
+  <div class="caja">
+    <h3>Dibujar en</h3>
+    <div class="chips" id="soporte">
+      <button data-s="pantalla" class="on">📱 La pantalla</button>
+      <button data-s="papel">📝 Papel</button>
+    </div>
+  </div>
+
+  <div class="caja">
+    <h3>Tiempo por turno</h3>
+    <div class="chips" id="tiempos">
+      <button data-t="45">45 s</button><button data-t="60" class="on">60 s</button><button data-t="90">90 s</button>
+    </div>
+    <h3>Gana el primero en llegar a</h3>
+    <div class="chips" id="metas">
+      <button data-g="5">5</button><button data-g="8" class="on">8</button><button data-g="12">12</button>
+    </div>
+  </div>
+
+  <div class="caja reglas">
+    <h3>Cómo se juega</h3>
+    <ul>
+      <li>Cada turno juega <b>una persona</b> de un equipo. Le pasan el celu y solo ella mira la consigna.</li>
+      <li>La ruleta dice cómo mostrarla: <b class="dib">dibujando</b> (sin letras ni números), con <b class="mim">mímica</b> (sin hablar ni hacer ruido) o <b class="tar">tarareando</b> (sin letra: solo "na-na", "tu-ru" o silbando).</li>
+      <li>Si su equipo adivina antes de que se acabe el tiempo, suma 1 punto.</li>
+      <li>Si se acaba el tiempo, los otros equipos tienen <b>un intento</b> cada uno para robar el punto.</li>
+      <li>En cada turno pasa otra persona, para que todos jueguen.</li>
+    </ul>
+  </div>
+
+  <button class="grande" id="empezar">▶ Empezar</button>
+  <button class="sec" id="seguir" style="display:none">↻ Seguir la partida anterior</button>
+  <a class="volver" href="../../">← Volver a la Juegoteca</a>
+</section>
+
+<!-- TABLERO / PASAR -->
+<section class="pant" id="pPasar">
+  <div class="tabla" id="tabla"></div>
+  <div class="centro">
+    <div class="ojo">🙈</div>
+    <p class="sub">Le toca a</p>
+    <div class="equipo" id="eqTurno"></div>
+    <p>Pasale el celu a quien va a mostrar.<br>El resto, <b>no mire</b>.</p>
+  </div>
+  <button class="grande" id="listo">Soy yo, girá la ruleta</button>
+  <button class="sec chico" id="terminar">Terminar partida</button>
+</section>
+
+<!-- RULETA -->
+<section class="pant" id="pRuleta">
+  <div class="centro">
+    <div class="ruleta" id="ruleta">🎲</div>
+    <div class="modo" id="modoTxt"></div>
+  </div>
+</section>
+
+<!-- CARTA -->
+<section class="pant" id="pCarta">
+  <div class="centro">
+    <div class="modo" id="cModo"></div>
+    <div class="carta" id="carta">
+      <div class="cat" id="cCat"></div>
+      <div class="pal" id="cPal"></div>
+      <div class="pista" id="cPista"></div>
+    </div>
+    <p class="regla" id="cRegla"></p>
+  </div>
+  <button class="grande" id="arrancar">¡Ya! Arrancar el reloj</button>
+  <button class="sec chico" id="cambiar">Cambiar consigna (no la conozco)</button>
+</section>
+
+<!-- JUEGO -->
+<section class="pant" id="pJuego">
+  <div class="barra">
+    <div class="reloj" id="reloj">60</div>
+    <div class="progreso"><i id="prog"></i></div>
+    <button class="sec chico espiar" id="espiar">👁 Ver</button>
+  </div>
+  <div class="peek" id="peek"></div>
+  <div class="oculta" id="oculta">
+    <div class="modoGrande" id="jIcono"></div>
+    <div class="modo" id="jModo"></div>
+    <p class="sub">Mantené apretado <b>👁 Ver</b> si te olvidaste la consigna.</p>
+  </div>
+  <div id="lienzoCaja"><canvas id="lienzo"></canvas></div>
+  <div class="herr" id="herr">
+    <button class="col on" data-c="#1a1030">⚫</button>
+    <button class="col" data-c="#e63946">🔴</button>
+    <button class="col" data-c="#1d70d6">🔵</button>
+    <button class="col" data-c="borra">🧽</button>
+    <button id="limpiar">🗑️</button>
+  </div>
+  <div class="acc2">
+    <button class="btnok" id="acerto">✅ ¡Adivinaron!</button>
+  </div>
+  <button class="sec chico" id="rendirse">Nos rendimos</button>
+</section>
+
+<!-- RESULTADO -->
+<section class="pant" id="pRes">
+  <div class="centro">
+    <div class="ojo" id="rIcono">⏰</div>
+    <h2 id="rTit">¡Se acabó el tiempo!</h2>
+    <p class="sub" id="rSub">Los otros equipos tienen un intento cada uno. ¿Alguien adivinó?</p>
+    <div class="carta"><div class="cat">La consigna era</div><div class="pal" id="rPal"></div></div>
+    <div class="quien" id="quien"></div>
+  </div>
+</section>
+
+<!-- FIN -->
+<section class="pant" id="pFin">
+  <div class="centro">
+    <div class="podio">🏆</div>
+    <h2>Ganó</h2>
+    <div class="equipo" id="ganador"></div>
+    <div class="tabla" id="tablaFin"></div>
+  </div>
+  <button class="grande" id="otra">Jugar otra</button>
+  <a class="volver" href="../../">← Volver a la Juegoteca</a>
+</section>
+
+<script>
+/* ===== Consignas (originales, ATP) ===== */
+const MAZO={
+dib:{nombre:"Dibujar",icono:"✏️",color:"var(--dib)",hex:"#ff6b6b",
+ regla:"Dibujá sin letras, sin números y sin hablar. Podés señalar tu dibujo.",
+ cartas:[
+ ["Objeto","Mate"],["Objeto","Termo"],["Objeto","Paraguas"],["Objeto","Bicicleta"],["Objeto","Anteojos"],["Objeto","Escalera"],
+ ["Objeto","Tijera"],["Objeto","Reloj despertador"],["Objeto","Lamparita"],["Objeto","Guitarra"],["Objeto","Pava"],["Objeto","Llave"],
+ ["Objeto","Barrilete"],["Objeto","Sombrero"],["Objeto","Hamaca"],["Objeto","Candado"],["Objeto","Valija"],["Objeto","Ventilador"],
+ ["Objeto","Silla de playa"],["Objeto","Carretilla"],["Objeto","Martillo"],["Objeto","Cepillo de dientes"],["Objeto","Microondas"],
+ ["Animal","Pingüino"],["Animal","Jirafa"],["Animal","Caracol"],["Animal","Pulpo"],["Animal","Hornero"],["Animal","Tortuga"],
+ ["Animal","Murciélago"],["Animal","Elefante"],["Animal","Carpincho"],["Animal","Mariposa"],["Animal","Tiburón"],["Animal","Gallina"],
+ ["Animal","Araña"],["Animal","Caballo"],["Animal","Ballena"],["Animal","Cangrejo"],
+ ["Lugar","Faro"],["Lugar","Castillo"],["Lugar","Volcán"],["Lugar","Isla"],["Lugar","Estadio"],["Lugar","Puente"],["Lugar","Pirámide"],
+ ["Lugar","Plaza con calesita"],["Lugar","Iglú"],["Lugar","Cascada"],
+ ["Comida","Pizza"],["Comida","Empanada"],["Comida","Choripán"],["Comida","Helado"],["Comida","Torta de cumpleaños"],["Comida","Banana"],
+ ["Comida","Huevo frito"],["Comida","Medialuna"],["Comida","Sandía"],["Comida","Alfajor"],
+ ["Cosas varias","Cohete"],["Cosas varias","Arco iris"],["Cosas varias","Sirena"],["Cosas varias","Robot"],["Cosas varias","Fantasma"],
+ ["Cosas varias","Muñeco de nieve"],["Cosas varias","Tren"],["Cosas varias","Colectivo"],["Cosas varias","Velero"],["Cosas varias","Dinosaurio"],
+ ["Cosas varias","Tormenta"],["Cosas varias","Corona"],["Cosas varias","Dragón"],["Cosas varias","Extraterrestre"],["Cosas varias","Semáforo"]
+ ]},
+mim:{nombre:"Mímica",icono:"🙌",color:"var(--mim)",hex:"#4ecdc4",
+ regla:"Actuala sin hablar, sin hacer ruidos y sin señalar cosas de la habitación.",
+ cartas:[
+ ["Acción","Cebar mate"],["Acción","Hacer un asado"],["Acción","Colgar la ropa"],["Acción","Pescar"],["Acción","Cambiar un pañal"],
+ ["Acción","Inflar un globo"],["Acción","Atarse los cordones"],["Acción","Andar en monopatín"],["Acción","Sacarse una selfie"],
+ ["Acción","Cortar el pasto"],["Acción","Hacer panqueques"],["Acción","Pintar una pared"],["Acción","Bañar al perro"],["Acción","Ordeñar una vaca"],
+ ["Acción","Esquiar"],["Acción","Bucear"],["Acción","Patear un penal"],["Acción","Jugar al ping pong"],["Acción","Remar"],["Acción","Hacer malabares"],
+ ["Acción","Lavarse los dientes"],["Acción","Estornudar"],["Acción","Perder el colectivo"],["Acción","Pisar un chicle"],["Acción","Ponerse lentes de contacto"],
+ ["Acción","Armar una carpa"],["Acción","Subir a un caballo"],["Acción","Cortarse el pelo"],
+ ["Oficio","Bombero"],["Oficio","Mozo"],["Oficio","Dentista"],["Oficio","Peluquero"],["Oficio","Mago"],["Oficio","Director de orquesta"],
+ ["Oficio","Astronauta"],["Oficio","Cirujano"],["Oficio","Árbitro"],["Oficio","Cartero"],["Oficio","Payaso"],["Oficio","Albañil"],["Oficio","Fotógrafo"],
+ ["Personaje","Pirata"],["Personaje","Momia"],["Personaje","Zombi"],["Personaje","Superhéroe volando"],["Personaje","Rey en su trono"],
+ ["Personaje","Bailarina de ballet"],["Personaje","Estatua viviente"],["Personaje","Robot"],["Personaje","Vampiro"],
+ ["Animal","Gorila"],["Animal","Canguro"],["Animal","Flamenco"],["Animal","Serpiente"],["Animal","Pingüino"],["Animal","Gato que se despierta"],
+ ["Animal","Mono"],["Animal","Gallo"],["Animal","Cangrejo"],
+ ["Situación","Ascensor que se trabó"],["Situación","Día de mucho viento"],["Situación","Pisar el piso caliente en la playa"],
+ ["Situación","Buscar señal en el celu"],["Situación","Comer algo muy picante"],["Situación","Ver una película de terror"],
+ ["Situación","Agarrar el ramo en un casamiento"],["Situación","Abrir un frasco que no se abre"],["Situación","Caminar en la nieve"]
+ ]},
+tar:{nombre:"Tararear",icono:"🎵",color:"var(--tar)",hex:"#a78bfa",
+ regla:"Tarareala sin decir la letra: solo \"na-na\", \"tu-ru\", silbando o haciendo el ritmo. No vale hacer mímica.",
+ cartas:[
+ ["Infantil","Feliz cumpleaños",""],["Infantil","Arroz con leche",""],["Infantil","Los pollitos dicen",""],["Infantil","Manuelita","María Elena Walsh"],
+ ["Infantil","La vaca Lola",""],["Infantil","Sapo Pepe",""],["Infantil","Un elefante se balanceaba",""],["Infantil","Estrellita, ¿dónde estás?",""],
+ ["Infantil","La farolera",""],["Infantil","Saco una manito",""],["Infantil","El twist del mono liso","María Elena Walsh"],
+ ["Infantil","La cucaracha",""],["Infantil","Cielito lindo",""],
+ ["Argentina","Himno Nacional Argentino",""],["Argentina","Muchachos","la de la Selección 2022"],["Argentina","De música ligera","Soda Stereo"],
+ ["Argentina","Persiana americana","Soda Stereo"],["Argentina","Matador","Los Fabulosos Cadillacs"],["Argentina","Mil horas","Los Abuelos de la Nada"],
+ ["Argentina","Muchacha ojos de papel","Almendra"],["Argentina","Rasguña las piedras","Sui Generis"],["Argentina","Seminare","Serú Girán"],
+ ["Argentina","Zamba de mi esperanza",""],["Argentina","Mi Buenos Aires querido","Carlos Gardel"],["Argentina","Por una cabeza","Carlos Gardel"],
+ ["Argentina","La cumparsita","tango"],["Argentina","Libertango","Astor Piazzolla"],["Argentina","Lamento boliviano","Enanitos Verdes"],
+ ["Argentina","Costumbres argentinas","Los Abuelos de la Nada"],["Argentina","Yo vengo a ofrecer mi corazón","Fito Páez"],
+ ["Argentina","Avanti morocha","Rodrigo"],
+ ["Mundo","La bamba",""],["Mundo","Macarena","Los del Río"],["Mundo","Despacito","Luis Fonsi"],["Mundo","Waka waka","Shakira"],
+ ["Mundo","Bohemian Rhapsody","Queen"],["Mundo","We will rock you","Queen"],["Mundo","Let it be","The Beatles"],
+ ["Mundo","Yellow submarine","The Beatles"],["Mundo","Thriller","Michael Jackson"],["Mundo","Billie Jean","Michael Jackson"],
+ ["Mundo","Seven Nation Army","The White Stripes (la de las canchas)"],["Mundo","Uptown funk","Bruno Mars"],["Mundo","Para Elisa","Beethoven"],
+ ["Mundo","Jingle bells",""],["Mundo","Noche de paz",""],["Mundo","Las mañanitas",""],["Mundo","Gasolina","Daddy Yankee"],
+ ["Mundo","La Marcha Nupcial","la de los casamientos"],["Mundo","Himno de la alegría","Beethoven"],
+ ["Película o tele","Marcha Imperial","Star Wars"],["Película o tele","Misión Imposible",""],["Película o tele","Piratas del Caribe",""],
+ ["Película o tele","Tema de Harry Potter",""],["Película o tele","Los Simpson (apertura)",""],["Película o tele","El Chavo del 8 (apertura)",""],
+ ["Película o tele","Hakuna Matata","El Rey León"],["Película o tele","Libre soy","Frozen"],["Película o tele","La Pantera Rosa",""],
+ ["Película o tele","Tiburón (cuando se acerca)",""],["Película o tele","Titanic (My heart will go on)",""],["Película o tele","Cazafantasmas",""]
+ ]}
+};
+
+/* ===== Estado ===== */
+const COLORES=["#ff6b6b","#4ecdc4","#ffc23d","#a78bfa","#3ddc84","#ff9f43"];
+const NOMBRES=["Los Garabatos","Las Estatuas","Los Silbadores","Los Mudos","Los Artistas","Los Afinados"];
+let S={equipos:[{n:NOMBRES[0],p:0},{n:NOMBRES[1],p:0}],modos:["dib","mim","tar"],soporte:"pantalla",tiempo:60,meta:8,turno:0,usados:{dib:[],mim:[],tar:[]},enCurso:false};
+let modoAct=null,cartaAct=null;
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function guardar(){try{localStorage.setItem("mostralo",JSON.stringify(S))}catch(e){}}
+function cargar(){try{const d=JSON.parse(localStorage.getItem("mostralo"));if(d&&d.equipos)return d}catch(e){}return null}
+function ir(id){$$(".pant").forEach(p=>p.classList.toggle("on",p.id===id));window.scrollTo(0,0)}
+
+/* ===== Configuración ===== */
+function pintaEquipos(){
+  $("#listaEq").innerHTML=S.equipos.map((e,i)=>`<div class="fila"><span class="punto" style="background:${COLORES[i]}"></span><input type="text" maxlength="20" data-i="${i}" value="${esc(e.n)}" aria-label="Nombre del equipo ${i+1}"></div>`).join("");
+  $("#masEq").disabled=S.equipos.length>=6;$("#menosEq").disabled=S.equipos.length<=2;
+}
+$("#listaEq").addEventListener("input",e=>{const i=e.target.dataset.i;if(i!=null)S.equipos[i].n=e.target.value});
+$("#masEq").onclick=()=>{S.equipos.push({n:NOMBRES[S.equipos.length],p:0});pintaEquipos()};
+$("#menosEq").onclick=()=>{S.equipos.pop();pintaEquipos()};
+function grupo(sel,attr,fn){$(sel).addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  $$(sel+" button").forEach(x=>x.classList.toggle("on",x===b));fn(b.dataset[attr])})}
+grupo("#soporte","s",v=>S.soporte=v);
+grupo("#tiempos","t",v=>S.tiempo=+v);
+grupo("#metas","g",v=>S.meta=+v);
+$("#modos").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  const on=$$("#modos button.on");if(b.classList.contains("on")&&on.length===1)return; // al menos uno
+  b.classList.toggle("on");S.modos=$$("#modos button.on").map(x=>x.dataset.m)});
+
+function marcarConfig(){
+  $$("#modos button").forEach(b=>b.classList.toggle("on",S.modos.includes(b.dataset.m)));
+  $$("#soporte button").forEach(b=>b.classList.toggle("on",b.dataset.s===S.soporte));
+  $$("#tiempos button").forEach(b=>b.classList.toggle("on",+b.dataset.t===S.tiempo));
+  $$("#metas button").forEach(b=>b.classList.toggle("on",+b.dataset.g===S.meta));
+}
+
+$("#empezar").onclick=()=>{
+  S.equipos.forEach((e,i)=>{e.n=e.n.trim()||("Equipo "+(i+1));e.p=0});
+  S.turno=0;S.enCurso=true;desbloquearAudio();guardar();pasar();
+};
+$("#seguir").onclick=()=>{desbloquearAudio();pasar()};
+
+/* ===== Turnos ===== */
+const eqAct=()=>S.turno%S.equipos.length;
+function pintaTabla(sel,resaltar){
+  $(sel).innerHTML=S.equipos.map((e,i)=>`<div class="${i===resaltar?"turno":""}"><span><span class="punto" style="display:inline-block;vertical-align:middle;margin-right:8px;background:${COLORES[i]}"></span>${esc(e.n)}</span><span class="pts">${e.p}</span></div>`).join("");
+}
+function pasar(){
+  const i=eqAct();pintaTabla("#tabla",i);
+  $("#eqTurno").textContent=S.equipos[i].n;$("#eqTurno").style.color=COLORES[i];
+  ir("pPasar");
+}
+$("#terminar").onclick=()=>{S.enCurso=false;guardar();inicio()};
+$("#listo").onclick=girar;
+
+function girar(){
+  ir("pRuleta");
+  const pos=S.modos,elegido=pos[Math.floor(Math.random()*pos.length)];
+  const r=$("#ruleta"),t=$("#modoTxt");t.textContent="";t.className="modo";
+  let k=0,pasos=14+Math.floor(Math.random()*4),demora=60;
+  // asegura que el último paso caiga en el elegido
+  const orden=["dib","mim","tar"].filter(m=>pos.includes(m));
+  const inicioIdx=(orden.indexOf(elegido)-pasos%orden.length+orden.length*10)%orden.length;
+  (function paso(){
+    const m=orden[(inicioIdx+k)%orden.length];
+    r.textContent=MAZO[m].icono;r.style.borderColor=MAZO[m].hex;tic(k===pasos?880:440,.04);
+    if(k<pasos){k++;demora*=1.12;setTimeout(paso,demora)}
+    else{t.textContent=MAZO[elegido].nombre;t.classList.add(elegido);vibrar(80);setTimeout(()=>mostrarCarta(elegido),1100)}
+  })();
+}
+function sacar(m){
+  const total=MAZO[m].cartas.length;
+  if(S.usados[m].length>=total)S.usados[m]=[];
+  let idx;do{idx=Math.floor(Math.random()*total)}while(S.usados[m].includes(idx));
+  S.usados[m].push(idx);guardar();return MAZO[m].cartas[idx];
+}
+function mostrarCarta(m){
+  modoAct=m;cartaAct=sacar(m);
+  const M=MAZO[m];
+  $("#cModo").textContent=M.icono+" "+M.nombre;$("#cModo").className="modo "+m;
+  $("#carta").style.setProperty("--c",M.hex);
+  $("#cCat").textContent=cartaAct[0];$("#cPal").textContent=cartaAct[1];
+  $("#cPista").textContent=cartaAct[2]?"("+cartaAct[2]+")":"";
+  let regla=M.regla;if(m==="dib"&&S.soporte==="papel")regla+=" Agarrá papel y lapicera.";
+  $("#cRegla").textContent=regla;
+  ir("pCarta");
+}
+$("#cambiar").onclick=()=>mostrarCarta(modoAct);
+
+/* ===== Reloj ===== */
+let fin=0,intervalo=null,lock=null;
+$("#arrancar").onclick=()=>{
+  const M=MAZO[modoAct];
+  $("#peek").textContent=cartaAct[1];
+  $("#jIcono").textContent=M.icono;$("#jModo").textContent=M.nombre;$("#jModo").className="modo "+modoAct;
+  const lienzo=modoAct==="dib"&&S.soporte==="pantalla";
+  $("#lienzoCaja").style.display=lienzo?"block":"none";
+  $("#herr").style.display=lienzo?"flex":"none";
+  $("#oculta").style.display=lienzo?"none":"flex";
+  ir("pJuego");
+  if(lienzo)prepararLienzo();
+  fin=Date.now()+S.tiempo*1000;ultimoSeg=null;tick();intervalo=setInterval(tick,200);
+  pedirPantalla();
+};
+let ultimoSeg=null;
+function tick(){
+  const resta=Math.max(0,fin-Date.now()),s=Math.ceil(resta/1000);
+  $("#reloj").textContent=s;$("#reloj").classList.toggle("poco",s<=10);
+  $("#prog").style.width=(resta/(S.tiempo*1000)*100)+"%";
+  if(s!==ultimoSeg){ultimoSeg=s;if(s<=5&&s>0)tic(660,.08)}
+  if(resta<=0){pararReloj();tic(220,.6);vibrar([200,100,200]);resultado(false)}
+}
+function pararReloj(){clearInterval(intervalo);intervalo=null;soltarPantalla()}
+$("#acerto").onclick=()=>{pararReloj();sumar(eqAct());tic(990,.15);vibrar(60)};
+$("#rendirse").onclick=()=>{pararReloj();resultado(true)};
+
+/* espiar consigna */
+const esp=$("#espiar");
+const ver=v=>e=>{e.preventDefault();$("#peek").classList.toggle("on",v)};
+esp.addEventListener("pointerdown",ver(true));
+["pointerup","pointerleave","pointercancel"].forEach(ev=>esp.addEventListener(ev,ver(false)));
+esp.addEventListener("contextmenu",e=>e.preventDefault());
+
+/* ===== Resultado ===== */
+function resultado(rendido){
+  const i=eqAct();
+  $("#rIcono").textContent=rendido?"🏳️":"⏰";
+  $("#rTit").textContent=rendido?"Se rindieron":"¡Se acabó el tiempo!";
+  $("#rPal").textContent=cartaAct[1];
+  const otros=S.equipos.map((e,k)=>({e,k})).filter(x=>x.k!==i);
+  $("#rSub").textContent="Los otros equipos tienen un intento cada uno. ¿Alguien adivinó?";
+  $("#quien").innerHTML=otros.map(x=>`<button data-k="${x.k}"><span class="punto" style="background:${COLORES[x.k]}"></span>Robó ${esc(x.e.n)}</button>`).join("")+
+    `<button data-k="-1" class="sec">Nadie, seguimos</button>`;
+  ir("pRes");
+}
+$("#quien").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  const k=+b.dataset.k;if(k>=0)sumar(k);else siguiente()});
+
+function sumar(k){S.equipos[k].p++;guardar();siguiente()}
+function siguiente(){
+  S.turno++;guardar();
+  // se cierra al terminar una vuelta completa, así todos los equipos juegan la misma cantidad de turnos
+  if(S.turno%S.equipos.length===0){
+    const max=Math.max(...S.equipos.map(e=>e.p));
+    const lideres=S.equipos.filter(e=>e.p===max);
+    if(max>=S.meta&&lideres.length===1){terminar(lideres[0]);return}
+  }
+  pasar();
+}
+function terminar(g){
+  S.enCurso=false;guardar();
+  $("#ganador").textContent=g.n;$("#ganador").style.color=COLORES[S.equipos.indexOf(g)];
+  pintaTabla("#tablaFin",S.equipos.indexOf(g));ir("pFin");vibrar([100,60,100,60,300]);
+  [523,659,784,1046].forEach((f,i)=>setTimeout(()=>tic(f,.18),i*160));
+}
+$("#otra").onclick=inicio;
+
+/* ===== Lienzo ===== */
+const cv=$("#lienzo"),cx=cv.getContext("2d");let trazo=null,color="#1a1030";
+function prepararLienzo(){
+  const r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;
+  cv.width=Math.round(r.width*d);cv.height=Math.round(r.height*d);
+  cx.setTransform(d,0,0,d,0,0);cx.lineCap="round";cx.lineJoin="round";
+  cx.fillStyle="#fff";cx.fillRect(0,0,r.width,r.height);
+}
+function punto(e){const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]}
+cv.addEventListener("pointerdown",e=>{e.preventDefault();cv.setPointerCapture(e.pointerId);trazo=punto(e);
+  cx.strokeStyle=color==="borra"?"#fff":color;cx.lineWidth=color==="borra"?28:5;
+  cx.beginPath();cx.moveTo(...trazo);cx.lineTo(trazo[0]+.1,trazo[1]+.1);cx.stroke()});
+cv.addEventListener("pointermove",e=>{if(!trazo)return;const p=punto(e);cx.beginPath();cx.moveTo(...trazo);cx.lineTo(...p);cx.stroke();trazo=p});
+["pointerup","pointercancel"].forEach(ev=>cv.addEventListener(ev,()=>trazo=null));
+$("#herr").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  if(b.id==="limpiar"){prepararLienzo();return}
+  color=b.dataset.c;$$("#herr .col").forEach(x=>x.classList.toggle("on",x===b))});
+
+/* ===== Sonido, vibración y pantalla encendida ===== */
+let ac=null;
+function desbloquearAudio(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume()}catch(e){}}
+function tic(f,dur){if(!ac)return;try{const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type="triangle";
+  g.gain.setValueAtTime(.25,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+dur);
+  o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+dur)}catch(e){}}
+function vibrar(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
+async function pedirPantalla(){try{lock=await navigator.wakeLock?.request("screen")}catch(e){}}
+function soltarPantalla(){try{lock&&lock.release();lock=null}catch(e){}}
+
+/* ===== Arranque ===== */
+function inicio(){
+  const d=cargar();
+  if(d){S=Object.assign(S,d);S.usados=Object.assign({dib:[],mim:[],tar:[]},d.usados||{})}
+  marcarConfig();pintaEquipos();
+  $("#seguir").style.display=S.enCurso?"block":"none";
+  ir("pInicio");
+}
+inicio();
+</script>
+</body>
+</html>

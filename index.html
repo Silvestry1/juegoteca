@@ -38,6 +38,7 @@ main{display:grid;gap:22px 14px;padding:12px 16px 32px;grid-template-columns:rep
 .ilus div{font-size:3.6rem;width:92px;height:92px;border-radius:50%;background:radial-gradient(circle,#ffffff55,#ffffff10 70%);display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 4px 6px #0006)}
 .titulo{position:relative;font-weight:900;text-transform:uppercase;font-size:1.05rem;line-height:1.05;color:#fff;text-shadow:2px 2px 0 #000a;word-break:break-word}
 .lema{position:relative;font-size:.68rem;color:#fffd;margin-top:4px;font-style:italic}
+.casa{position:relative;align-self:flex-start;margin-bottom:5px;background:var(--acc);color:#1b1400;font-size:.6rem;font-weight:900;padding:2px 7px;border-radius:4px;letter-spacing:1px;text-transform:uppercase;box-shadow:0 2px 4px #0006}
 .dorso{transform:rotateY(180deg);background:#f4efe3;color:#222;padding:12px;display:flex;flex-direction:column;gap:8px}
 .dorso h2{margin:0;font-size:1rem;text-transform:uppercase}
 .dorso p{margin:0;font-size:.82rem;line-height:1.35;flex:1;overflow:auto}
@@ -109,14 +110,14 @@ function pinta(){
           <div class="lomo"><span>JUEGOTECA</span></div>
           <div class="top"><div class="calif ${clsCalif(c)}">${c}</div><div class="jug">👥 ${jugadores(g)}</div></div>
           <div class="ilus">${ilus}</div>
-          <div class="titulo">${esc(g.nombre)}</div>
+          ${g.propio?'<div class="casa">★ Hecho en casa</div>':""}<div class="titulo">${esc(g.nombre)}</div>
           <div class="lema">${esc(g.lema||g.tipo)}</div>
         </div>
         <div class="cara dorso">
           <h2>${esc(g.nombre)}</h2>
           <div class="ficha"><span>${esc(g.tipo)}</span><span>👥 ${jugadores(g)}</span><span>${c==="VAR"?"Edad: varía":"Edad "+esc(g.edad)}</span></div>
           <p>${esc(g.descripcion)}</p>
-          <a href="${esc(g.url)}" target="_blank" rel="noopener">▶ JUGAR</a>
+          <a href="${esc(g.url)}"${g.propio?"":' target="_blank" rel="noopener"'}>▶ JUGAR</a>
           <small>Tocá para dar vuelta</small>
         </div>
       </div>

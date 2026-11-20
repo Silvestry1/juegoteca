@@ -1,5 +1,21 @@
 [
  {
+  "nombre": "Mostralo como puedas",
+  "tipo": "Dibujar",
+  "min": 4,
+  "max": 20,
+  "edad": "6+",
+  "propio": true,
+  "descripcion": "Por equipos, con un solo celu. La ruleta decide si la consigna se muestra dibujando, con mímica o tarareando. Si tu equipo no adivina a tiempo, los demás pueden robar el punto.",
+  "url": "juegos/mostralo/",
+  "icono": "🎭",
+  "colores": [
+   "#ff6b6b",
+   "#7b4dff"
+  ],
+  "lema": "Dibujo, mímica o tarareo: lo decide la ruleta"
+ },
+ {
   "nombre": "skribbl.io",
   "tipo": "Dibujar",
   "min": 2,
