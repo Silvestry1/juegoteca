@@ -38,14 +38,14 @@
   "max": null,
   "edad": "3+",
   "propio": true,
-  "descripcion": "Lanzador de dados para cualquier juego de mesa: d4, d6, d8, d10, d12, d20, d100 o de las caras que quieras. Mezclás tipos, sumás o restás un valor, dejás dados fijos para volver a tirar el resto y queda el historial de tiradas.",
+  "descripcion": "Dos modos. Generala · 10.000: dados grandes de los de siempre, tocás para guardar, cuenta los tiros y canta Escalera, Full, Póker y Generala; la suma va solo si la prendés. Rol: d4 a d100 o caras a elección, modificador, dados fijos e historial.",
   "url": "juegos/dados/",
   "icono": "🎲",
   "colores": [
    "#2f9e44",
    "#0b2618"
   ],
-  "lema": "Para cuando se pierden los dados"
+  "lema": "Para la Generala de la abuela y la partida de rol"
  },
  {
   "nombre": "Bingo de la casa",
