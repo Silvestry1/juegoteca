@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f2a1e">
+<title>Bingo de la Casa</title>
+<style>
+:root{--bg:#0f2a1e;--card:#18402e;--txt:#fff8ec;--sub:#b9d6c6;--acc:#ffc23d;--ok:#3ddc84;--mal:#ff5c5c;--papel:#fff8ec;--tinta:#13241b}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior:none}
+.pant{display:none;min-height:100%;padding:16px 16px calc(16px + env(safe-area-inset-bottom));flex-direction:column;gap:14px;max-width:620px;margin:0 auto}
+.pant.on{display:flex}
+h1{margin:4px 0 0;font-size:2.1rem;line-height:1.05;text-transform:uppercase;color:var(--acc);text-shadow:0 0 12px #ffc23d66;text-align:center}
+h2{margin:0;font-size:1.3rem;text-align:center}
+p{margin:0;line-height:1.4}
+.sub{color:var(--sub);text-align:center}
+.caja{background:var(--card);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.caja h3{margin:0;font-size:.85rem;text-transform:uppercase;letter-spacing:1px;color:var(--sub)}
+.fila{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.fila>*{flex:1}
+button{font:inherit;border:0;border-radius:12px;padding:12px 14px;background:#ffffff1a;color:var(--txt);font-weight:600;cursor:pointer}
+button.on{background:var(--acc);color:#1b1400}
+button.grande{padding:16px;font-size:1.2rem;font-weight:800;background:var(--acc);color:#1b1400}
+button.peligro{background:#ff5c5c33}
+button.peligro.armado{background:var(--mal);color:#fff}
+button:disabled{opacity:.4}
+input[type=text]{padding:12px;border-radius:10px;border:2px solid #ffffff22;background:#00000033;color:var(--txt);font-size:1.3rem;font-weight:800;letter-spacing:4px;text-transform:uppercase;text-align:center;min-width:0}
+a.volver{color:var(--sub);text-align:center;font-size:.9rem}
+.nota{font-size:.85rem;color:var(--sub)}
+.reglas{font-size:.92rem;color:var(--sub)}
+.reglas b{color:var(--txt)}
+.reglas ul{margin:6px 0 0;padding-left:18px}
+.reglas li{margin:4px 0}
+.elegir{display:flex;flex-direction:column;gap:12px}
+.elegir button{text-align:left;padding:16px;display:flex;gap:14px;align-items:center}
+.elegir .ico{font-size:2.4rem}
+.elegir b{display:block;font-size:1.15rem}
+.elegir small{color:var(--sub);font-weight:400}
+
+/* bolillero */
+.bola{width:190px;height:190px;margin:4px auto 0;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 35% 30%,#fff 0 18%,var(--c,#ffc23d) 60%,#00000066 100%);box-shadow:0 12px 30px #0009}
+.bola span{width:62%;height:62%;border-radius:50%;background:#fff;color:#13241b;display:flex;align-items:center;justify-content:center;font-size:4.2rem;font-weight:900}
+.bola.gira{animation:gira .12s linear infinite}
+@keyframes gira{from{transform:rotate(-8deg) scale(.96)}to{transform:rotate(8deg) scale(1.02)}}
+.bola.cae{animation:cae .45s cubic-bezier(.2,1.6,.4,1)}
+@keyframes cae{from{transform:scale(.4)}to{transform:scale(1)}}
+.lectura{text-align:center;font-size:1.1rem;color:var(--sub);min-height:1.5rem}
+.conteo{text-align:center;font-weight:700}
+.ultimas{display:flex;justify-content:center;gap:8px;min-height:44px}
+.ultimas i{font-style:normal;width:44px;height:44px;border-radius:50%;background:var(--c);color:#13241b;display:flex;align-items:center;justify-content:center;font-weight:900;opacity:.85}
+.tablero{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
+.tablero div{aspect-ratio:1;border-radius:6px;background:#00000033;color:#ffffff55;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:clamp(.7rem,3.2vw,1.05rem)}
+.tablero div.sale{background:var(--c);color:#13241b}
+.tablero div.ult{outline:3px solid #fff}
+
+/* cartón */
+.carton{background:var(--papel);color:var(--tinta);border-radius:14px;padding:10px;box-shadow:0 10px 30px #0008}
+.carton .cab{display:flex;justify-content:space-between;align-items:baseline;padding:0 4px 8px;font-weight:800}
+.carton .cab small{font-weight:600;color:#5b6f63}
+.carton .cod{font-size:1.4rem;letter-spacing:3px}
+.grilla{display:grid;grid-template-columns:repeat(9,1fr);gap:3px}
+.grilla div{aspect-ratio:.82;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:clamp(1rem,5.2vw,1.6rem);position:relative;user-select:none}
+.grilla div.num{background:#fff;border:2px solid #13241b22;cursor:pointer}
+.grilla div.vacio{background:repeating-linear-gradient(45deg,#13241b14 0 6px,transparent 6px 12px)}
+.grilla div.marca::after{content:"";position:absolute;inset:10%;border-radius:50%;background:#e8413bcc;mix-blend-mode:multiply}
+.grilla div.ok{background:#3ddc84;border-color:#13241b55}
+.grilla div.falta{background:#fff;color:#13241b55}
+.grilla div.marcamal{outline:3px solid var(--mal)}
+.filaok{outline:3px solid #0a7d43;outline-offset:1px}
+.veredicto{text-align:center;font-size:1.6rem;font-weight:900}
+.veredicto.si{color:var(--ok)}
+.veredicto.no{color:var(--mal)}
+</style>
+</head>
+<body>
+
+<!-- INICIO -->
+<section class="pant on" id="pInicio">
+  <h1>Bingo<br>de la casa</h1>
+  <p class="sub">90 bolillas, cartones de 15 números. Uno canta, el resto juega con su celu.</p>
+  <div class="elegir">
+    <button id="irBolillero"><span class="ico">🎱</span><span><b>Soy el que canta</b><small>Bolillero, tablero de salidos y verificación de cartones.</small></span></button>
+    <button id="irCarton"><span class="ico">🎟️</span><span><b>Quiero mi cartón</b><small>Te toca un cartón al azar y marcás tocando los números.</small></span></button>
+  </div>
+  <div class="caja reglas">
+    <h3>Cómo se juega</h3>
+    <ul>
+      <li>Uno abre <b>Soy el que canta</b> en un celu o una compu y saca las bolillas en voz alta (o deja que hable el celu).</li>
+      <li>Cada jugador abre <b>Quiero mi cartón</b> en su celu y va tocando los números que salen.</li>
+      <li><b>Línea:</b> completás una fila entera (5 números). <b>Bingo:</b> completás los 15.</li>
+      <li>El que canta línea o bingo le pasa su <b>código de cartón</b> al que canta, que lo verifica contra las bolillas que salieron.</li>
+      <li>Se puede jugar con premio para la primera línea y otro para el primer bingo.</li>
+    </ul>
+  </div>
+  <a class="volver" href="../../">← Volver a la Juegoteca</a>
+</section>
+
+<!-- BOLILLERO -->
+<section class="pant" id="pBolillero">
+  <h2>Bolillero</h2>
+  <div class="bola" id="bola"><span id="bolaNum">?</span></div>
+  <p class="lectura" id="lectura">Tocá «Sacar bolilla» para empezar</p>
+  <p class="conteo" id="conteo">0 de 90</p>
+  <div class="ultimas" id="ultimas"></div>
+  <button class="grande" id="sacar">Sacar bolilla</button>
+  <div class="fila">
+    <button id="auto">Automático: no</button>
+    <button id="voz">Voz: sí</button>
+  </div>
+  <div class="fila">
+    <button id="abrirVerif">🔍 Verificar cartón</button>
+    <button id="deshacer">↩ Deshacer</button>
+  </div>
+  <div class="caja">
+    <h3>Salieron</h3>
+    <div class="tablero" id="tablero"></div>
+  </div>
+  <button class="peligro" id="nueva">Nueva partida</button>
+  <a class="volver" href="#" data-ir="pInicio">← Volver</a>
+</section>
+
+<!-- VERIFICAR -->
+<section class="pant" id="pVerif">
+  <h2>Verificar cartón</h2>
+  <p class="sub">Pedile el código al que cantó y escribilo acá.</p>
+  <div class="fila">
+    <input type="text" id="verifCod" maxlength="5" autocomplete="off" autocapitalize="characters" placeholder="CÓDIGO">
+    <button class="grande" id="verifBtn" style="flex:none">Ver</button>
+  </div>
+  <div id="verifRes"></div>
+  <button id="volverBolillero">← Volver al bolillero</button>
+</section>
+
+<!-- MI CARTÓN -->
+<section class="pant" id="pCarton">
+  <h2>Mi cartón</h2>
+  <div class="carton" id="miCarton"></div>
+  <p class="nota" style="text-align:center">Tocá un número para marcarlo; tocalo de nuevo para desmarcar. Si cantás línea o bingo, pasale el código al que canta.</p>
+  <p class="veredicto" id="aviso"></p>
+  <div class="fila">
+    <button class="peligro" id="otroCarton">Cambiar de cartón</button>
+    <button id="limpiar">Borrar marcas</button>
+  </div>
+  <div class="caja">
+    <h3>¿Se te cerró la página?</h3>
+    <p class="nota">Tu cartón queda guardado en este celu. Si cambiaste de celu, cargá tu código:</p>
+    <div class="fila">
+      <input type="text" id="cargarCod" maxlength="5" autocomplete="off" autocapitalize="characters" placeholder="CÓDIGO">
+      <button id="cargarBtn" style="flex:none">Cargar</button>
+    </div>
+  </div>
+  <a class="volver" href="#" data-ir="pInicio">← Volver</a>
+</section>
+
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const LETRAS="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const COLORES=["#ff6b6b","#ffa94d","#ffd43b","#a9e34b","#3ddc84","#38d9a9","#4dabf7","#9775fa","#f783ac"];
+const color=n=>COLORES[Math.min(8,Math.floor(n/10))];
+const guardar=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const leer=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}};
+
+function irA(id){document.querySelectorAll(".pant").forEach(p=>p.classList.toggle("on",p.id===id));scrollTo(0,0)}
+document.querySelectorAll("[data-ir]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();irA(a.dataset.ir)}));
+
+/* botón que pide un segundo toque para confirmar */
+function confirmable(btn,accion){
+  const txt=btn.textContent;let t=null;
+  btn.addEventListener("click",()=>{
+    if(btn.classList.contains("armado")){clearTimeout(t);btn.classList.remove("armado");btn.textContent=txt;accion();return}
+    btn.classList.add("armado");btn.textContent="Tocá de nuevo para confirmar";
+    t=setTimeout(()=>{btn.classList.remove("armado");btn.textContent=txt},3000);
+  });
+}
+
+/* ---------- cartones reproducibles por código ---------- */
+function semilla(str){let h=1779033703^str.length;for(let i=0;i<str.length;i++){h=Math.imul(h^str.charCodeAt(i),3432918353);h=h<<13|h>>>19}return h>>>0}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function mezclar(arr,r){for(let i=arr.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}return arr}
+function normalizar(c){return (c||"").toUpperCase().replace(/[^A-Z0-9]/g,"").replace(/O/g,"0").replace(/I/g,"1")}
+function codigoValido(c){return c.length===5&&[...c].every(ch=>LETRAS.includes(ch))}
+function codigoNuevo(){const b=new Uint32Array(5);crypto.getRandomValues(b);return [...b].map(x=>LETRAS[x%LETRAS.length]).join("")}
+
+/* Cartón de 3 filas x 9 columnas, 15 números, 5 por fila.
+   Columna 0: 1-9, columna 1: 10-19 ... columna 8: 80-90. */
+function generarCarton(cod){
+  const r=mulberry32(semilla("bingo:"+cod));
+  for(;;){
+    const cant=Array(9).fill(1);let resto=6;
+    while(resto>0){const c=Math.floor(r()*9);if(cant[c]<3){cant[c]++;resto--}}
+    const grilla=[[],[],[]].map(()=>Array(9).fill(0));
+    const porFila=[0,0,0];
+    for(let c=0;c<9;c++){mezclar([0,1,2],r).slice(0,cant[c]).forEach(f=>{grilla[f][c]=1;porFila[f]++})}
+    if(porFila.some(x=>x!==5))continue;
+    for(let c=0;c<9;c++){
+      const desde=c===0?1:c*10,hasta=c===8?90:c*10+9;
+      const pool=[];for(let n=desde;n<=hasta;n++)pool.push(n);
+      const nums=mezclar(pool,r).slice(0,cant[c]).sort((a,b)=>a-b);
+      let k=0;for(let f=0;f<3;f++)if(grilla[f][c])grilla[f][c]=nums[k++];
+    }
+    return grilla;
+  }
+}
+
+function dibujarCarton(cont,cod,grilla,opc){
+  opc=opc||{};
+  cont.innerHTML="";
+  const cab=document.createElement("div");cab.className="cab";
+  cab.innerHTML=`<small>CARTÓN</small><span class="cod">${cod}</span>`;
+  const g=document.createElement("div");g.className="grilla";
+  grilla.forEach((fila,f)=>fila.forEach((n,c)=>{
+    const d=document.createElement("div");
+    if(!n){d.className="vacio"}else{
+      d.className="num";d.textContent=n;d.dataset.n=n;d.style.color="#13241b";
+      if(opc.clase)d.classList.add(opc.clase(n,f));
+      if(opc.marcado&&opc.marcado(n))d.classList.add("marca");
+      if(opc.alTocar)d.addEventListener("click",()=>opc.alTocar(n,d));
+    }
+    g.appendChild(d);
+  }));
+  cont.append(cab,g);
+}
+
+/* ---------- bolillero ---------- */
+let partida=leer("bingo.partida",null);
+if(!partida||!Array.isArray(partida.salieron))partida={salieron:[]};
+let vozOn=leer("bingo.voz",true),autoT=null,girando=false;
+
+const decir=t=>{
+  if(!vozOn||!("speechSynthesis" in window))return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(t);u.lang="es-AR";u.rate=.9;
+  const v=speechSynthesis.getVoices().find(v=>/^es[-_]AR/i.test(v.lang))||speechSynthesis.getVoices().find(v=>/^es/i.test(v.lang));
+  if(v)u.voice=v;
+  speechSynthesis.speak(u);
+};
+const UNI=["","uno","dos","tres","cuatro","cinco","seis","siete","ocho","nueve","diez","once","doce","trece","catorce","quince","dieciséis","diecisiete","dieciocho","diecinueve","veinte","veintiuno","veintidós","veintitrés","veinticuatro","veinticinco","veintiséis","veintisiete","veintiocho","veintinueve"];
+const DEC=["","","","treinta","cuarenta","cincuenta","sesenta","setenta","ochenta","noventa"];
+function enLetras(n){if(n<30)return UNI[n];const d=Math.floor(n/10),u=n%10;return u?DEC[d]+" y "+UNI[u]:DEC[d]}
+function lecturaDe(n){return n<10?`Solo el ${enLetras(n)}`:`${enLetras(n)}: ${String(n).split("").map(x=>enLetras(+x)||"cero").join(", ")}`}
+
+function pintarBolillero(animar){
+  const s=partida.salieron,ult=s[s.length-1];
+  const bola=$("bola");
+  if(ult){bola.style.setProperty("--c",color(ult));$("bolaNum").textContent=ult;$("lectura").textContent=lecturaDe(ult)}
+  else{bola.style.removeProperty("--c");$("bolaNum").textContent="?";$("lectura").textContent="Tocá «Sacar bolilla» para empezar"}
+  if(animar){bola.classList.remove("cae");void bola.offsetWidth;bola.classList.add("cae")}
+  $("conteo").textContent=`${s.length} de 90`;
+  $("ultimas").innerHTML=s.slice(-6,-1).reverse().map(n=>`<i style="--c:${color(n)}">${n}</i>`).join("");
+  const set=new Set(s);
+  $("tablero").querySelectorAll("div").forEach(d=>{const n=+d.dataset.n;
+    d.classList.toggle("sale",set.has(n));d.classList.toggle("ult",n===ult);
+    d.style.setProperty("--c",color(n))});
+  $("sacar").disabled=s.length>=90||girando;
+  $("sacar").textContent=s.length>=90?"No quedan bolillas":"Sacar bolilla";
+  $("deshacer").disabled=!s.length||girando;
+}
+(function armarTablero(){const t=$("tablero");for(let n=1;n<=90;n++){const d=document.createElement("div");d.dataset.n=n;d.textContent=n;t.appendChild(d)}})();
+
+function sacar(){
+  if(girando)return;
+  const quedan=[];const set=new Set(partida.salieron);
+  for(let n=1;n<=90;n++)if(!set.has(n))quedan.push(n);
+  if(!quedan.length){pararAuto();return}
+  const b=new Uint32Array(1);crypto.getRandomValues(b);
+  const n=quedan[b[0]%quedan.length];
+  girando=true;$("sacar").disabled=true;$("deshacer").disabled=true;
+  const bola=$("bola");bola.classList.add("gira");
+  let k=0;const giro=setInterval(()=>{const x=quedan[Math.floor(Math.random()*quedan.length)];$("bolaNum").textContent=x;bola.style.setProperty("--c",color(x));if(++k>12){
+    clearInterval(giro);bola.classList.remove("gira");
+    partida.salieron.push(n);guardar("bingo.partida",partida);girando=false;
+    pintarBolillero(true);decir(lecturaDe(n));
+    if(partida.salieron.length>=90)pararAuto();
+  }},70);
+}
+function pararAuto(){clearInterval(autoT);autoT=null;$("auto").textContent="Automático: no";$("auto").classList.remove("on")}
+$("sacar").addEventListener("click",sacar);
+$("auto").addEventListener("click",()=>{
+  if(autoT){pararAuto();return}
+  const pasos=[8,12,15];const actual=leer("bingo.seg",12);
+  const seg=pasos[(pasos.indexOf(actual)+1)%pasos.length]||12;
+  guardar("bingo.seg",seg);
+  $("auto").textContent=`Automático: cada ${seg} s`;$("auto").classList.add("on");
+  sacar();autoT=setInterval(sacar,seg*1000);
+});
+function pintarVoz(){$("voz").textContent="Voz: "+(vozOn?"sí":"no");$("voz").classList.toggle("on",vozOn)}
+$("voz").addEventListener("click",()=>{vozOn=!vozOn;guardar("bingo.voz",vozOn);pintarVoz();if(!vozOn&&"speechSynthesis" in window)speechSynthesis.cancel()});
+$("deshacer").addEventListener("click",()=>{if(girando)return;partida.salieron.pop();guardar("bingo.partida",partida);pintarBolillero(false)});
+confirmable($("nueva"),()=>{pararAuto();partida={salieron:[]};guardar("bingo.partida",partida);pintarBolillero(false)});
+$("irBolillero").addEventListener("click",()=>{pintarBolillero(false);pintarVoz();irA("pBolillero")});
+
+/* ---------- verificación ---------- */
+function verificar(){
+  const cod=normalizar($("verifCod").value);$("verifCod").value=cod;
+  const res=$("verifRes");res.innerHTML="";
+  if(!codigoValido(cod)){res.innerHTML=`<p class="veredicto no">Código inválido</p><p class="sub">Son 5 caracteres, letras y números.</p>`;return}
+  const grilla=generarCarton(cod),set=new Set(partida.salieron);
+  const filas=grilla.map(f=>f.filter(Boolean));
+  const llenas=filas.map(f=>f.every(n=>set.has(n)));
+  const faltan=filas.flat().filter(n=>!set.has(n));
+  const v=document.createElement("p");v.className="veredicto";
+  if(!faltan.length){v.textContent="¡BINGO! ✔";v.classList.add("si")}
+  else if(llenas.some(Boolean)){v.textContent=`¡Línea! ✔ (fila ${llenas.map((x,i)=>x?i+1:0).filter(Boolean).join(" y ")})`;v.classList.add("si")}
+  else{v.textContent="Todavía no";v.classList.add("no")}
+  const c=document.createElement("div");c.className="carton";
+  dibujarCarton(c,cod,grilla,{clase:n=>set.has(n)?"ok":"falta"});
+  const celdas=c.querySelectorAll(".grilla div");
+  llenas.forEach((ok,f)=>{if(ok)for(let k=0;k<9;k++)celdas[f*9+k].classList.add("filaok")});
+  const det=document.createElement("p");det.className="sub";
+  det.textContent=faltan.length?`Le faltan ${faltan.length}: ${faltan.join(", ")}`:"Están los 15 números.";
+  det.textContent+=` · Van ${partida.salieron.length} bolillas.`;
+  res.append(v,c,det);
+}
+$("abrirVerif").addEventListener("click",()=>{$("verifRes").innerHTML="";$("verifCod").value="";irA("pVerif");$("verifCod").focus()});
+$("verifBtn").addEventListener("click",verificar);
+$("verifCod").addEventListener("keydown",e=>{if(e.key==="Enter")verificar()});
+$("volverBolillero").addEventListener("click",()=>{pintarBolillero(false);irA("pBolillero")});
+
+/* ---------- mi cartón ---------- */
+let mio=leer("bingo.carton",null);
+function cartonNuevo(cod){mio={cod:cod||codigoNuevo(),marcas:[]};guardar("bingo.carton",mio)}
+function pintarMio(){
+  const grilla=generarCarton(mio.cod),marcas=new Set(mio.marcas);
+  dibujarCarton($("miCarton"),mio.cod,grilla,{
+    marcado:n=>marcas.has(n),
+    alTocar:(n,d)=>{if(marcas.has(n))marcas.delete(n);else marcas.add(n);mio.marcas=[...marcas];guardar("bingo.carton",mio);d.classList.toggle("marca",marcas.has(n));avisar(grilla,marcas)}
+  });
+  avisar(grilla,marcas);
+}
+function avisar(grilla,marcas){
+  const filas=grilla.map(f=>f.filter(Boolean));
+  const a=$("aviso");a.className="veredicto si";
+  if(filas.flat().every(n=>marcas.has(n)))a.textContent=`¡Cantá BINGO! Código ${mio.cod}`;
+  else if(filas.some(f=>f.every(n=>marcas.has(n))))a.textContent=`¡Cantá LÍNEA! Código ${mio.cod}`;
+  else a.textContent="";
+}
+$("irCarton").addEventListener("click",()=>{if(!mio||!codigoValido(mio.cod))cartonNuevo();pintarMio();irA("pCarton")});
+confirmable($("otroCarton"),()=>{cartonNuevo();pintarMio()});
+confirmable($("limpiar"),()=>{mio.marcas=[];guardar("bingo.carton",mio);pintarMio()});
+function cargar(){
+  const cod=normalizar($("cargarCod").value);$("cargarCod").value=cod;
+  if(!codigoValido(cod)){$("cargarCod").style.borderColor="var(--mal)";return}
+  $("cargarCod").style.borderColor="";$("cargarCod").value="";
+  cartonNuevo(cod);pintarMio();scrollTo(0,0);
+}
+$("cargarBtn").addEventListener("click",cargar);
+$("cargarCod").addEventListener("keydown",e=>{if(e.key==="Enter")cargar()});
+
+/* enlaces directos: ?modo=carton o ?modo=bolillero */
+const modo=new URLSearchParams(location.search).get("modo");
+if(modo==="carton")$("irCarton").click();
+else if(modo==="bolillero")$("irBolillero").click();
+if("speechSynthesis" in window)speechSynthesis.getVoices();
+</script>
+</body>
+</html>
