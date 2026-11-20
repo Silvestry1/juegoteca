@@ -17,8 +17,13 @@ Editá `juegos.json` y sumá un bloque así (separado por coma del anterior):
   "max": 10,
   "edad": "10+",
   "descripcion": "Una o dos líneas de cómo se juega.",
-  "url": "https://link-para-jugar"
+  "url": "https://link-para-jugar",
+  "icono": "🎯",
+  "colores": ["#ff6b6b", "#ffd93d"],
+  "lema": "Frase corta para el frente de la caja"
 }
 ```
+
+`edad` define la calificación de la caja: menos de 13 = ATP, 13 = +13, 16 = +16, 18 = +18. Opcional: `"imagen": "ruta/a/imagen.png"` reemplaza al ícono.
 
 Si no sabés la cantidad de jugadores, poné `null` en `min` o `max`.

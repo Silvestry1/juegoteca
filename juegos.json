@@ -6,7 +6,13 @@
   "max": 20,
   "edad": "8+",
   "descripcion": "Uno dibuja una palabra y el resto escribe qué es. Suma el que adivina más rápido.",
-  "url": "https://skribbl.io"
+  "url": "https://skribbl.io",
+  "icono": "✏️",
+  "colores": [
+   "#ff6b6b",
+   "#ffd93d"
+  ],
+  "lema": "Dibujá, adiviná, ganá"
  },
  {
   "nombre": "Gartic Phone",
@@ -15,7 +21,13 @@
   "max": 30,
   "edad": "8+",
   "descripcion": "Teléfono descompuesto con dibujos: escribís, el otro dibuja, el siguiente describe.",
-  "url": "https://garticphone.com"
+  "url": "https://garticphone.com",
+  "icono": "📞",
+  "colores": [
+   "#6c5ce7",
+   "#00cec9"
+  ],
+  "lema": "El teléfono descompuesto dibujado"
  },
  {
   "nombre": "StopotS",
@@ -24,7 +36,13 @@
   "max": 10,
   "edad": "10+",
   "descripcion": "Tutti Frutti online: sale una letra, completás categorías y se votan las respuestas.",
-  "url": "https://stopots.com"
+  "url": "https://stopots.com",
+  "icono": "🛑",
+  "colores": [
+   "#e17055",
+   "#fdcb6e"
+  ],
+  "lema": "¡Basta para mí, basta para todos!"
  },
  {
   "nombre": "Codenames",
@@ -33,7 +51,13 @@
   "max": 64,
   "edad": "10+",
   "descripcion": "Dos equipos; el jefe de espías da pistas de una palabra para encontrar sus cartas.",
-  "url": "https://codenames.game"
+  "url": "https://codenames.game",
+  "icono": "🕵️",
+  "colores": [
+   "#2d3436",
+   "#d63031"
+  ],
+  "lema": "Una palabra. Un equipo. Un asesino."
  },
  {
   "nombre": "Spyfall",
@@ -42,7 +66,13 @@
   "max": 8,
   "edad": "13+",
   "descripcion": "Todos saben el lugar menos el espía. Preguntas para descubrirlo.",
-  "url": "https://derewah.itch.io/spyfall"
+  "url": "https://derewah.itch.io/spyfall",
+  "icono": "🗺️",
+  "colores": [
+   "#0984e3",
+   "#2d3436"
+  ],
+  "lema": "Uno de ustedes no sabe dónde está"
  },
  {
   "nombre": "Secret Hitler",
@@ -51,7 +81,13 @@
   "max": 10,
   "edad": "13+",
   "descripcion": "Roles ocultos: liberales contra fascistas. Pide cuenta gratuita.",
-  "url": "https://secrethitler.io"
+  "url": "https://secrethitler.io",
+  "icono": "🗳️",
+  "colores": [
+   "#b33939",
+   "#2c2c54"
+  ],
+  "lema": "Nadie es quien dice ser"
  },
  {
   "nombre": "Wolvesville",
@@ -60,7 +96,13 @@
   "max": null,
   "edad": "12+",
   "descripcion": "El Lobo: de noche se ataca, de día se debate y se vota.",
-  "url": "https://www.wolvesville.com"
+  "url": "https://www.wolvesville.com",
+  "icono": "🐺",
+  "colores": [
+   "#130f40",
+   "#6ab04c"
+  ],
+  "lema": "Cae la noche en el pueblo"
  },
  {
   "nombre": "JKLM BombParty",
@@ -69,7 +111,13 @@
   "max": 16,
   "edad": "10+",
   "descripcion": "Escribí una palabra con las letras dadas antes de que explote la bomba.",
-  "url": "https://jklm.fun"
+  "url": "https://jklm.fun",
+  "icono": "💣",
+  "colores": [
+   "#eb4d4b",
+   "#f0932b"
+  ],
+  "lema": "Escribí antes de que explote"
  },
  {
   "nombre": "Board Game Arena",
@@ -78,7 +126,13 @@
   "max": null,
   "edad": "según juego",
   "descripcion": "Cientos de juegos de mesa con licencia. Muchos gratis, otros Premium.",
-  "url": "https://boardgamearena.com"
+  "url": "https://boardgamearena.com",
+  "icono": "🎲",
+  "colores": [
+   "#22a6b3",
+   "#130f40"
+  ],
+  "lema": "Cientos de mesas, una sola pantalla"
  },
  {
   "nombre": "playingcards.io",
@@ -87,7 +141,13 @@
   "max": null,
   "edad": "según juego",
   "descripcion": "Mesa virtual de cartas, sin registro. Sirve para mazos propios.",
-  "url": "https://playingcards.io"
+  "url": "https://playingcards.io",
+  "icono": "🃏",
+  "colores": [
+   "#218c74",
+   "#1e272e"
+  ],
+  "lema": "La mesa de cartas que siempre está"
  },
  {
   "nombre": "Letter Jam",
@@ -96,7 +156,13 @@
   "max": null,
   "edad": "10+",
   "descripcion": "Cooperativo: ves las letras de los demás y no la tuya; se dan pistas con palabras.",
-  "url": "https://letterjam.game"
+  "url": "https://letterjam.game",
+  "icono": "🔤",
+  "colores": [
+   "#f78fb3",
+   "#546de5"
+  ],
+  "lema": "Tu letra la ven todos menos vos"
  },
  {
   "nombre": "Decrypto",
@@ -105,7 +171,13 @@
   "max": null,
   "edad": "12+",
   "descripcion": "Dos equipos se pasan códigos con pistas sin que el rival los descifre.",
-  "url": "https://decryptr.io"
+  "url": "https://decryptr.io",
+  "icono": "🔐",
+  "colores": [
+   "#1e3799",
+   "#38ada9"
+  ],
+  "lema": "Pasá el código sin que te lo roben"
  },
  {
   "nombre": "Make It Meme",
@@ -114,7 +186,13 @@
   "max": null,
   "edad": "13+",
   "descripcion": "Cada uno le pone texto a un meme y se vota el mejor.",
-  "url": "https://makeitmeme.com"
+  "url": "https://makeitmeme.com",
+  "icono": "😂",
+  "colores": [
+   "#f6b93b",
+   "#e55039"
+  ],
+  "lema": "El meme lo hacés vos"
  },
  {
   "nombre": "Vote's Out",
@@ -123,6 +201,12 @@
   "max": null,
   "edad": "13+",
   "descripcion": "Respuestas graciosas a consignas y votación.",
-  "url": "https://votesout.com"
+  "url": "https://votesout.com",
+  "icono": "🏆",
+  "colores": [
+   "#8e44ad",
+   "#f39c12"
+  ],
+  "lema": "La respuesta más zarpada gana"
  }
 ]
