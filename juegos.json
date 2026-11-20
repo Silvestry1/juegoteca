@@ -48,6 +48,22 @@
   "lema": "Para cuando se pierden los dados"
  },
  {
+  "nombre": "Bingo de la casa",
+  "tipo": "Azar",
+  "min": 2,
+  "max": null,
+  "edad": "6+",
+  "propio": true,
+  "descripcion": "Uno canta con el bolillero (90 bolillas, con voz opcional) y cada uno abre su cartón en el celu y marca tocando. Si alguien canta línea o bingo, se verifica con el código del cartón.",
+  "url": "juegos/bingo/",
+  "icono": "🎱",
+  "colores": [
+   "#3ddc84",
+   "#0f2a1e"
+  ],
+  "lema": "Bolillero en un celu, cartones en todos"
+ },
+ {
   "nombre": "skribbl.io",
   "tipo": "Dibujar",
   "min": 2,
