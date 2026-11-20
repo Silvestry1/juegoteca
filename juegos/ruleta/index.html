@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14102a">
+<title>La Ruleta</title>
+<style>
+:root{--bg:#14102a;--card:#241c45;--txt:#fff8ec;--sub:#c9bfe6;--acc:#ffc23d;--rojo:#d8322f;--negro:#1d1d24;--verde:#1f9d55;--ok:#3ddc84;--mal:#ff5c5c}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior:none}
+main{max-width:560px;margin:0 auto;padding:16px 16px calc(20px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px}
+h1{margin:4px 0 0;font-size:1.9rem;text-transform:uppercase;color:var(--acc);text-shadow:0 0 12px #ffc23d66;text-align:center}
+p{margin:0;line-height:1.4}
+.sub{color:var(--sub);text-align:center}
+.tabs{display:flex;gap:8px}
+.tabs button{flex:1}
+button{font:inherit;border:0;border-radius:12px;padding:12px 14px;background:#ffffff1a;color:var(--txt);font-weight:600;cursor:pointer}
+button.on{background:var(--acc);color:#1b1400}
+button.grande{padding:16px;font-size:1.15rem;font-weight:800;background:var(--acc);color:#1b1400}
+button:disabled{opacity:.4}
+.chico{padding:8px 12px;font-size:.9rem}
+.caja{background:var(--card);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.caja h3{margin:0;font-size:.85rem;text-transform:uppercase;letter-spacing:1px;color:var(--sub)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.fila{display:flex;gap:8px;align-items:center}
+input[type=text],input[type=number],select{padding:10px;border-radius:10px;border:2px solid #ffffff22;background:#00000033;color:var(--txt);font-size:1rem;min-width:0}
+select option{background:#241c45}
+.fila input[type=text]{flex:1}
+label.check{display:flex;gap:8px;align-items:center;color:var(--sub);font-size:.95rem}
+label.check input{width:20px;height:20px;accent-color:var(--acc)}
+.lista{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow:auto}
+.lista div{display:flex;align-items:center;gap:8px;background:#00000033;border-radius:10px;padding:6px 8px 6px 12px}
+.lista span.t{flex:1;overflow-wrap:anywhere}
+.lista .pt{width:14px;height:14px;border-radius:50%;flex:none}
+.lista button{padding:6px 10px;background:#ffffff12}
+a.volver{color:var(--sub);text-align:center;font-size:.9rem}
+.nota{font-size:.85rem;color:var(--sub)}
+/* rueda */
+.rueda{position:relative;width:min(88vw,380px);aspect-ratio:1;margin:4px auto 0}
+.rueda canvas{width:100%;height:100%;display:block;border-radius:50%;box-shadow:0 10px 40px #000a}
+.flecha{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:30px solid var(--acc);filter:drop-shadow(0 3px 3px #000a);z-index:2}
+.eje{position:absolute;inset:0;margin:auto;width:18%;height:18%;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe7a3,#c78a12);box-shadow:0 2px 8px #000a;border:none;padding:0;font-size:1.6rem}
+.resultado{min-height:3.2rem;text-align:center;font-size:1.9rem;font-weight:900;line-height:1.15;overflow-wrap:anywhere}
+.resultado small{display:block;font-size:.95rem;font-weight:600;color:var(--sub)}
+/* casino */
+.saldo{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:1.2rem}
+.saldo b{color:var(--acc);font-size:1.5rem}
+.paño{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.paño button{padding:9px 0;border-radius:8px;font-weight:800;font-size:.95rem;position:relative}
+.paño .r{background:var(--rojo)}.paño .n{background:var(--negro);outline:1px solid #ffffff22}.paño .v{background:var(--verde);grid-column:span 3}
+.ext{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.ext button{padding:10px 4px;font-size:.85rem;border-radius:8px;position:relative}
+.ext .r{background:var(--rojo)}.ext .n{background:var(--negro);outline:1px solid #ffffff22}
+.ficha{position:absolute;top:-6px;right:2px;background:var(--acc);color:#1b1400;border-radius:999px;font-size:.7rem;padding:1px 6px;font-weight:900;box-shadow:0 1px 3px #000a}
+.apuestas{font-size:.9rem;color:var(--sub)}
+.gano{color:var(--ok)}.perdio{color:var(--mal)}
+.oculto{display:none!important}
+</style>
+</head>
+<body>
+<main>
+  <h1>La Ruleta</h1>
+  <p class="sub">Para decidir quién empieza, quién paga o qué prenda toca. O para jugar a la ruleta con fichas de mentira.</p>
+
+  <div class="tabs">
+    <button id="tabLibre" class="on">Ruleta libre</button>
+    <button id="tabCasino">Casino</button>
+  </div>
+
+  <div class="rueda">
+    <div class="flecha"></div>
+    <canvas id="lienzo" width="760" height="760"></canvas>
+    <button class="eje" id="eje" aria-label="Girar">🎯</button>
+  </div>
+  <div class="resultado" id="resultado"></div>
+  <button class="grande" id="girar">Girar</button>
+
+  <!-- RULETA LIBRE -->
+  <section id="libre" style="display:none;flex-direction:column;gap:14px">
+    <div class="caja">
+      <h3>Plantillas</h3>
+      <div class="chips" id="plantillas"></div>
+    </div>
+    <div class="caja">
+      <h3>Opciones de la ruleta (<span id="cant">0</span>)</h3>
+      <div class="fila">
+        <input type="text" id="nueva" placeholder="Escribí un nombre o una opción" maxlength="40" enterkeyhint="done">
+        <button id="agregar">+</button>
+      </div>
+      <div class="lista" id="lista"></div>
+      <label class="check"><input type="checkbox" id="sacar"> Sacar de la ruleta lo que va saliendo (para sortear un orden)</label>
+      <div class="chips">
+        <button class="chico" id="mezclar">Mezclar colores</button>
+        <button class="chico" id="vaciar">Vaciar</button>
+      </div>
+      <p class="nota">Lo que cargás queda guardado en este celu para la próxima.</p>
+    </div>
+  </section>
+
+  <!-- CASINO -->
+  <section id="casino" style="display:none;flex-direction:column;gap:14px">
+    <div class="caja">
+      <div class="saldo"><span>Fichas</span><b id="saldo">1000</b></div>
+      <div class="fila">
+        <span class="nota">Valor de cada ficha que tocás:</span>
+        <div class="chips" id="valores" style="flex:1"></div>
+      </div>
+      <p class="apuestas" id="apuestasTxt">Tocá números o casillas para apostar. Tocá de nuevo para sumar otra ficha.</p>
+      <div class="chips">
+        <button class="chico" id="borrarAp">Sacar apuestas</button>
+        <button class="chico" id="repetir">Repetir última</button>
+        <button class="chico" id="reiniciar">Volver a 1000</button>
+      </div>
+    </div>
+    <div class="caja">
+      <h3>Paño</h3>
+      <div class="paño" id="paño"></div>
+      <div class="ext" id="ext"></div>
+      <p class="nota">Pagos: pleno 35 a 1; docena y columna 2 a 1; rojo/negro, par/impar, 1-18/19-36 pagan 1 a 1. Ruleta de un solo cero: si sale 0, pierden las apuestas simples. Últimos números: <span id="historial">—</span></p>
+    </div>
+  </section>
+
+  <a class="volver" href="../../">← Volver a la Juegoteca</a>
+</main>
+
+<script>
+const $=s=>document.querySelector(s);
+const PALETA=["#ff6b6b","#ffc23d","#4ecdc4","#a78bfa","#3ddc84","#ff9f43","#54a0ff","#f368e0","#1dd1a1","#ee5253","#feca57","#5f27cd","#48dbfb","#ff6b81","#10ac84","#c8d6e5"];
+const PLANTILLAS={
+  "Nombres":["Juan","Sofi","Mati","Cami","Lu","Fede"],
+  "Sí o no":["Sí","No","Sí","No","Preguntá de nuevo","Ni en pedo"],
+  "Verdad o reto":["Verdad","Reto","Verdad","Reto","Elegís vos","Pasa al de la derecha"],
+  "Prendas":["Imitá a alguien de la ronda","Cantá un pedazo de una canción","Hablá con acento cordobés hasta tu próximo turno","Contá un chiste","10 sentadillas","Hacé de mozo una ronda","Mandá un audio cantando al último chat","Decí 3 cosas lindas del de tu izquierda","Bailá 20 segundos sin música","Elegí quién hace la próxima prenda"],
+  "Quién paga":["Paga el que giró","Paga el de la izquierda","Paga el de la derecha","Pagan todos","Paga el más alto","Paga el que llegó último","Invita la casa"],
+  "Comida":["Pizza","Empanadas","Milanesas","Asado","Hamburguesas","Sushi","Pastas","Choripán"],
+  "Turnos":["Empieza el más chico","Empieza el más grande","Empieza el dueño de casa","Empieza el que giró","Empieza el de la izquierda","Empieza el último que llegó"],
+  "1 al 6":["1","2","3","4","5","6"]
+};
+const cv=$("#lienzo"),cx=cv.getContext("2d"),R=cv.width/2;
+let modo="libre",ang=0,girando=false;
+
+/* ---------- guardado ---------- */
+function leer(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+function guardar(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+
+/* ---------- ruleta libre ---------- */
+let ops=leer("ruleta.ops",PLANTILLAS["Verdad o reto"].slice());
+let corr=leer("ruleta.corr",0);
+$("#sacar").checked=leer("ruleta.sacar",false);
+function color(i){return PALETA[(i+corr)%PALETA.length]}
+function pintarLista(){
+  const l=$("#lista");l.innerHTML="";
+  ops.forEach((o,i)=>{
+    const d=document.createElement("div");
+    d.innerHTML='<span class="pt"></span><span class="t"></span><button aria-label="Quitar">✕</button>';
+    d.querySelector(".pt").style.background=color(i);
+    d.querySelector(".t").textContent=o;
+    d.querySelector("button").onclick=()=>{ops.splice(i,1);cambio()};
+    l.appendChild(d);
+  });
+  $("#cant").textContent=ops.length;
+  $("#girar").disabled=modo==="libre"&&ops.length<2;
+}
+function cambio(){guardar("ruleta.ops",ops);pintarLista();dibujar()}
+function agregar(){
+  const v=$("#nueva").value.trim();if(!v)return;
+  v.split(/[,;\n]/).map(s=>s.trim()).filter(Boolean).forEach(s=>ops.push(s.slice(0,40)));
+  $("#nueva").value="";cambio();$("#nueva").focus();
+}
+$("#agregar").onclick=agregar;
+$("#nueva").addEventListener("keydown",e=>{if(e.key==="Enter")agregar()});
+$("#vaciar").onclick=()=>{ops=[];$("#resultado").innerHTML="";cambio()};
+$("#mezclar").onclick=()=>{corr=Math.floor(Math.random()*PALETA.length);guardar("ruleta.corr",corr);cambio()};
+$("#sacar").onchange=e=>guardar("ruleta.sacar",e.target.checked);
+Object.keys(PLANTILLAS).forEach(n=>{
+  const b=document.createElement("button");b.className="chico";b.textContent=n;
+  b.onclick=()=>{ops=PLANTILLAS[n].slice();$("#resultado").innerHTML="";cambio()};
+  $("#plantillas").appendChild(b);
+});
+
+/* ---------- casino ---------- */
+const ORDEN=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+const ROJOS=new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+const colorNum=n=>n===0?"v":(ROJOS.has(n)?"r":"n");
+const EXT=[
+  ["1ª docena",n=>n>=1&&n<=12,2],["2ª docena",n=>n>=13&&n<=24,2],["3ª docena",n=>n>=25,2],
+  ["Col. 1",n=>n>0&&n%3===1,2],["Col. 2",n=>n>0&&n%3===2,2],["Col. 3",n=>n>0&&n%3===0,2],
+  ["1 a 18",n=>n>=1&&n<=18,1],["Par",n=>n>0&&n%2===0,1],["Rojo",n=>ROJOS.has(n),1],
+  ["Negro",n=>n>0&&!ROJOS.has(n),1],["Impar",n=>n%2===1,1],["19 a 36",n=>n>=19,1]
+];
+let saldo=leer("ruleta.saldo",1000),valor=10,ap={},ultima={},hist=[];
+const VAL=[5,10,50,100];
+VAL.forEach(v=>{const b=document.createElement("button");b.className="chico"+(v===valor?" on":"");b.textContent=v;
+  b.onclick=()=>{valor=v;document.querySelectorAll("#valores button").forEach(x=>x.classList.toggle("on",x===b))};$("#valores").appendChild(b)});
+const botones={};
+function botonAp(cont,clave,txt,cls){
+  const b=document.createElement("button");b.className=cls||"";b.textContent=txt;
+  b.onclick=()=>apostar(clave);cont.appendChild(b);botones[clave]=b;
+}
+botonAp($("#paño"),"n0","0","v");
+for(let n=1;n<=36;n++)botonAp($("#paño"),"n"+n,n,colorNum(n));
+EXT.forEach((e,i)=>botonAp($("#ext"),"e"+i,e[0],e[0]==="Rojo"?"r":(e[0]==="Negro"?"n":"")));
+const totalAp=()=>Object.values(ap).reduce((a,b)=>a+b,0);
+function apostar(k){
+  if(girando)return;
+  if(totalAp()+valor>saldo){$("#apuestasTxt").textContent="No te alcanzan las fichas para esa apuesta.";return}
+  ap[k]=(ap[k]||0)+valor;pintarCasino();
+}
+function nombreAp(k){return k[0]==="n"?"al "+k.slice(1):EXT[+k.slice(1)][0]}
+function pintarCasino(){
+  $("#saldo").textContent=saldo-totalAp();
+  for(const k in botones){
+    const b=botones[k];let f=b.querySelector(".ficha");
+    if(ap[k]){if(!f){f=document.createElement("span");f.className="ficha";b.appendChild(f)}f.textContent=ap[k]}
+    else if(f)f.remove();
+  }
+  const t=totalAp();
+  if(t)$("#apuestasTxt").textContent="Apostado: "+t+" ("+Object.keys(ap).map(k=>ap[k]+" "+nombreAp(k)).join(", ")+")";
+  if(modo==="casino")$("#girar").disabled=false;
+  $("#historial").innerHTML=hist.length?hist.map(n=>'<b style="color:'+(n===0?"#3ddc84":ROJOS.has(n)?"#ff6b6b":"#fff")+'">'+n+'</b>').join(" "):"—";
+}
+$("#borrarAp").onclick=()=>{if(girando)return;ap={};$("#apuestasTxt").textContent="Apuestas sacadas.";pintarCasino()};
+$("#repetir").onclick=()=>{if(girando)return;const t=Object.values(ultima).reduce((a,b)=>a+b,0);
+  if(!t){$("#apuestasTxt").textContent="Todavía no hubo apuesta para repetir.";return}
+  if(t>saldo){$("#apuestasTxt").textContent="No te alcanzan las fichas para repetir.";return}
+  ap={...ultima};pintarCasino()};
+$("#reiniciar").onclick=()=>{if(girando)return;saldo=1000;ap={};guardar("ruleta.saldo",saldo);$("#apuestasTxt").textContent="Fichas en 1000 otra vez.";pintarCasino()};
+function liquidar(n){
+  let gan=0,pago=0;const t=totalAp();
+  for(const k in ap){
+    const m=ap[k];
+    if(k[0]==="n"){if(+k.slice(1)===n){gan+=m*35+m;}}
+    else{const e=EXT[+k.slice(1)];if(e[1](n))gan+=m*e[2]+m;}
+  }
+  saldo=saldo-t+gan;guardar("ruleta.saldo",saldo);
+  if(t)ultima={...ap};ap={};
+  hist.unshift(n);hist=hist.slice(0,10);
+  const neto=gan-t;
+  let txt=t?(neto>0?'<span class="gano">Ganaste '+neto+'</span>':neto<0?'<span class="perdio">Perdiste '+(-neto)+'</span>':"Quedaste igual"):"Sin apuestas";
+  if(saldo<=0)txt+=" · Te fundiste: tocá «Volver a 1000»";
+  $("#apuestasTxt").textContent="Tocá números o casillas para la próxima.";
+  pintarCasino();return txt;
+}
+
+/* ---------- dibujo ---------- */
+function segs(){
+  if(modo==="libre")return ops.map((o,i)=>({t:o,c:color(i)}));
+  return ORDEN.map(n=>({t:String(n),c:n===0?"#1f9d55":ROJOS.has(n)?"#d8322f":"#1d1d24",n}));
+}
+function dibujar(){
+  const s=segs(),N=s.length;cx.clearRect(0,0,cv.width,cv.height);
+  cx.save();cx.translate(R,R);
+  cx.beginPath();cx.arc(0,0,R-2,0,Math.PI*2);cx.fillStyle=modo==="casino"?"#5a3b12":"#ffffff22";cx.fill();
+  if(N===0){cx.fillStyle="#c9bfe6";cx.font="bold 38px system-ui";cx.textAlign="center";cx.fillText("Cargá opciones",0,-90);cx.restore();return}
+  const a=Math.PI*2/N,rin=modo==="casino"?R-26:R-10;
+  cx.rotate(ang);
+  for(let i=0;i<N;i++){
+    // el segmento i queda centrado en -PI/2 + i*a cuando ang=0 (arriba)
+    const ini=-Math.PI/2+i*a-a/2;
+    cx.beginPath();cx.moveTo(0,0);cx.arc(0,0,rin,ini,ini+a);cx.closePath();
+    cx.fillStyle=s[i].c;cx.fill();cx.strokeStyle="#00000055";cx.lineWidth=2;cx.stroke();
+    cx.save();cx.rotate(ini+a/2);
+    if(modo==="casino"){
+      cx.fillStyle="#fff";cx.font="bold 30px system-ui";cx.textAlign="center";cx.textBaseline="middle";
+      cx.translate(rin-34,0);cx.rotate(Math.PI/2);cx.fillText(s[i].t,0,0);
+    }else{
+      const claro=["#ffc23d","#feca57","#48dbfb","#c8d6e5","#4ecdc4","#1dd1a1","#3ddc84"].includes(s[i].c);
+      cx.fillStyle=claro?"#1b1400":"#fff";cx.textAlign="right";cx.textBaseline="middle";
+      let fs=Math.min(40,Math.max(18,a*R*0.42));cx.font="bold "+fs+"px system-ui";
+      let t=s[i].t;const max=rin*0.62;
+      while(cx.measureText(t).width>max&&t.length>2)t=t.slice(0,-2)+"…";
+      cx.fillText(t,rin-22,0);
+    }
+    cx.restore();
+  }
+  cx.restore();
+  if(modo==="casino"){cx.beginPath();cx.arc(R,R,R*0.55,0,Math.PI*2);cx.fillStyle="#3b2610";cx.fill()}
+}
+
+/* ---------- giro ---------- */
+function indiceArriba(N){
+  const a=Math.PI*2/N;let x=(-ang)%(Math.PI*2);if(x<0)x+=Math.PI*2;
+  return Math.round(x/a)%N;
+}
+let ac=null;
+function beep(f){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();
+  o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.05);o.stop(ac.currentTime+.06)}catch(e){}}
+function girar(){
+  if(girando)return;const s=segs(),N=s.length;if(N<2)return;
+  girando=true;$("#girar").disabled=true;$("#resultado").innerHTML="";
+  const gana=Math.floor(Math.random()*N),a=Math.PI*2/N;
+  const jitter=(Math.random()-.5)*a*0.7;
+  // ángulo final: -gana*a (+ vueltas), así el segmento ganador queda arriba
+  const vueltas=5+Math.floor(Math.random()*3);
+  let actual=ang%(Math.PI*2);
+  let fin=-gana*a+jitter;while(fin>actual)fin-=Math.PI*2;fin-=vueltas*Math.PI*2;
+  const desde=actual,dur=4200+Math.random()*1200,t0=performance.now();let ult=indiceArriba(N);
+  if(navigator.vibrate)navigator.vibrate(20);
+  function paso(t){
+    const p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,4);
+    ang=desde+(fin-desde)*e;dibujar();
+    const i=indiceArriba(N);if(i!==ult){ult=i;beep(modo==="casino"?1400:900)}
+    if(p<1)requestAnimationFrame(paso);else terminar(gana,s);
+  }
+  requestAnimationFrame(paso);
+}
+function terminar(i,s){
+  girando=false;if(navigator.vibrate)navigator.vibrate([40,40,80]);beep(520);
+  if(modo==="libre"){
+    const txt=s[i].t;
+    $("#resultado").innerHTML="";$("#resultado").append(document.createTextNode(txt));
+    if($("#sacar").checked){
+      ops.splice(i,1);guardar("ruleta.ops",ops);pintarLista();
+      const sm=document.createElement("small");sm.textContent=ops.length?"Salió y lo saqué. Quedan "+ops.length+".":"Era el último.";
+      $("#resultado").appendChild(sm);
+      setTimeout(()=>{ang=0;dibujar()},1400);
+    }
+    pintarLista();
+  }else{
+    const n=s[i].n,c=colorNum(n);
+    const det=n===0?"Cero":(c==="r"?"Rojo":"Negro")+" · "+(n%2?"Impar":"Par")+" · "+(n<=18?"1 a 18":"19 a 36");
+    $("#resultado").innerHTML='<span style="color:'+(c==="v"?"#3ddc84":c==="r"?"#ff6b6b":"#fff")+'">'+n+'</span><small>'+det+' · '+liquidar(n)+'</small>';
+    $("#girar").disabled=false;
+  }
+}
+$("#girar").onclick=girar;$("#eje").onclick=girar;
+
+/* ---------- pestañas ---------- */
+function setModo(m){
+  if(girando)return;modo=m;ang=0;
+  $("#tabLibre").classList.toggle("on",m==="libre");$("#tabCasino").classList.toggle("on",m==="casino");
+  $("#libre").style.display=m==="libre"?"flex":"none";$("#casino").style.display=m==="casino"?"flex":"none";
+  $("#resultado").innerHTML="";$("#girar").disabled=false;
+  history.replaceState(null,"",m==="casino"?"?modo=casino":location.pathname);
+  pintarLista();pintarCasino();dibujar();
+}
+$("#tabLibre").onclick=()=>setModo("libre");$("#tabCasino").onclick=()=>setModo("casino");
+setModo(new URLSearchParams(location.search).get("modo")==="casino"?"casino":"libre");
+</script>
+</body>
+</html>

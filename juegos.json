@@ -96,6 +96,22 @@
   "lema": "Bolillero en un celu, cartones en todos"
  },
  {
+  "nombre": "La Ruleta",
+  "tipo": "Herramientas",
+  "min": 2,
+  "max": 30,
+  "edad": "4+",
+  "propio": true,
+  "descripcion": "Ruleta para la juntada: cargás nombres u opciones propias o usás una plantilla (quién empieza, quién paga, verdad o reto, prendas, comida) y la girás. Puede ir sacando lo que sale para sortear un orden. Trae además un modo casino de un solo cero con fichas de mentira.",
+  "url": "juegos/ruleta/",
+  "icono": "🎡",
+  "colores": [
+   "#ffc23d",
+   "#d8322f"
+  ],
+  "lema": "Que decida la ruleta"
+ },
+ {
   "nombre": "skribbl.io",
   "tipo": "Dibujar",
   "min": 2,
