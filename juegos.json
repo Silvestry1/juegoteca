@@ -97,7 +97,7 @@
  },
  {
   "nombre": "La Ruleta",
-  "tipo": "Herramienta",
+  "tipo": "Herramientas",
   "min": 2,
   "max": 30,
   "edad": "4+",
