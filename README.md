@@ -33,5 +33,5 @@ Si no sabés la cantidad de jugadores, poné `null` en `min` o `max`.
 Viven en `juegos/<nombre>/` y se juegan con un solo celular, sin servidor. En `juegos.json` llevan `"propio": true` (abren en la misma pestaña y muestran la etiqueta "Hecho en casa").
 
 - `juegos/mostralo/`: **Mostralo como puedas**. Dibujo, mímica o tarareo por equipos; las consignas están en el objeto `MAZO` del `index.html`.
-- `juegos/dados/`: **Dados**. Lanzador de dados (d4 a d100 o caras a elección), con modificador, dados fijos e historial guardado en el celular. Categoría "Herramientas".
+- `juegos/dados/`: **Dados**. Dos modos: "Generala · 10.000" (d6 grandes, guardar dados, contador de tiros, detecta jugadas de Generala, suma opcional apagada) y "Rol" (d4 a d100 o caras a elección, modificador, dados fijos, historial, suma opcional prendida). Categoría "Herramientas".
 - `juegos/nisetocurra/`: **Ni se te ocurra**. Palabras prohibidas por equipos, con dificultad Normal/Difícil/Brutal (4, 5 o 6 prohibidas) y mazo ATP, +18 o mezcla. Las cartas están en las constantes `ATP` y `ADULTO` del `index.html`, una por línea: `Palabra: prohibida1, ..., prohibida6`.
