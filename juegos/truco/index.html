@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#13261b">
+<title>Anotador de truco</title>
+<style>
+:root{--bg:#13261b;--paño:#1c3a29;--card:#0d1c13;--txt:#fff;--sub:#cfe0d4;--acc:#ffc23d;--rojo:#e0473a;--madera:#f0cf8f;--madera2:#8a5a2b}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior:none;user-select:none;-webkit-user-select:none}
+.wrap{min-height:100vh;padding:10px 12px calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;max-width:620px;margin:0 auto}
+button{font:inherit;border:0;border-radius:14px;padding:10px 12px;background:#ffffff1f;color:var(--txt);font-weight:800;cursor:pointer;touch-action:manipulation}
+button:active{filter:brightness(1.25)}
+button:disabled{opacity:.35}
+a.volver{color:var(--sub);text-align:center;font-size:1rem;padding:6px}
+
+.barra{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.barra h1{margin:0;font-size:1.15rem;letter-spacing:.5px;color:var(--sub);font-weight:800}
+.barra .meta{font-weight:900;color:var(--acc)}
+#deshacer{padding:12px 16px;font-size:1.1rem;background:#ffffff26}
+
+.mesa{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.equipo{background:var(--paño);border-radius:20px;padding:10px 8px 10px;display:flex;flex-direction:column;gap:10px;box-shadow:inset 0 0 30px #0007;border:3px solid transparent;transition:border-color .3s}
+.equipo.lider{border-color:#ffc23d55}
+.nombre{width:100%;background:#00000030;border:2px dashed #ffffff30;border-radius:12px;color:var(--txt);font:inherit;font-size:1.35rem;font-weight:900;text-align:center;padding:8px 4px;user-select:text;-webkit-user-select:text}
+.nombre:focus{outline:none;border-color:var(--acc);border-style:solid}
+.ganadas{text-align:center;font-size:.95rem;color:var(--sub);min-height:1.2em;margin-top:-4px}
+.ganadas b{color:var(--acc)}
+
+.tanteo{text-align:center;line-height:1}
+.tanteo .num{font-size:3.6rem;font-weight:900;font-variant-numeric:tabular-nums}
+.tanteo .que{font-size:1.25rem;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.tanteo .que.buenas{color:var(--acc)}
+.tanteo .total{font-size:.9rem;color:var(--sub);margin-top:4px;opacity:.8}
+
+/* palitos */
+.palitos{display:grid;gap:6px}
+.palitos.a30{grid-template-columns:1fr 1fr}
+.palitos.a15{grid-template-columns:1fr;justify-items:center}
+.col{display:flex;flex-direction:column;gap:4px;align-items:center}
+.col h4{margin:0;font-size:.8rem;letter-spacing:1px;text-transform:uppercase;color:var(--sub);opacity:.85}
+.col.buenas h4{color:var(--acc)}
+.col.buenas{border-left:2px dashed #ffffff40}
+.cuadro{width:100%;max-width:86px;aspect-ratio:1}
+.a15 .cuadro{max-width:min(110px,100%)}
+.cuadro svg{width:100%;height:100%;display:block;overflow:visible}
+.cuadro .guia{fill:none;stroke:#ffffff1c;stroke-width:3;stroke-dasharray:6 7}
+.pal .borde{stroke:var(--madera2);stroke-width:9;stroke-linecap:round}
+.pal .cuerpo{stroke:var(--madera);stroke-width:5;stroke-linecap:round}
+.pal .cabeza{fill:var(--rojo);stroke:#7a1810;stroke-width:2}
+.pal.nuevo{animation:cae .45s cubic-bezier(.2,.8,.3,1.3) both;transform-box:fill-box;transform-origin:center}
+@keyframes cae{0%{opacity:0;transform:scale(1.8) rotate(20deg)}100%{opacity:1;transform:none}}
+
+/* botones de puntos */
+.sumar{padding:18px 4px;font-size:2.4rem;font-weight:900;background:var(--acc);color:#1b1400;border-radius:18px;box-shadow:0 5px 0 #b8860b;line-height:1}
+.sumar:active{transform:translateY(3px);box-shadow:0 2px 0 #b8860b}
+.rapidos{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.rapidos button{padding:14px 0;font-size:1.35rem}
+.restar{padding:12px 4px;font-size:1.25rem;background:#00000040;border:2px solid #ffffff30}
+
+.ajustes{background:var(--card);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.ajustes h3{margin:0;font-size:.85rem;text-transform:uppercase;letter-spacing:1px;color:var(--sub)}
+.selector{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:#00000040;border-radius:14px;padding:5px}
+.selector button{padding:14px 6px;font-size:1.15rem;background:transparent;color:var(--sub)}
+.selector button.on{background:var(--acc);color:#1b1400}
+.ajustes .fila{display:flex;gap:8px}
+.ajustes .fila button{flex:1;padding:14px 8px;font-size:1.05rem}
+.ayuda{font-size:.98rem;color:var(--sub);margin:0;line-height:1.4}
+.selector button.armado,button.peligro.armado{background:var(--rojo);color:#fff}
+
+.aviso{position:fixed;left:50%;top:18px;transform:translate(-50%,calc(-100% - 40px));opacity:0;background:var(--acc);color:#1b1400;font-weight:900;font-size:1.3rem;padding:12px 20px;border-radius:14px;box-shadow:0 8px 24px #000a;transition:transform .3s,opacity .3s;z-index:5;text-align:center;max-width:90vw}
+.aviso.on{transform:translate(-50%,0);opacity:1}
+
+.ganador{position:fixed;inset:0;background:#000c;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}
+.ganador.on{display:flex}
+.ganador .caja{background:var(--paño);border:4px solid var(--acc);border-radius:24px;padding:26px 20px;text-align:center;max-width:420px;width:100%;display:flex;flex-direction:column;gap:14px;animation:sube .4s cubic-bezier(.2,.8,.3,1.2)}
+@keyframes sube{from{transform:scale(.7);opacity:0}to{transform:none;opacity:1}}
+.ganador .copa{font-size:4.5rem;line-height:1}
+.ganador h2{margin:0;font-size:2.2rem;color:var(--acc);line-height:1.1}
+.ganador p{margin:0;font-size:1.25rem;color:var(--sub)}
+.ganador button{padding:18px;font-size:1.3rem}
+.ganador .otra{background:var(--acc);color:#1b1400}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="barra">
+    <h1>Truco · a <span class="meta" id="metaTxt">30</span></h1>
+    <button id="deshacer" disabled>↶ Deshacer</button>
+  </div>
+
+  <div class="mesa" id="mesa"></div>
+
+  <div class="ajustes">
+    <h3>Partida a</h3>
+    <div class="selector" id="selMeta">
+      <button data-m="15">15</button>
+      <button data-m="30">30 (malas y buenas)</button>
+    </div>
+    <div class="fila">
+      <button class="peligro" id="nueva">Nueva partida</button>
+      <button class="peligro" id="borrarG">Borrar ganadas</button>
+    </div>
+    <p class="ayuda">Tocá el nombre para cambiarlo. Los palitos van de a 5, como en el papel. Todo queda guardado en este celu, aunque lo cierres.</p>
+  </div>
+
+  <a class="volver" href="../../">← Volver a la Juegoteca</a>
+</div>
+
+<div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+
+<div class="ganador" id="ganador" role="dialog" aria-modal="true" aria-labelledby="ganTit">
+  <div class="caja">
+    <div class="copa">🏆</div>
+    <h2 id="ganTit">¡Ganó Nosotros!</h2>
+    <p id="ganSub"></p>
+    <button class="otra" id="otra">Otra partida</button>
+    <button id="ganDeshacer">↶ Me equivoqué, deshacer</button>
+  </div>
+</div>
+
+<script>
+const leer=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}};
+const grabar=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const CLAVE="truco-anotador";
+const $=id=>document.getElementById(id);
+
+const base={meta:30,n:["Nosotros","Ellos"],p:[0,0],g:[0,0],h:[],fin:-1};
+let S=Object.assign({},base,leer(CLAVE,{}));
+if(![15,30].includes(S.meta))S.meta=30;
+let nuevoPalito=[-1,-1]; // índice del palito recién agregado, para animarlo
+
+const guardar=()=>{S.h=S.h.slice(-300);grabar(CLAVE,S)};
+
+// --- dibujo de un cuadro de 5 fósforos: izquierda, arriba, derecha, abajo, cruzado ---
+const PALOS=[[12,84,12,20],[20,12,84,12],[88,20,88,84],[84,88,20,88],[24,76,76,24]];
+function cuadro(llenos,animar){
+  let s='<svg viewBox="0 0 100 100" aria-hidden="true"><rect class="guia" x="12" y="12" width="76" height="76" rx="4"/>';
+  for(let k=0;k<llenos;k++){
+    const [x1,y1,x2,y2]=PALOS[k];
+    s+=`<g class="pal${animar===k?' nuevo':''}"><line class="borde" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/><line class="cuerpo" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/><circle class="cabeza" cx="${x2}" cy="${y2}" r="7"/></g>`;
+  }
+  return s+'</svg>';
+}
+function columna(puntos,desde,cant,titulo,clase,animIdx){
+  let h=`<div class="col ${clase}">${titulo?`<h4>${titulo}</h4>`:''}`;
+  for(let c=0;c<cant;c++){
+    const ini=desde+c*5;
+    const llenos=Math.max(0,Math.min(5,puntos-ini));
+    const anim=(animIdx>=ini&&animIdx<ini+5)?animIdx-ini:-1;
+    h+=`<div class="cuadro">${cuadro(llenos,anim)}</div>`;
+  }
+  return h+'</div>';
+}
+
+function textoTanteo(p){
+  if(S.meta===15)return {num:p,que:p===1?"punto":"puntos",buenas:false};
+  if(p<=15)return {num:p,que:"malas",buenas:false};
+  return {num:p-15,que:"buenas",buenas:true};
+}
+
+function armarMesa(){
+  const m=$("mesa");m.innerHTML="";
+  [0,1].forEach(i=>{
+    const e=document.createElement("section");e.className="equipo";e.id="eq"+i;
+    e.innerHTML=`
+      <input class="nombre" maxlength="16" aria-label="Nombre del equipo" value="">
+      <div class="ganadas"></div>
+      <div class="tanteo" aria-live="polite"><div class="num"></div><div class="que"></div><div class="total"></div></div>
+      <div class="palitos"></div>
+      <button class="sumar" aria-label="Sumar 1">+1</button>
+      <div class="rapidos"><button data-d="2">+2</button><button data-d="3">+3</button><button data-d="4">+4</button></div>
+      <button class="restar">−1 Restar</button>`;
+    const inp=e.querySelector(".nombre");
+    inp.value=S.n[i];
+    inp.addEventListener("input",()=>{S.n[i]=inp.value.trim()||(i?"Ellos":"Nosotros");guardar()});
+    inp.addEventListener("blur",()=>{inp.value=S.n[i]});
+    inp.addEventListener("keydown",ev=>{if(ev.key==="Enter")inp.blur()});
+    e.querySelector(".sumar").onclick=()=>sumar(i,1);
+    e.querySelectorAll(".rapidos button").forEach(b=>b.onclick=()=>sumar(i,+b.dataset.d));
+    e.querySelector(".restar").onclick=()=>sumar(i,-1);
+    m.appendChild(e);
+  });
+}
+
+function pintar(){
+  $("metaTxt").textContent=S.meta;
+  document.querySelectorAll("#selMeta button").forEach(b=>b.classList.toggle("on",+b.dataset.m===S.meta));
+  [0,1].forEach(i=>{
+    const e=$("eq"+i),p=S.p[i],t=textoTanteo(p);
+    e.querySelector(".num").textContent=t.num;
+    const q=e.querySelector(".que");q.textContent=t.que;q.classList.toggle("buenas",t.buenas);
+    e.querySelector(".total").textContent=S.meta===30?`${p} de 30`:`de 15`;
+    e.querySelector(".ganadas").innerHTML=S.g[i]?`Partidas ganadas: <b>${S.g[i]}</b>`:"";
+    e.classList.toggle("lider",p>S.p[1-i]);
+    const pal=e.querySelector(".palitos");
+    const a=nuevoPalito[i];
+    if(S.meta===30){
+      pal.className="palitos a30";
+      pal.innerHTML=columna(p,0,3,"Malas","malas",a)+columna(p,15,3,"Buenas","buenas",a);
+    }else{
+      pal.className="palitos a15";
+      pal.innerHTML=columna(p,0,3,"","",a);
+    }
+    const lleno=S.fin>=0;
+    e.querySelectorAll(".sumar,.rapidos button").forEach(b=>b.disabled=lleno||p>=S.meta);
+    e.querySelector(".restar").disabled=lleno||p<=0;
+  });
+  $("deshacer").disabled=!S.h.length;
+  nuevoPalito=[-1,-1];
+  mostrarGanador();
+}
+
+function sumar(i,d){
+  if(S.fin>=0)return;
+  const antes=S.p.slice();
+  const nuevo=Math.max(0,Math.min(S.meta,S.p[i]+d));
+  if(nuevo===S.p[i])return;
+  S.p[i]=nuevo;
+  let gano=-1;
+  if(nuevo>=S.meta){gano=i;S.g[i]++;S.fin=i}
+  S.h.push({p:antes,gano});
+  if(d>0)nuevoPalito[i]=nuevo-1;
+  vibrar(d>0?25:[15,40,15]);
+  if(S.meta===30&&antes[i]<=15&&nuevo>15&&gano<0)avisar(`${S.n[i]} entró en las buenas`);
+  guardar();pintar();
+}
+
+function deshacer(){
+  const e=S.h.pop();if(!e)return;
+  if(e.gano>=0){S.g[e.gano]=Math.max(0,S.g[e.gano]-1);S.fin=-1}
+  S.p=e.p;vibrar(15);guardar();pintar();
+}
+
+function nuevaPartida(){S.p=[0,0];S.h=[];S.fin=-1;guardar();pintar()}
+
+function mostrarGanador(){
+  const g=$("ganador");
+  if(S.fin<0){g.classList.remove("on");return}
+  const i=S.fin;
+  $("ganTit").textContent=`¡Ganó ${S.n[i]}!`;
+  const otro=textoTanteo(S.p[1-i]);
+  $("ganSub").textContent=`${S.n[1-i]} quedó en ${otro.num} ${otro.que}.`+(S.g[0]+S.g[1]>1?` Van ${S.g[0]} a ${S.g[1]} en partidas.`:"");
+  g.classList.add("on");
+}
+
+// botones que piden confirmar con un segundo toque
+function confirmar(btn,txtOk,accion,necesita){
+  const orig=btn.textContent;let t=null;
+  btn.onclick=()=>{
+    if(necesita&&!necesita()){accion();return}
+    if(btn.classList.contains("armado")){clearTimeout(t);btn.classList.remove("armado");btn.textContent=orig;accion();return}
+    btn.classList.add("armado");btn.textContent=txtOk;
+    t=setTimeout(()=>{btn.classList.remove("armado");btn.textContent=orig},3500);
+  };
+}
+
+let tAviso=null;
+function avisar(txt){const a=$("aviso");a.textContent=txt;a.classList.add("on");clearTimeout(tAviso);tAviso=setTimeout(()=>a.classList.remove("on"),2600)}
+function vibrar(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
+
+// pantalla siempre prendida mientras se anota
+let cerrojo=null;
+async function mantenerPrendida(){try{if("wakeLock" in navigator&&!cerrojo){cerrojo=await navigator.wakeLock.request("screen");cerrojo.addEventListener("release",()=>cerrojo=null)}}catch(e){}}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")mantenerPrendida()});
+document.addEventListener("pointerdown",mantenerPrendida,{once:true});
+
+armarMesa();
+$("deshacer").onclick=deshacer;
+$("ganDeshacer").onclick=deshacer;
+$("otra").onclick=nuevaPartida;
+document.querySelectorAll("#selMeta button").forEach(b=>{
+  let t=null;
+  b.onclick=()=>{
+    const m=+b.dataset.m;if(m===S.meta)return;
+    const hay=S.p[0]+S.p[1]>0&&S.fin<0;
+    if(hay&&!b.classList.contains("armado")){
+      b.classList.add("armado");const orig=b.textContent;b.textContent="¿Reinicio? Tocá de nuevo";
+      t=setTimeout(()=>{b.classList.remove("armado");b.textContent=orig},3500);return;
+    }
+    clearTimeout(t);b.classList.remove("armado");b.textContent=m===15?"15":"30 (malas y buenas)";
+    S.meta=m;nuevaPartida();
+  };
+});
+confirmar($("nueva"),"¿Seguro? Tocá de nuevo",nuevaPartida,()=>S.p[0]+S.p[1]>0&&S.fin<0);
+confirmar($("borrarG"),"¿Seguro? Tocá de nuevo",()=>{S.g=[0,0];guardar();pintar()});
+pintar();
+</script>
+<script>if("serviceWorker" in navigator)navigator.serviceWorker.register("../../sw.js",{scope:"../../"});</script>
+</body>
+</html>

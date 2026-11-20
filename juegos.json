@@ -96,6 +96,22 @@
   "lema": "Que decida la ruleta"
  },
  {
+  "nombre": "Anotador de truco",
+  "tipo": "Herramientas",
+  "min": 2,
+  "max": 6,
+  "edad": "8+",
+  "propio": true,
+  "descripcion": "Para anotar el truco sin papel ni birome. Nosotros y Ellos (con el nombre que quieras), partida a 15 o a 30 con malas y buenas, palitos de a 5 como siempre, botones grandes, deshacer y aviso de quién ganó. Queda guardado en el celu.",
+  "url": "juegos/truco/",
+  "icono": "🃏",
+  "colores": [
+   "#e0473a",
+   "#13261b"
+  ],
+  "lema": "Los fósforos de siempre, en el celu"
+ },
+ {
   "nombre": "skribbl.io",
   "tipo": "Dibujar",
   "min": 2,

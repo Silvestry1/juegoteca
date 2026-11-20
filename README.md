@@ -48,3 +48,4 @@ Si agregás un juego propio nuevo en `juegos/<nombre>/`:
    `<script>if("serviceWorker" in navigator)navigator.serviceWorker.register("../../sw.js",{scope:"../../"});</script>`
 
 Los cambios a juegos que ya existen llegan solos: la app siempre intenta bajar la versión nueva y usa la guardada solo si no hay señal (o tarda más de 3,5 s).
+- `juegos/truco/`: **Anotador de truco**. Nosotros/Ellos con nombres editables, partida a 15 o a 30 (malas y buenas), fósforos de a 5, +1/+2/+3/+4 y −1, deshacer, aviso de ganador y partidas ganadas. Se guarda en `localStorage` (`truco-anotador`) y mantiene la pantalla prendida. Categoría "Herramientas".
