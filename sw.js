@@ -1,6 +1,6 @@
 // Service worker de la Juegoteca.
 // Al agregar un juego propio nuevo, sumá su carpeta a PROPIOS y subí VERSION.
-const VERSION = "v11";
+const VERSION = "v12";
 const CACHE = "juegoteca-" + VERSION;
 const PROPIOS = [
   "./",
@@ -27,6 +27,11 @@ const PROPIOS = [
   "juegos/bingo/",
   "juegos/bingomusical/",
   "juegos/truco/",
+  "juegos/truco/mesa/",
+  "juegos/truco/mesa/motor.js",
+  "juegos/comun/baraja.js",
+  "juegos/comun/qrcode.js",
+  "juegos/comun/peerjs.min.js",
   "juegos/comun/cartas-propias.js",
   "juegos/comun/tema.css",
   "juegos/comun/tema.js"
