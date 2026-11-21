@@ -81,3 +81,22 @@ header{margin-top:max(150px,22vh)}
 .sticker,.casa{background:var(--acc2);box-shadow:0 4px 0 var(--acc2-sombra),0 8px 16px #0008}
 .casa{box-shadow:0 3px 0 var(--acc2-sombra)}
 .barra span b{color:var(--acc2)}
+
+/* --- Ajustes: sin guiños a ningún sistema operativo y título fijo arriba --- */
+.barra{gap:10px;padding:11px 14px;font-size:.8rem;letter-spacing:2px;text-transform:uppercase;color:var(--txt)}
+.barra::before{content:"";width:10px;height:10px;background:var(--acc);box-shadow:3px 3px 0 var(--acc-sombra)}
+.barra span{margin:0}
+/* barra del título: queda pegada arriba siempre */
+.tope{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;gap:10px;
+  padding:calc(10px + env(safe-area-inset-top)) 16px 10px;background:var(--win);border-bottom:1px solid var(--win-borde);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 8px 24px #0008}
+.tope .cartel{display:flex;align-items:center}
+.tope h1{font-size:1.6rem;gap:8px}
+.tope h1 .px-emo img{width:32px;height:32px}
+.tope .sticker{position:static;transform:rotate(-6deg);margin-left:10px;font-size:.7rem;padding:3px 8px}
+.tope time{margin-left:auto;font-family:var(--mono);font-size:.8rem;color:var(--sub2)}
+body{padding-top:calc(62px + env(safe-area-inset-top))}
+header{margin-top:16px;padding-top:18px}
+#lupa{z-index:60}
+@media (max-width:360px){.tope .sticker{display:none}}
+.tope time{white-space:nowrap}@media (max-width:440px){.tope time{display:none}}

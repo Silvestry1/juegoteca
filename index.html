@@ -136,12 +136,14 @@ body.sin-scroll{overflow:hidden}
 <script src="estilo/paleta.js"></script>
 <script src="estilo/pixel.js"></script>
 <script src="estilo/sprites.js" defer></script>
-<script>addEventListener("DOMContentLoaded",()=>{const f=()=>document.querySelectorAll(".barra time").forEach(t=>t.textContent=new Date().toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"}));f();setInterval(f,30000);});</script>
+<script>addEventListener("DOMContentLoaded",()=>{const f=()=>document.querySelectorAll(".tope time").forEach(t=>t.textContent=new Date().toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"}));f();setInterval(f,30000);});</script>
 </head>
 <body>
-<header>
-  <div class="barra"><i></i><i></i><i></i><span>juegoteca · <b>inicio</b></span><time></time></div>
+<div class="tope">
   <a class="cartel" href="./" title="Volver al inicio"><h1><span class="px-emo">🎬</span>Juegoteca</h1><span class="sticker">¡A jugar!</span></a>
+  <time></time>
+</div>
+<header>
   <p>Tocá una caja y <em>a jugar</em></p>
   <div class="botones">
     <button class="btnqr" id="abrirQR"><span class="px-emo">📱</span> Mostrar QR</button>
@@ -150,7 +152,7 @@ body.sin-scroll{overflow:hidden}
   <div class="aviso" id="aviso">Sin conexión: los juegos <b>Hecho en casa</b> andan igual. Los demás necesitan internet.</div>
 </header>
 <section class="ventana">
-<div class="barra"><i></i><i></i><i></i><span>juegoteca · <b>estante</b></span><time></time></div>
+<div class="barra"><span>Estante</span></div>
 <div class="filtros" id="filtros"></div>
 <div class="cant"><label for="n">Somos</label><input id="n" type="number" min="1" inputmode="numeric" placeholder="—"><span>personas</span></div>
 <main id="lista"></main>

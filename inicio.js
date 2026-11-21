@@ -11,6 +11,17 @@
   #jt-inicio:active{transform:scale(.92)}
   @media print{#jt-inicio{display:none}}`;
   document.head.appendChild(css);
+  // Diseño pixel de los juegos de la casa (cada juego conserva sus colores)
+  if (/\/juegos\//.test(location.pathname)) {
+    const t = document.createElement("link"); t.rel = "stylesheet"; t.href = raiz + "juegos/comun/tema.css";
+    document.head.appendChild(t);
+    const f = document.createElement("link"); f.rel = "stylesheet";
+    f.href = "https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&display=swap";
+    document.head.appendChild(f);
+    const j = document.createElement("script"); j.src = raiz + "juegos/comun/tema.js"; j.defer = true;
+    const pon = () => document.body.appendChild(j);
+    document.body ? pon() : addEventListener("DOMContentLoaded", pon);
+  }
   const b = document.createElement("button");
   b.id = "jt-inicio";
   b.type = "button";
