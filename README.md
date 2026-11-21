@@ -64,3 +64,9 @@ Los cambios a juegos que ya existen llegan solos: la app siempre intenta bajar l
 **Compartir mi lista** arma un texto (`#cartas <juego>`, una carta por línea con campos separados por `|`, y `#sacadas` con las oficiales sacadas) para mandar por WhatsApp. Ese texto se puede pegar en otro celu (**Pegar una lista que te mandaron**) o usar para sumar cartas al mazo oficial del `index.html`.
 
 Para un juego de adivinar nuevo: cargá el script, llamá a `CartasPropias({juego, nombre, campos, clave, resumen, oficiales, validar, alCambiar})` (ver el comentario al principio del archivo) y armá el mazo con `mis.activas()` y `mis.ocultas()`.
+
+## Archivar y avisar que un juego no anda
+
+Mantener apretada una caja (o clic derecho) abre un menú con **📦 Archivar** y **⚠️ Avisar que no anda**.
+- Archivar saca el juego de la Estantería solo en ese celu (`localStorage`, clave `juegoteca-archivados`, lista de `id` o `url`). Los archivados quedan en la sección **Archivados**, abajo de todo y plegada; mantener apretada una caja ahí la devuelve.
+- Avisar arma un mensaje con el nombre y el link del juego y abre el menú de compartir del celu (o WhatsApp si no hay), porque el sitio no tiene servidor.

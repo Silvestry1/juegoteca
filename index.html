@@ -127,6 +127,25 @@ body.sin-scroll{overflow:hidden}
 #lupa .dorso a{font-size:1.25rem;padding:15px;border-radius:10px}
 #lupa .dorso small{font-size:.8rem}
 #lupa .dorso .extra button{font-size:.95rem;padding:11px 6px}
+/* mantener apretado, archivados */
+.caja{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.caja.apretando .giro{transform:scale(.95);transition:transform .45s}
+#archivo{margin-top:0}
+#archivo>summary{cursor:pointer;list-style:none}
+#archivo>summary::-webkit-details-marker{display:none}
+#archivo .flecha{margin-left:auto;font-style:normal;transition:transform .2s}
+#archivo[open] .flecha{transform:rotate(90deg)}
+.archivo-nota{text-align:center;color:var(--sub);font-size:.85rem;margin:10px 16px 0}
+#archivadosGrid{display:grid;gap:22px 14px;padding:12px 16px 32px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.caja.archivada .frente{filter:grayscale(.55) brightness(.75)}
+#menuCaja{max-width:360px;text-align:center}
+#menuCaja h2{margin:0 0 12px;font-size:1.15rem}
+#menuCaja .opciones{display:flex;flex-direction:column;gap:8px}
+#menuCaja .opciones button{border:0;border-radius:10px;padding:14px;font-weight:700;font-size:1rem;background:#111;color:var(--acc)}
+#menuCaja .opciones button.sec{background:#e8e3f5;color:#111}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:#f4efe3;color:#222;padding:10px 16px;border-radius:999px;
+  font-size:.9rem;font-weight:700;box-shadow:0 4px 14px #000a;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:80;max-width:calc(100% - 32px);text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
 @media (display-mode: standalone),(display-mode: fullscreen){.btninst{display:none}}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -152,18 +171,33 @@ body.sin-scroll{overflow:hidden}
   <div class="aviso" id="aviso">Sin conexión: los juegos <b>Hecho en casa</b> andan igual. Los demás necesitan internet.</div>
 </header>
 <section class="ventana">
-<div class="barra"><span>Estante</span></div>
+<div class="barra"><span>Estantería</span></div>
 <div class="filtros" id="filtros"></div>
 <div class="cant"><label for="n">Somos</label><input id="n" type="number" min="1" inputmode="numeric" placeholder="—"><span>personas</span></div>
 <main id="lista"></main>
 </section>
-<footer>Los juegos que agregás con <b>+</b> quedan guardados solo en este celu.</footer>
+<details class="ventana" id="archivo" hidden>
+<summary class="barra"><span>Archivados (<b id="archivoCant">0</b>)</span><em class="flecha" aria-hidden="true">▸</em></summary>
+<p class="archivo-nota">Los que archivaste en este celu. Mantené apretada una caja para devolverla a la estantería.</p>
+<div id="archivadosGrid" class="grilla"></div>
+</details>
+<footer>Mantené apretada una caja para <b>archivarla</b> o <b>avisar que no anda</b>.<br>Los juegos que agregás con <b>+</b> y lo que archivás quedan solo en este celu.</footer>
+<div id="toast" role="status" aria-live="polite"></div>
 
 <div id="lupa" hidden role="dialog" aria-modal="true" aria-label="Detalle del juego">
   <button type="button" class="cerrar" aria-label="Cerrar">✕</button>
   <div class="lugar"></div>
-  <p class="pista">Tocá afuera para volver al estante</p>
+  <p class="pista">Tocá afuera para volver a la estantería</p>
 </div>
+
+<dialog id="menuCaja" aria-label="Opciones del juego">
+  <h2 id="menuNombre"></h2>
+  <div class="opciones">
+    <button type="button" id="mArchivar"></button>
+    <button type="button" id="mAvisar">⚠️ Avisar que no anda</button>
+    <button type="button" id="mCancelar" class="sec">Cancelar</button>
+  </div>
+</dialog>
 
 <dialog id="qr">
   <img src="qr-juegoteca.png" alt="Código QR de la Juegoteca" width="592" height="812">
@@ -251,16 +285,17 @@ function calif(g){
   return "+18";
 }
 function clsCalif(c){return c==="+13"?"mas":c==="+16"?"mas16":c==="+18"?"mas18":""}
-function pinta(){
-  const n=parseInt($("#n").value);
-  const todos=juegos.concat(Locales.lista());
-  const vis=todos.filter(g=>(tipo==="Todos"||g.tipo===tipo)&&
-    (!n||((g.min==null||n>=g.min)&&(g.max==null||n<=g.max))));
-  $("#lista").innerHTML=vis.map(g=>{
+// Archivados: cada celu guarda qué juegos no quiere ver en la estantería
+const CLAVE_ARCH="juegoteca-archivados";
+const claveJuego=g=>g.id||g.url;
+function archivados(){try{return new Set(JSON.parse(localStorage.getItem(CLAVE_ARCH))||[]);}catch{return new Set();}}
+function guardarArchivados(set){try{localStorage.setItem(CLAVE_ARCH,JSON.stringify([...set]));}catch{}}
+function todosLosJuegos(){return juegos.concat(Locales.lista());}
+function cajaHTML(g,arch){
     const [c1,c2]=g.colores||["#444","#111"];const c=calif(g);
     const ilus=g.imagen?`<img src="${esc(g.imagen)}" alt="" style="width:100%;height:100%;object-fit:cover">`:`<div>${esc(g.icono||"🎲")}</div>`;
     const off=!g.propio&&!navigator.onLine;
-    return `<article class="caja${off?" sinred":""}" tabindex="0" aria-label="${esc(g.nombre)}">
+    return `<article class="caja${off?" sinred":""}${arch?" archivada":""}" data-k="${esc(claveJuego(g))}" tabindex="0" aria-label="${esc(g.nombre)}">
       <div class="giro">
         <div class="cara frente" style="background:linear-gradient(160deg,${esc(c1)},${esc(c2)})">
           <div class="lomo"><span>JUEGOTECA</span></div>
@@ -278,10 +313,23 @@ function pinta(){
           <small>Tocá para dar vuelta</small>
         </div>
       </div>
-    </article>`}).join("")+`<article class="caja nueva" tabindex="0" role="button" aria-label="Agregar un juego" id="cajaMas">
-      <div class="giro"><div class="cara"><b>+</b><span>Agregar juego</span><small>Pegá un link o subí los archivos</small></div></div>
     </article>`;
 }
+function pinta(){
+  const n=parseInt($("#n").value);
+  const todos=todosLosJuegos();const arch=archivados();
+  const vis=todos.filter(g=>!arch.has(claveJuego(g))&&(tipo==="Todos"||g.tipo===tipo)&&
+    (!n||((g.min==null||n>=g.min)&&(g.max==null||n<=g.max))));
+  $("#lista").innerHTML=vis.map(g=>cajaHTML(g,false)).join("")+`<article class="caja nueva" tabindex="0" role="button" aria-label="Agregar un juego" id="cajaMas">
+      <div class="giro"><div class="cara"><b>+</b><span>Agregar juego</span><small>Pegá un link o subí los archivos</small></div></div>
+    </article>`;
+  const ocultos=todos.filter(g=>arch.has(claveJuego(g)));
+  $("#archivo").hidden=!ocultos.length;
+  $("#archivoCant").textContent=ocultos.length;
+  $("#archivadosGrid").innerHTML=ocultos.map(g=>cajaHTML(g,true)).join("");
+}
+let tAviso;
+function aviso(t){const a=$("#toast");a.textContent=t;a.classList.add("on");clearTimeout(tAviso);tAviso=setTimeout(()=>a.classList.remove("on"),2800);}
 async function accionesLocales(e){
   const q=e.target.closest("[data-quitar]");
   if(q){const j=Locales.lista().find(x=>x.id===q.dataset.quitar);
@@ -318,16 +366,59 @@ lupa.addEventListener("click",async e=>{
   lupa.querySelector(".caja").classList.toggle("vuelta");
 });
 addEventListener("keydown",e=>{if(e.key==="Escape"&&!lupa.hidden)cerrarLupa();});
-$("#lista").addEventListener("click",async e=>{
-  if(e.target.closest("a"))return;
-  if(e.target.closest("#cajaMas")){abrirAgregar();return;}
-  if(await accionesLocales(e))return;
-  const c=e.target.closest(".caja"); if(c) abrirLupa(c);
-});
-$("#lista").addEventListener("keydown",e=>{
-  if((e.key==="Enter"||e.key===" ")&&e.target.id==="cajaMas"){e.preventDefault();abrirAgregar();return;}
-  if((e.key==="Enter"||e.key===" ")&&e.target.classList.contains("caja")){e.preventDefault();abrirLupa(e.target);}
-});
+// Mantener apretada una caja: menú con Archivar / Avisar que no anda
+let menuAbierto=0,menuK=null,tApriete=null,cajaApretada=null,origen=null,recienMenu=false;
+function soltar(){clearTimeout(tApriete);tApriete=null;cajaApretada?.classList.remove("apretando");cajaApretada=null;}
+function abrirMenu(k){
+  const g=todosLosJuegos().find(x=>claveJuego(x)===k);if(!g)return;
+  menuK=k;const arch=archivados().has(k);
+  $("#menuNombre").textContent=g.nombre;
+  $("#mArchivar").textContent=arch?"↩ Devolver a la estantería":"📦 Archivar";
+  if(!$("#menuCaja").open){$("#menuCaja").showModal();menuAbierto=Date.now();}
+}
+for(const grilla of [$("#lista"),$("#archivadosGrid")]){
+  grilla.addEventListener("pointerdown",e=>{
+    const c=e.target.closest(".caja:not(.nueva)");if(!c||e.button>0)return;
+    soltar();cajaApretada=c;origen=[e.clientX,e.clientY];
+    tApriete=setTimeout(()=>{const k=c.dataset.k;soltar();recienMenu=true;tragarClick=true;navigator.vibrate?.(15);abrirMenu(k);},550);
+    setTimeout(()=>{if(cajaApretada===c)c.classList.add("apretando");},120);
+  });
+  grilla.addEventListener("pointermove",e=>{if(origen&&tApriete&&Math.hypot(e.clientX-origen[0],e.clientY-origen[1])>10)soltar();});
+  for(const ev of ["pointerup","pointercancel","pointerleave"])grilla.addEventListener(ev,soltar);
+  grilla.addEventListener("contextmenu",e=>{const c=e.target.closest(".caja:not(.nueva)");if(!c)return;e.preventDefault();soltar();recienMenu=true;if(e.pointerType!=="mouse"&&e.button!==2)tragarClick=true;abrirMenu(c.dataset.k);});
+  grilla.addEventListener("click",async e=>{
+    if(recienMenu){recienMenu=false;e.preventDefault();return;}
+    if(e.target.closest("a"))return;
+    if(e.target.closest("#cajaMas")){abrirAgregar();return;}
+    if(await accionesLocales(e))return;
+    const c=e.target.closest(".caja"); if(c) abrirLupa(c);
+  });
+  grilla.addEventListener("keydown",e=>{
+    if((e.key==="Enter"||e.key===" ")&&e.target.id==="cajaMas"){e.preventDefault();abrirAgregar();return;}
+    if((e.key==="Enter"||e.key===" ")&&e.target.classList.contains("caja")){e.preventDefault();abrirLupa(e.target);}
+    if((e.key==="ContextMenu"||(e.shiftKey&&e.key==="F10"))&&e.target.dataset.k){e.preventDefault();abrirMenu(e.target.dataset.k);}
+  });
+}
+$("#menuCaja").addEventListener("close",()=>{setTimeout(()=>{recienMenu=false;},50);});
+// el toque que suelta el dedo después de mantener apretado no tiene que elegir una opción
+let tragarClick=false;
+addEventListener("pointerup",()=>{if(tragarClick)setTimeout(()=>{tragarClick=false;},350);},true);
+$("#menuCaja").addEventListener("click",e=>{if(tragarClick){tragarClick=false;e.stopPropagation();e.preventDefault();}},true);
+$("#menuCaja").addEventListener("click",e=>{if(e.target.id==="menuCaja")$("#menuCaja").close();});
+$("#mCancelar").onclick=()=>$("#menuCaja").close();
+$("#mArchivar").onclick=()=>{
+  const set=archivados();const estaba=set.has(menuK);
+  estaba?set.delete(menuK):set.add(menuK);guardarArchivados(set);
+  $("#menuCaja").close();pinta();
+  aviso(estaba?"De vuelta en la estantería.":"Archivado. Lo encontrás abajo de todo, en Archivados.");
+};
+$("#mAvisar").onclick=async()=>{
+  const g=todosLosJuegos().find(x=>claveJuego(x)===menuK);$("#menuCaja").close();if(!g)return;
+  const link=/^https?:/i.test(g.url)?g.url:new URL(g.url,location.href).href;
+  const txt=`⚠️ Juegoteca: el juego "${g.nombre}" no anda o está caído.\nLink: ${link}\n(Avisado desde ${location.origin+location.pathname})`;
+  if(navigator.share){try{await navigator.share({title:"Juego caído",text:txt});return;}catch(err){if(err&&err.name==="AbortError")return;}}
+  open("https://wa.me/?text="+encodeURIComponent(txt),"_blank","noopener");
+};
 $("#abrirQR").onclick=()=>$("#qr").showModal();
 $("#cerrarQR").onclick=()=>$("#qr").close();
 $("#qr").addEventListener("click",e=>{if(e.target.id==="qr")$("#qr").close();});
