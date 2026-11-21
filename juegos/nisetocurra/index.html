@@ -123,6 +123,11 @@ a.volver{color:var(--sub);text-align:center;font-size:.9rem}
       <button data-d="brutal">Brutal</button>
     </div>
     <p class="nota" id="notaDif"></p>
+    <h3>Pases por turno</h3>
+    <div class="chips" id="pases">
+      <button data-x="1">1</button><button data-x="2">2</button><button data-x="3" class="on">3</button><button data-x="5">5</button><button data-x="0">Sin límite</button>
+    </div>
+    <p class="nota">Pasar no resta puntos. Cada falta resta 1.</p>
   </div>
 
   <div class="caja">
@@ -148,7 +153,7 @@ a.volver{color:var(--sub);text-align:center;font-size:.9rem}
       <li>En cada turno, <b>una persona</b> de un equipo agarra el celu y le hace adivinar a su equipo todas las palabras que pueda antes de que se termine el tiempo.</li>
       <li>No puede decir <b>la palabra</b>, ni <b>las prohibidas</b> de la carta, ni pedazos o derivados de ellas (si está prohibido "cocina", tampoco vale "cocinar"), ni traducirlas, ni deletrear, ni decir "suena como" o "rima con".</li>
       <li>Alguien de <b>otro equipo</b> se pone atrás y mira la pantalla. Si escucha una prohibida, se aprieta <b>🚫 Falta</b>: resta 1 y pasa a la carta siguiente.</li>
-      <li>✅ <b>Adivinaron</b> suma 1. ⏭ <b>Pasar</b> salta la carta (según la dificultad, puede costar 1 punto).</li>
+      <li>✅ <b>Adivinaron</b> suma 1. ⏭ <b>Pasar</b> salta la carta sin restar, hasta el límite de pases por turno.</li>
       <li>Si suena el final con una carta en juego, los otros equipos tienen <b>un intento</b> para robarla.</li>
       <li>La partida se cierra al terminar una vuelta completa, cuando un equipo pasó la meta.</li>
     </ul>
@@ -577,16 +582,16 @@ function pintaMisCartas(){
 }
 
 const DIF={
- normal:{n:4,libres:Infinity,falta:1,txt:"4 prohibidas por carta. Pasar es gratis.",regla:"Pasar no resta. Falta: −1."},
- dificil:{n:5,libres:1,falta:1,txt:"5 prohibidas por carta. Un pase gratis por turno; cada pase extra resta 1.",regla:"1 pase gratis; después cada pase −1. Falta: −1."},
- brutal:{n:6,libres:0,falta:2,txt:"6 prohibidas por carta. Cada pase resta 1, cada falta resta 2 y no se puede hacer gestos: manos quietas.",regla:"Manos quietas. Pase −1. Falta −2."}
+ normal:{n:4,txt:"4 prohibidas por carta.",regla:""},
+ dificil:{n:5,txt:"5 prohibidas por carta.",regla:""},
+ brutal:{n:6,txt:"6 prohibidas por carta y no se puede hacer gestos: manos quietas.",regla:"Manos quietas. "}
 };
 const NOTA_MAZO={atp:"Palabras para cualquier mesa.",adulto:"Para adultos: sexo, pareja, vida adulta y joda. Solo para mayores de 18.",mezcla:"Mezcla las ATP con las +18. Solo para mayores de 18."};
 
 /* ===== Estado ===== */
 const COLORES=["#ffd23f","#ff3b3b","#3ddc84","#8aa4ff","#ff9f43","#d68bff"];
 const NOMBRES=["Los Callados","Las Lenguas Sueltas","Los Sin Filtro","Los Mudos","Los Charlatanes","Los Censurados"];
-let S={equipos:[{n:NOMBRES[0],p:0},{n:NOMBRES[1],p:0}],mazo:"atp",dif:"dificil",tiempo:60,meta:20,turno:0,usados:[],mayor:false,enCurso:false};
+let S={equipos:[{n:NOMBRES[0],p:0},{n:NOMBRES[1],p:0}],mazo:"atp",dif:"dificil",pases:3,tiempo:60,meta:20,turno:0,usados:[],mayor:false,enCurso:false};
 let ronda=[],cartaAct=null,porTiempo=false,robo=-1;
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -609,6 +614,7 @@ function grupo(sel,attr,fn){$(sel).addEventListener("click",e=>{const b=e.target
 grupo("#mazos","z",v=>{S.mazo=v});
 grupo("#difs","d",v=>S.dif=v);
 grupo("#tiempos","t",v=>S.tiempo=+v);
+grupo("#pases","x",v=>S.pases=+v);
 grupo("#metas","g",v=>S.meta=+v);
 $("#mayor").onclick=()=>{S.mayor=!S.mayor;marcarConfig()};
 $("#misCartas").onclick=()=>mis.abrir();
@@ -617,6 +623,7 @@ function marcarConfig(){
   $$("#mazos button").forEach(b=>b.classList.toggle("on",b.dataset.z===S.mazo));
   $$("#difs button").forEach(b=>b.classList.toggle("on",b.dataset.d===S.dif));
   $$("#tiempos button").forEach(b=>b.classList.toggle("on",+b.dataset.t===S.tiempo));
+  $$("#pases button").forEach(b=>b.classList.toggle("on",+b.dataset.x===S.pases));
   $$("#metas button").forEach(b=>b.classList.toggle("on",+b.dataset.g===S.meta));
   $("#notaMazo").textContent=NOTA_MAZO[S.mazo];
   $("#notaDif").textContent=DIF[S.dif].txt;
@@ -662,13 +669,16 @@ function mostrar(){
   $("#carta").classList.toggle("mas18",cartaAct.z==="adulto");
 }
 function puntosRonda(){
-  const d=DIF[S.dif];let pases=0,t=0;
-  ronda.forEach(r=>{if(r.e==="ok")t++;else if(r.e==="mal")t-=d.falta;else{pases++;if(pases>d.libres)t--}});
+  let t=0;
+  ronda.forEach(r=>{if(r.e==="ok")t++;else if(r.e==="mal")t--;}); // pasar no resta
   return t;
 }
+const pasesQuedan=()=>S.pases===0?Infinity:S.pases-ronda.filter(r=>r.e==="pas").length;
+const txtPases=()=>S.pases===0?"Pases sin límite":S.pases===1?"1 pase por turno":S.pases+" pases por turno";
 function pintaBotonPasar(){
-  const d=DIF[S.dif],pases=ronda.filter(r=>r.e==="pas").length;
-  $("#bPas").textContent=pases<d.libres?(d.libres===Infinity?"⏭ Pasar":"⏭ Pasar (gratis)"):"⏭ Pasar (−1)";
+  const quedan=pasesQuedan();
+  $("#bPas").disabled=quedan<=0;
+  $("#bPas").textContent=S.pases===0?"⏭ Pasar":quedan>0?"⏭ Pasar (quedan "+quedan+")":"⏭ Sin pases";
   $("#marc").textContent=(puntosRonda()>0?"+":"")+puntosRonda();
 }
 
@@ -676,7 +686,7 @@ function pintaBotonPasar(){
 let fin=0,intervalo=null,lock=null,ultimoSeg=null;
 function arrancar(){
   ronda=[];porTiempo=false;robo=-1;
-  $("#reglaJ").textContent=DIF[S.dif].regla;
+  $("#reglaJ").textContent=DIF[S.dif].regla+txtPases()+", pasar no resta. Falta: −1.";
   mostrar();pintaBotonPasar();ir("pJuego");
   fin=Date.now()+S.tiempo*1000;ultimoSeg=null;tick();intervalo=setInterval(tick,200);
   pedirPantalla();tic(660,.12);
@@ -699,7 +709,7 @@ function marcar(e){
   mostrar();pintaBotonPasar();
 }
 $("#bOk").onclick=()=>marcar("ok");
-$("#bPas").onclick=()=>marcar("pas");
+$("#bPas").onclick=()=>{if(pasesQuedan()>0)marcar("pas")};
 $("#bMal").onclick=()=>marcar("mal");
 
 /* ===== Resumen ===== */

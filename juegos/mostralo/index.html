@@ -79,6 +79,7 @@ a.volver{color:var(--sub);text-align:center;font-size:.9rem}
 .acc2{display:flex;gap:8px}
 .acc2 button{flex:1}
 .btnok{background:var(--ok);color:#06210f;font-weight:900;font-size:1.1rem;padding:16px}
+.btnmal{background:var(--mal);color:#fff;font-weight:800;flex:0 0 34%!important}
 /* resultado */
 .quien{display:flex;flex-direction:column;gap:8px}
 .quien button{padding:14px;font-size:1.05rem;text-align:left;display:flex;align-items:center;gap:10px}
@@ -136,6 +137,11 @@ a.volver{color:var(--sub);text-align:center;font-size:.9rem}
     <div class="chips" id="tiempos">
       <button data-t="45">45 s</button><button data-t="60" class="on">60 s</button><button data-t="90">90 s</button>
     </div>
+    <h3>Cambios de consigna por turno</h3>
+    <div class="chips" id="pases">
+      <button data-x="1">1</button><button data-x="2" class="on">2</button><button data-x="3">3</button><button data-x="0">Sin límite</button>
+    </div>
+    <p class="nota">Cambiar la consigna no resta puntos. Cada falta resta 1.</p>
     <h3>Gana el primero en llegar a</h3>
     <div class="chips" id="metas">
       <button data-g="5">5</button><button data-g="8" class="on">8</button><button data-g="12">12</button>
@@ -155,6 +161,8 @@ a.volver{color:var(--sub);text-align:center;font-size:.9rem}
       <li>La ruleta dice cómo mostrarla: <b class="dib">dibujando</b> (sin letras ni números), con <b class="mim">mímica</b> (sin hablar ni hacer ruido) o <b class="tar">tarareando</b> (sin letra: solo "na-na", "tu-ru" o silbando).</li>
       <li>Si su equipo adivina antes de que se acabe el tiempo, suma el punto (2 si la consigna es difícil y se juega en Mezcla).</li>
       <li>Si se acaba el tiempo, los otros equipos tienen <b>un intento</b> cada uno para robar el punto.</li>
+      <li>Antes de arrancar el reloj se puede <b>cambiar la consigna</b> sin perder puntos, hasta el límite elegido.</li>
+      <li>Si quien muestra rompe la regla (escribe letras, habla, dice la letra de la canción), el otro equipo aprieta <b>🚫 Falta</b>: su equipo pierde 1 punto y termina el turno.</li>
       <li>En cada turno pasa otra persona, para que todos jueguen.</li>
     </ul>
   </div>
@@ -225,6 +233,7 @@ a.volver{color:var(--sub);text-align:center;font-size:.9rem}
   </div>
   <div class="acc2">
     <button class="btnok" id="acerto">✅ ¡Adivinaron!</button>
+    <button class="btnmal" id="falta">🚫 Falta (−1)</button>
   </div>
   <button class="sec chico" id="rendirse">Nos rendimos</button>
 </section>
@@ -449,7 +458,7 @@ function pintaMisCartas(){
 /* ===== Estado ===== */
 const COLORES=["#ff6b6b","#4ecdc4","#ffc23d","#a78bfa","#3ddc84","#ff9f43"];
 const NOMBRES=["Los Garabatos","Las Estatuas","Los Silbadores","Los Mudos","Los Artistas","Los Afinados"];
-let S={equipos:[{n:NOMBRES[0],p:0},{n:NOMBRES[1],p:0}],modos:["dib","mim","tar"],soporte:"pantalla",tiempo:60,meta:8,turno:0,usados:{dib:[],mim:[],tar:[]},dif:"d",cont:"atp",enCurso:false};
+let S={equipos:[{n:NOMBRES[0],p:0},{n:NOMBRES[1],p:0}],modos:["dib","mim","tar"],soporte:"pantalla",tiempo:60,pases:2,meta:8,turno:0,usados:{dib:[],mim:[],tar:[]},dif:"d",cont:"atp",enCurso:false};
 let modoAct=null,cartaAct=null;
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -472,6 +481,7 @@ grupo("#soporte","s",v=>S.soporte=v);
 grupo("#dificultad","d",v=>S.dif=v);
 grupo("#contenido","a",v=>{S.cont=v;S.usados={dib:[],mim:[],tar:[]};$("#aviso18").style.display=v==="atp"?"none":"block"});
 grupo("#tiempos","t",v=>S.tiempo=+v);
+grupo("#pases","x",v=>S.pases=+v);
 grupo("#metas","g",v=>S.meta=+v);
 $("#modos").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
   const on=$$("#modos button.on");if(b.classList.contains("on")&&on.length===1)return; // al menos uno
@@ -481,6 +491,7 @@ function marcarConfig(){
   $$("#modos button").forEach(b=>b.classList.toggle("on",S.modos.includes(b.dataset.m)));
   $$("#soporte button").forEach(b=>b.classList.toggle("on",b.dataset.s===S.soporte));
   $$("#tiempos button").forEach(b=>b.classList.toggle("on",+b.dataset.t===S.tiempo));
+  $$("#pases button").forEach(b=>b.classList.toggle("on",+b.dataset.x===S.pases));
   $$("#metas button").forEach(b=>b.classList.toggle("on",+b.dataset.g===S.meta));
   $$("#dificultad button").forEach(b=>b.classList.toggle("on",b.dataset.d===S.dif));
   $$("#contenido button").forEach(b=>b.classList.toggle("on",b.dataset.a===S.cont));
@@ -506,7 +517,14 @@ function pasar(){
 $("#terminar").onclick=()=>{S.enCurso=false;guardar();inicio()};
 $("#listo").onclick=girar;
 
+let cambios=0;
+const cambiosQuedan=()=>S.pases===0?Infinity:S.pases-cambios;
+function pintaCambiar(){
+  const q=cambiosQuedan();$("#cambiar").disabled=q<=0;
+  $("#cambiar").textContent=q<=0?"Ya no podés cambiar la consigna en este turno":"Cambiar consigna (no la conozco)"+(q===Infinity?"":" · quedan "+q);
+}
 function girar(){
+  cambios=0;
   ir("pRuleta");
   const pos=S.modos,elegido=pos[Math.floor(Math.random()*pos.length)];
   const r=$("#ruleta"),t=$("#modoTxt");t.textContent="";t.className="modo";
@@ -551,9 +569,10 @@ function mostrarCarta(m){
   $("#cNivel").className="nivel"+(cartaObj.a?" adu":"");
   let regla=M.regla;if(m==="dib"&&S.soporte==="papel")regla+=" Agarrá papel y lapicera.";
   $("#cRegla").textContent=regla;
+  pintaCambiar();
   ir("pCarta");
 }
-$("#cambiar").onclick=()=>mostrarCarta(modoAct);
+$("#cambiar").onclick=()=>{if(cambiosQuedan()<=0)return;cambios++;mostrarCarta(modoAct)};
 $("#sacarCarta").onclick=()=>{mis.ocultar(cartaObj.id);mostrarCarta(modoAct)};
 $("#misCartas").onclick=()=>mis.abrir();
 
@@ -583,6 +602,11 @@ function tick(){
 function pararReloj(){clearInterval(intervalo);intervalo=null;soltarPantalla()}
 $("#acerto").onclick=()=>{pararReloj();sumar(eqAct(),valor());tic(990,.15);vibrar(60)};
 $("#rendirse").onclick=()=>{pararReloj();resultado(true)};
+let faltaSeg=0;
+$("#falta").onclick=()=>{ // doble toque para que no se apriete sin querer
+  const b=$("#falta");
+  if(Date.now()>faltaSeg){faltaSeg=Date.now()+2500;b.textContent="¿Falta? Tocá de nuevo";setTimeout(()=>{if(Date.now()>=faltaSeg)b.textContent="🚫 Falta (−1)"},2600);return}
+  faltaSeg=0;b.textContent="🚫 Falta (−1)";pararReloj();tic(180,.3);vibrar([80,40,80]);sumar(eqAct(),-1)};
 
 /* espiar consigna */
 const esp=$("#espiar");

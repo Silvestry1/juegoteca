@@ -34,7 +34,7 @@ Viven en `juegos/<nombre>/` y se juegan con un solo celular, sin servidor. En `j
 
 - `juegos/mostralo/`: **Mostralo como puedas**. Dibujo, mímica o tarareo por equipos; las consignas están en el objeto `MAZO` del `index.html`.
 - `juegos/dados/`: **Dados**. Dos modos: "Generala · 10.000" (d6 grandes, guardar dados, contador de tiros, detecta jugadas de Generala, suma opcional apagada) y "Rol" (d4 a d100 o caras a elección, modificador, dados fijos, historial, suma opcional prendida). Categoría "Herramientas".
-- `juegos/nisetocurra/`: **Ni se te ocurra**. Palabras prohibidas por equipos, con dificultad Normal/Difícil/Brutal (4, 5 o 6 prohibidas) y mazo ATP, +18 o mezcla. Las cartas están en las constantes `ATP` y `ADULTO` del `index.html`, una por línea: `Palabra: prohibida1, ..., prohibida6`.
+- `juegos/nisetocurra/`: **Ni se te ocurra**. Palabras prohibidas por equipos, con dificultad Normal/Difícil/Brutal (4, 5 o 6 prohibidas), límite de pases por turno (pasar no resta, falta −1) y mazo ATP, +18 o mezcla. Las cartas están en las constantes `ATP` y `ADULTO` del `index.html`, una por línea: `Palabra: prohibida1, ..., prohibida6`.
 
 - `juegos/bingomusical/`: **Bingo musical**. Cartones con títulos de temas (3×3, 4×4 o 5×5 con centro libre). El anfitrión trae una playlist de YouTube/YouTube Music con su propia clave de la YouTube Data API (queda en su celu, no en el repo) o pega/importa la lista (CSV de Exportify o TuneMyMusic para Spotify/TIDAL). La lista viaja en el link (`#p=...`, comprimida) y la ronda en `&r=XXXX` (4 caracteres que codifican tamaño de cartón, cantidad de temas y sorteo), así que no hay servidor. El QR impreso lleva solo la lista: sirve para todas las rondas mientras no cambie la lista, y el jugador escribe el código de ronda. Modo automático: elige cartón y cantidad de temas según jugadores, duración y segundos por tema (E[T] ≈ Σ (1 − C(t,k)/C(N,k))^J). Categoría "Música".
 
@@ -64,3 +64,9 @@ Los cambios a juegos que ya existen llegan solos: la app siempre intenta bajar l
 **Compartir mi lista** arma un texto (`#cartas <juego>`, una carta por línea con campos separados por `|`, y `#sacadas` con las oficiales sacadas) para mandar por WhatsApp. Ese texto se puede pegar en otro celu (**Pegar una lista que te mandaron**) o usar para sumar cartas al mazo oficial del `index.html`.
 
 Para un juego de adivinar nuevo: cargá el script, llamá a `CartasPropias({juego, nombre, campos, clave, resumen, oficiales, validar, alCambiar})` (ver el comentario al principio del archivo) y armá el mazo con `mis.activas()` y `mis.ocultas()`.
+
+## Archivar y avisar que un juego no anda
+
+Mantener apretada una caja (o clic derecho) abre un menú con **📦 Archivar** y **⚠️ Avisar que no anda**.
+- Archivar saca el juego de la Estantería solo en ese celu (`localStorage`, clave `juegoteca-archivados`, lista de `id` o `url`). Los archivados quedan en la sección **Archivados**, abajo de todo y plegada; mantener apretada una caja ahí la devuelve.
+- Avisar arma un mensaje con el nombre y el link del juego y abre el menú de compartir del celu (o WhatsApp si no hay), porque el sitio no tiene servidor.
