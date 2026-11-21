@@ -1,0 +1,8 @@
+/* T · Bordó + verde agua + dorado */
+:root{--bg:#14090c;--txt:#fbf0f1;--sub:#cdaab0;--acc:#4ff2c0;--acc-sombra:#16906c;--acc-txt:#03201a;--acc-suave:#4ff2c066;--chip:#28141a;
+  --win:#1c0e13ee;--cielo1:#30121e;--cielo2:#4a1a2b;--pared:#180a0f;--mesa1:#3a2218;--mesa2:#1f120d;--luz:#f2c14e26;--marco:#3a1d26;--dorso:#22111a;--sub2:#9a7d84;--txt2:#f0dde0;
+  --acc2:#f2c14e;--acc2-sombra:#9c7414}
+/* segundo color: sticker, sello Hecho en casa y la palabra destacada */
+.sticker,.casa{background:var(--acc2);box-shadow:0 4px 0 var(--acc2-sombra),0 8px 16px #0008}
+.casa{box-shadow:0 3px 0 var(--acc2-sombra)}
+.barra span b{color:var(--acc2)}

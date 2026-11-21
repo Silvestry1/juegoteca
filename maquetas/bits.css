@@ -1,0 +1,53 @@
+/* La portada actual, en 8 bits. Mismos colores y composición; cambian bordes, sombras, íconos y rayas. */
+:root{--paso:4px;--sombra:6px}
+img{image-rendering:pixelated}
+.px-emo{display:inline-flex;vertical-align:middle}
+.px-emo img{width:1.15em;height:1.15em;image-rendering:pixelated}
+/* cartel de neón pixel */
+.cartel{border:0;border-radius:0;padding:10px 20px;background:var(--bg);
+  box-shadow:0 calc(-1*var(--paso)) 0 var(--acc),0 var(--paso) 0 var(--acc),calc(-1*var(--paso)) 0 0 var(--acc),var(--paso) 0 0 var(--acc),
+   0 calc(-2*var(--paso)) 0 #ffc23d44,0 calc(2*var(--paso)) 0 #ffc23d44,calc(-2*var(--paso)) 0 0 #ffc23d44,calc(2*var(--paso)) 0 0 #ffc23d44,
+   0 calc(-3*var(--paso)) 0 #ffc23d1c,0 calc(3*var(--paso)) 0 #ffc23d1c,calc(-3*var(--paso)) 0 0 #ffc23d1c,calc(3*var(--paso)) 0 0 #ffc23d1c}
+h1{display:flex;align-items:center;gap:12px;text-shadow:3px 3px 0 #7a5400}
+h1 .px-emo img{width:1.25em;height:1.25em}
+/* botones y chips con esquinas escalonadas y sombra dura */
+.btnqr,.filtros button,.cant input{border-radius:0;
+  clip-path:polygon(0 var(--paso),var(--paso) var(--paso),var(--paso) 0,calc(100% - var(--paso)) 0,calc(100% - var(--paso)) var(--paso),100% var(--paso),100% calc(100% - var(--paso)),calc(100% - var(--paso)) calc(100% - var(--paso)),calc(100% - var(--paso)) 100%,var(--paso) 100%,var(--paso) calc(100% - var(--paso)),0 calc(100% - var(--paso)))}
+.btnqr{box-shadow:inset 0 -4px 0 #c78f12;padding:12px 20px 14px}
+.btnqr:active{box-shadow:none;transform:translateY(3px)}
+.filtros button{box-shadow:inset 0 -3px 0 #0005}
+/* cajas */
+.cara{border-radius:0;box-shadow:none;
+  clip-path:polygon(0 var(--paso),var(--paso) var(--paso),var(--paso) 0,calc(100% - var(--paso)) 0,calc(100% - var(--paso)) var(--paso),100% var(--paso),100% calc(100% - var(--paso)),calc(100% - var(--paso)) calc(100% - var(--paso)),calc(100% - var(--paso)) 100%,var(--paso) 100%,var(--paso) calc(100% - var(--paso)),0 calc(100% - var(--paso)))}
+.caja:not(.nueva)::before{content:"";position:absolute;inset:0;transform:translate(var(--sombra),var(--sombra));background:#000a;
+  clip-path:polygon(0 var(--paso),var(--paso) var(--paso),var(--paso) 0,calc(100% - var(--paso)) 0,calc(100% - var(--paso)) var(--paso),100% var(--paso),100% calc(100% - var(--paso)),calc(100% - var(--paso)) calc(100% - var(--paso)),calc(100% - var(--paso)) 100%,var(--paso) 100%,var(--paso) calc(100% - var(--paso)),0 calc(100% - var(--paso)))}
+.frente::before{background:var(--rayas) 0 0/36px 36px repeat;image-rendering:pixelated}
+.frente{box-shadow:inset 4px 4px 0 #ffffff30,inset -4px -4px 0 #00000030}
+.giro{transition:transform .5s steps(8)}
+.ilus div{background:none !important;filter:drop-shadow(4px 4px 0 #0005) !important;width:100% !important;height:auto !important;font-size:0 !important}
+.ilus div::before{content:"";position:absolute;width:92px;height:92px;left:50%;top:50%;transform:translate(-50%,-50%);z-index:-1;
+  background:#ffffff26;clip-path:polygon(30% 0,70% 0,70% 8%,85% 8%,85% 15%,92% 15%,92% 30%,100% 30%,100% 70%,92% 70%,92% 85%,85% 85%,85% 92%,70% 92%,70% 100%,30% 100%,30% 92%,15% 92%,15% 85%,8% 85%,8% 70%,0 70%,0 30%,8% 30%,8% 15%,15% 15%,15% 8%,30% 8%)}
+.ilus{z-index:0}
+.px-ico{width:78px;height:78px;display:block}
+.calif{border-radius:0;clip-path:polygon(25% 0,75% 0,75% 10%,90% 10%,90% 25%,100% 25%,100% 75%,90% 75%,90% 90%,75% 90%,75% 100%,25% 100%,25% 90%,10% 90%,10% 75%,0 75%,0 25%,10% 25%,10% 10%,25% 10%);border:0;box-shadow:inset 0 0 0 3px #111}
+.jug,.casa,.loc-tag,.sinred-tag,.ficha span{border-radius:0}
+.casa{box-shadow:3px 3px 0 #0006}
+.titulo{text-shadow:3px 3px 0 #000a}
+.caja::after{border-radius:0;background:var(--tablon) 0 0/64px 24px repeat-x;image-rendering:pixelated;height:12px;bottom:-14px}
+.dorso{box-shadow:inset 4px 4px 0 #fff,inset -4px -4px 0 #d8d0bc}
+.dorso a{border-radius:0;box-shadow:inset 0 -4px 0 #000}
+.dorso .extra button{border-radius:0}
+.caja.nueva .cara{border-radius:0;clip-path:none}
+#lupa{backdrop-filter:none}
+#lupa .cara{--paso:8px}
+#lupa .px-ico{width:130px;height:130px}
+#lupa .ilus div::before{width:170px;height:170px}
+#lupa .cerrar{border-radius:0}
+dialog{border-radius:0}
+#lupa .dorso a,#lupa .dorso .extra button{border-radius:0}
+/* ícono más definido que el fondo: más resolución, contorno y halo que tapa las rayas */
+:root{--px-res:34}
+.ilus div::before{background:#00000033;box-shadow:none}
+.ilus div{filter:drop-shadow(4px 4px 0 #0006) !important}
+.px-ico{width:88px;height:88px}
+#lupa .px-ico{width:150px;height:150px}

@@ -1,0 +1,8 @@
+/* R · Violeta + lima */
+:root{--bg:#100b1c;--txt:#f3efff;--sub:#b9acd6;--acc:#c6ff3d;--acc-sombra:#6c8f14;--acc-txt:#172000;--acc-suave:#c6ff3d66;--chip:#221a3a;
+  --win:#150f26ee;--cielo1:#24154a;--cielo2:#3a2370;--pared:#120c22;--mesa1:#2c2040;--mesa2:#181026;--luz:#c6ff3d22;--marco:#2c2148;--dorso:#1a1330;--sub2:#8f82ad;--txt2:#e2dbf5;
+  --acc2:#ff5fd2;--acc2-sombra:#9e2a80}
+/* segundo color: sticker, sello Hecho en casa y la palabra destacada */
+.sticker,.casa{background:var(--acc2);box-shadow:0 4px 0 var(--acc2-sombra),0 8px 16px #0008}
+.casa{box-shadow:0 3px 0 var(--acc2-sombra)}
+.barra span b{color:var(--acc2)}

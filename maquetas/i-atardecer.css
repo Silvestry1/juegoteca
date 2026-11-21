@@ -1,0 +1,17 @@
+/* I · Atardecer pastel: sol rayado, cielo durazno y lila, piso cuadriculado; objetos pixel sobre el horizonte */
+:root{--fondo:#ffe6ef;
+  --txt:#3a1d45;--sub:#7a4f80;--vidrio:rgba(255,255,255,.42);--vidrio-borde:rgba(255,255,255,.95);
+  --cromo:linear-gradient(180deg,#6a2a86 0%,#ff6fb5 42%,#3a1650 52%,#ff9e6f 85%);
+  --gel:linear-gradient(180deg,#ffe1a8,#ff8fb8 65%,#c56bff);--gel-txt:#3a0f33;--gel-sombra:#ff8fb866;
+  --dorso:rgba(255,255,255,.96);--dorso-txt:#3a1d45;--dorso-sub:#8a6a90;--chip-dorso:#fbe6f3;--lupa:rgba(255,230,239,.5)}
+body{background:linear-gradient(180deg,#c9b6ff 0%,#ffc6dd 35%,#ffe3c9 70%,#fff4ea 100%) fixed}
+.hero{background:linear-gradient(180deg,#c9b6ff 0%,#ffbcd9 60%,#ffd6c2 100%)}
+.hero .piso{background:
+  linear-gradient(#ffffff88 2px,transparent 2px) 0 0/100% 14px,
+  linear-gradient(90deg,#ffffff88 2px,transparent 2px) 0 0/28px 100%,
+  linear-gradient(180deg,#e9a6e8,#c98ae0)}
+.hero .obj-estrella{filter:drop-shadow(0 0 6px #fff)}
+.hero .obj-tele,.hero .obj-pilaVhs,.hero .obj-consola,.hero .obj-lava,.hero .obj-planta{filter:drop-shadow(0 6px 0 #a35fb066)}
+header{border:2px solid transparent;background:linear-gradient(var(--vidrio),var(--vidrio)) padding-box,linear-gradient(135deg,#fff,#ffc6dd,#fff,#c9b6ff,#fff) border-box}
+.caja::after{left:-10px;right:-10px;bottom:-14px;height:10px;border-radius:999px;background:linear-gradient(90deg,#ffe1a8,#ff8fb8,#c56bff);opacity:.7}
+.frente::after{content:"";position:absolute;inset:3px;pointer-events:none;background:linear-gradient(180deg,#ffffff00 55%,#ffb0d020)}
