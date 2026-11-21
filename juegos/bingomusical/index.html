@@ -8,6 +8,7 @@
 <style>
 :root{--bg:#1a0b2e;--card:#2c1650;--txt:#fff6fb;--sub:#cdb8e8;--acc:#ff4fa3;--acc2:#42e8e0;--ok:#3ddc84;--mal:#ff5c5c;--papel:#fff6fb;--tinta:#231238}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior:none}
 .pant{display:none;min-height:100%;padding:16px 16px calc(16px + env(safe-area-inset-bottom));flex-direction:column;gap:14px;max-width:640px;margin:0 auto}
@@ -116,9 +117,9 @@ details summary{cursor:pointer;font-weight:700;color:var(--txt)}
   <h1>Bingo<br>musical</h1>
   <p class="sub">El cartón tiene temas en vez de números. Uno pone la música, el resto marca cuando reconoce el tema.</p>
   <div class="elegir">
+    <button id="irMio" hidden><span class="ico">🎟️</span><span><b>Volver a mi cartón</b><small>El último cartón que te tocó en este celu.</small></span></button>
     <button id="irArmar"><span class="ico">🎧</span><span><b>Pongo la música</b><small>Cargás la playlist, se arman los cartones y los repartís con un QR.</small></span></button>
     <button id="irSeguir" hidden><span class="ico">▶️</span><span><b>Seguir la partida armada</b><small id="seguirInfo"></small></span></button>
-    <button id="irMio" hidden><span class="ico">🎟️</span><span><b>Volver a mi cartón</b><small>El último cartón que te tocó en este celu.</small></span></button>
   </div>
   <div class="caja reglas">
     <h3>Cómo se juega</h3>
@@ -175,14 +176,15 @@ details summary{cursor:pointer;font-weight:700;color:var(--txt)}
     <div class="fila stepper"><button id="jugMenos" style="flex:none">−</button><input type="text" id="jugadores" inputmode="numeric" style="text-align:center;font-size:1.3rem;font-weight:800"><button id="jugMas" style="flex:none">+</button></div>
     <h3>Cuánto suena cada tema</h3>
     <div class="opc" id="optSeg">
-      <button data-v="30">30 s</button><button data-v="45">45 s</button><button data-v="60">1 min</button><button data-v="90">1½ min</button>
+      <button data-v="30">30 s</button><button data-v="45">45 s</button><button data-v="60">1 min</button><button data-v="90">1½ min</button><button data-v="full">Tema<br>completo</button>
     </div>
+    <p class="nota" id="fiestaNota" hidden>🎉 <b>Modo fiesta:</b> la playlist suena entera de fondo y cada uno tacha lo que escucha. Entran todos los temas y el cartón se elige para que el bingo salga cerca de los ¾ de la playlist (calculando 3½ min por tema). Para una fiesta más corta, usá una playlist más corta.</p>
     <div class="opc" id="optModo">
       <button data-v="auto">Automático</button>
       <button data-v="manual">A mano</button>
     </div>
     <div id="cajaAuto" class="caja" style="padding:0;background:none">
-      <h3>¿Cuánto querés que dure hasta el bingo?</h3>
+      <h3 id="durTit">¿Cuánto querés que dure hasta el bingo?</h3>
       <div class="opc" id="optDur">
         <button data-v="15">15′</button><button data-v="20">20′</button><button data-v="30">30′</button><button data-v="45">45′</button><button data-v="60">60′</button>
       </div>
@@ -228,6 +230,7 @@ details summary{cursor:pointer;font-weight:700;color:var(--txt)}
   </div>
   <button id="irImprimir">🖨️ QR fijo para imprimir</button>
   <p class="nota" id="impresoNota" style="text-align:center"></p>
+  <p class="estim" id="fiestaHost" hidden>🎉 <b>Modo fiesta.</b> Poné la playlist en aleatorio y dejala sonar. Cada tanto tocá en la lista de abajo los temas que fueron sonando, así podés verificar. Si se te pasó alguno, fijate en el historial de tu app.</p>
 
   <div class="tema" id="tema"><div class="n" id="temaN">TODAVÍA NO SONÓ NADA</div><div class="t" id="temaT">Tocá «Siguiente tema»</div><div class="a" id="temaA"></div></div>
   <a class="boton" id="abrirTema" target="_blank" rel="noopener" hidden>▶ Abrir en YouTube Music</a>
@@ -242,6 +245,7 @@ details summary{cursor:pointer;font-weight:700;color:var(--txt)}
     <input type="text" id="buscar" placeholder="Buscar tema…" autocomplete="off">
     <div class="lista" id="hostLista"></div>
   </div>
+  <button class="prendida" data-wake>☀️ Pantalla prendida: sí</button>
   <button class="peligro" id="nuevaPartida">Nueva ronda (cartones nuevos, misma lista)</button>
   <a class="volver" href="#" data-ir="pInicio">← Volver</a>
 </section>
@@ -269,6 +273,8 @@ details summary{cursor:pointer;font-weight:700;color:var(--txt)}
     <button class="peligro" id="otroCarton">Cambiar de cartón</button>
     <button class="peligro" id="limpiar">Borrar marcas</button>
   </div>
+  <button class="prendida" data-wake>☀️ Pantalla prendida: sí</button>
+  <p class="nota" style="text-align:center">Lo que tachás queda guardado en el celu: si se bloquea, cambiás de app o se cierra la página, al volver está igual.</p>
   <div class="caja">
     <h3>¿Se te cerró la página?</h3>
     <p class="nota">Tu cartón queda guardado en este celu. Si cambiaste de celu, escaneá el QR de nuevo y cargá tu código:</p>
@@ -327,7 +333,22 @@ const guardar=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 const leer=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
-function irA(id){document.querySelectorAll(".pant").forEach(p=>p.classList.toggle("on",p.id===id));scrollTo(0,0)}
+function irA(id){document.querySelectorAll(".pant").forEach(p=>p.classList.toggle("on",p.id===id));scrollTo(0,0);pantallaPrendida()}
+
+/* ---------- pantalla prendida (Wake Lock) en el cartón y en la música ---------- */
+let wakeOn=leer("bm.wake",true),wake=null;
+async function pantallaPrendida(){
+  const quiere=wakeOn&&document.visibilityState==="visible"&&["pCarton","pHost"].includes((document.querySelector(".pant.on")||{}).id);
+  try{
+    if(quiere&&!wake&&"wakeLock" in navigator){wake=await navigator.wakeLock.request("screen");wake.addEventListener("release",()=>{wake=null})}
+    else if(!quiere&&wake){const w=wake;wake=null;await w.release()}
+  }catch(e){wake=null}
+}
+function pintarWake(){document.querySelectorAll("[data-wake]").forEach(b=>{
+  b.hidden=!("wakeLock" in navigator);b.textContent="☀️ Pantalla prendida: "+(wakeOn?"sí":"no");b.classList.toggle("on",wakeOn)})}
+document.querySelectorAll("[data-wake]").forEach(b=>b.addEventListener("click",()=>{wakeOn=!wakeOn;guardar("bm.wake",wakeOn);pintarWake();pantallaPrendida()}));
+document.addEventListener("visibilitychange",pantallaPrendida); // el sistema suelta el bloqueo al cambiar de app: se pide de nuevo al volver
+pintarWake();
 document.querySelectorAll("[data-ir]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();irA(a.dataset.ir)}));
 
 function confirmable(btn,accion){
@@ -447,6 +468,14 @@ function simular(N,g,J,veces){
   return {linea:sl/veces,bingo:sb/veces};
 }
 /* elige tamaño y cantidad de temas para acercarse a la duración pedida */
+/* fiesta: suena la playlist entera y entran todos los temas; se elige el cartón
+   para que el bingo salga cerca de los 3/4 de la lista */
+function elegirFiesta(total,J){
+  let b=null;
+  for(const g of [5,4,3]){if(total<Math.max(celdas(g)+6,Math.ceil(celdas(g)*1.75)))continue;
+    const err=Math.abs(bingoEsperado(total,celdas(g),J)/total-.75);if(!b||err<b.err-.03)b={g,n:total,err}}
+  return b;
+}
 function elegirAuto(total,J,minutos,seg){
   const objetivo=minutos*60/seg; // temas que entran en ese tiempo
   const max=Math.min(total,255);let mejor=null;
@@ -597,7 +626,10 @@ $("plCargar").addEventListener("click",async()=>{
 /* ---------- armar ---------- */
 const modo=opciones($("optModo"),"bm.modo","auto",()=>{pintarModo();estimar()});
 const dur=opciones($("optDur"),"bm.dur","30",()=>estimar());
-const seg=opciones($("optSeg"),"bm.seg","60",()=>estimar());
+const seg=opciones($("optSeg"),"bm.seg","60",()=>{pintarModo();estimar()});
+const fiesta=()=>seg()==="full";
+const segundos=()=>fiesta()?210:+seg(); // tema completo: 3½ min de promedio
+const duracion=()=>+dur();
 const tam=opciones($("optTam"),"bm.tam","4",()=>estimar());
 const cant=opciones($("optCant"),"bm.cant","45",()=>estimar());
 const app=opciones($("optApp"),"bm.app","ytm",()=>{if(host)pintarHost(false)});
@@ -606,7 +638,7 @@ function pintarJug(){$("jugadores").value=jugadores;guardar("bm.jug",jugadores)}
 $("jugMenos").addEventListener("click",()=>{jugadores=Math.max(2,jugadores-1);pintarJug();estimar()});
 $("jugMas").addEventListener("click",()=>{jugadores=Math.min(60,jugadores+1);pintarJug();estimar()});
 $("jugadores").addEventListener("input",()=>{const v=parseInt($("jugadores").value,10);if(v>=2&&v<=60){jugadores=v;guardar("bm.jug",v);estimar()}});
-function pintarModo(){$("cajaAuto").hidden=modo()!=="auto";$("cajaManual").hidden=modo()==="auto"}
+function pintarModo(){$("cajaAuto").hidden=modo()!=="auto";$("cajaManual").hidden=modo()==="auto";$("durTit").hidden=$("optDur").hidden=fiesta();$("fiestaNota").hidden=!fiesta()}
 pintarJug();pintarModo();
 
 let host=leer("bm.host",null); // {pk,todos[],artistas[],ronda,p,salieron[],impreso}
@@ -623,23 +655,25 @@ function listaLimpia(){
 }
 /* tamaño y cantidad según el modo */
 function plan(total){
-  if(modo()==="auto"){const a=elegirAuto(total,jugadores,+dur(),+seg());return a&&{g:a.g,n:a.n}}
+  if(modo()==="auto"){const a=fiesta()?elegirFiesta(total,jugadores):elegirAuto(total,jugadores,duracion(),segundos());return a&&{g:a.g,n:a.n}}
   const g=+tam(),n=+cant()?Math.min(+cant(),total):total;
   return n>=celdas(g)+6?{g,n}:null;
 }
-const minutos=t=>Math.max(1,Math.round(t*(+seg())/60));
+const minutos=t=>Math.max(1,Math.round(t*segundos()/60));
+const tiempo=t=>{const m=minutos(t);if(m<90)return `${m} min`;const q=Math.round(m/5)*5,h=Math.floor(q/60),r=q%60;return `${h} h${r?" "+r+" min":""}`};
 function estimar(){
   const e=$("estim"),total=Math.min(listaLimpia().length,MAX_LISTA);
   if(total<15){e.innerHTML="Cargá al menos 15 temas para calcular la duración.";return}
   const pl=plan(total);
   if(!pl){e.innerHTML=`Con ${total} temas no alcanza para ese cartón. Probá uno más chico o «Automático».`;return}
   const s=simular(pl.n,pl.g,jugadores,300);
-  let txt=`Cartón <b>${pl.g}×${pl.g}</b> con <b>${pl.n} temas</b> en juego. Con ${jugadores} jugadores, la primera línea sale cerca del tema <b>${Math.round(s.linea)}</b> (~${minutos(s.linea)} min) y el bingo cerca del tema <b>${Math.round(s.bingo)}</b> (~${minutos(s.bingo)} min).`;
-  if(modo()==="auto"){
-    const d=+dur(),m=minutos(s.bingo);
-    if(m<d*.8)txt+=` Con esta lista no llega a ${d} min: sumá temas o dejá sonar más cada uno.`;
-    else if(m>d*1.25)txt+=` Con tantos jugadores sale más largo de lo pedido: pasá los temas más rápido.`;
+  let txt=`Cartón <b>${pl.g}×${pl.g}</b> con <b>${pl.n} temas</b> en juego. Con ${jugadores} jugadores, la primera línea sale cerca del tema <b>${Math.round(s.linea)}</b>${fiesta()?" de la playlist":""} (~${tiempo(s.linea)}) y el bingo cerca del tema <b>${Math.round(s.bingo)}</b> (~${tiempo(s.bingo)}).`;
+  if(modo()==="auto"&&!fiesta()){
+    const d=duracion(),m=minutos(s.bingo);
+    if(m<d*.8)txt+=fiesta()?` Con esta lista el bingo sale antes de lo pedido: sumá temas o seguí jugando otra ronda.`:` Con esta lista no llega a ${d} min: sumá temas o dejá sonar más cada uno.`;
+    else if(m>d*1.25)txt+=fiesta()?` Con tantos jugadores sale más largo de lo pedido.`:` Con tantos jugadores sale más largo de lo pedido: pasá los temas más rápido.`;
   }
+  if(fiesta())txt+=pl.n<total?` Ojo: suena la playlist entera y ${total-pl.n} temas no cuentan, así que tarda más. En modo fiesta conviene «Automático» o «Todos».`:` La playlist entera dura ~${tiempo(total)}.`;
   e.innerHTML=txt;
 }
 infoLista=(f=>function(){f();estimar()})(infoLista);
@@ -655,7 +689,7 @@ $("armar").addEventListener("click",async()=>{
   if(!pl){err.textContent=`Con ${temas.length} temas no alcanza para ese cartón. Probá uno más chico o «Automático».`;return}
   const todos=temas.map(x=>x.t),pk=await empaquetar(todos);
   const cod=rondaNueva(pl.g,pl.n),p=rondaDe(todos,cod);
-  host={pk,todos,artistas:temas.map(x=>x.a),ronda:cod,p,salieron:[],impreso:host&&host.impreso||null,aviso};
+  host={pk,todos,artistas:temas.map(x=>x.a),ronda:cod,p,salieron:[],impreso:host&&host.impreso||null,aviso,fiesta:fiesta()};
   guardar("bm.host",host);
   pintarHost(false);irA("pHost");pintarQR();
 });
@@ -711,6 +745,8 @@ function pintarHost(animar){
     const l=linkTema(ult);$("abrirTema").href=l.u;$("abrirTema").textContent="▶ Abrir en "+l.n;$("abrirTema").hidden=false;
   }else{$("temaN").textContent="TODAVÍA NO SONÓ NADA";$("temaT").textContent="Tocá «Siguiente tema»";$("temaA").textContent="";$("abrirTema").hidden=true}
   if(animar){const t=$("tema");t.classList.remove("cae");void t.offsetWidth;t.classList.add("cae")}
+  const fi=!!host.fiesta;$("fiestaHost").hidden=!fi;$("siguiente").hidden=fi;if(fi)$("abrirTema").hidden=true;
+  if(fi&&ult==null)$("temaT").textContent="Marcá en la lista lo que suena";
   $("siguiente").disabled=s.length>=n;$("siguiente").textContent=s.length>=n?"Ya sonaron todos":"Siguiente tema";
   $("deshacer").disabled=!s.length;
   $("listaTit").textContent=`Temas · sonaron ${s.length} de ${n}`;
