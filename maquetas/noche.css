@@ -1,16 +1,16 @@
 /* L/M · Escritorio de noche: escena oscura y cálida, ventanas modernas, un solo acento naranja; lo pixel son solo los íconos y unos objetos chicos */
-:root{--px-res:34;--bg:#0f0d0c;--txt:#f3eee9;--sub:#b5aaa0;--acc:#ff6a1a;--chip:#211d1a;--win:#171413ee;--win-borde:#ffffff14;--mono:"JetBrains Mono",ui-monospace,monospace}
-body{font-family:"Inter",system-ui,sans-serif;background:#0f0d0c;color:var(--txt)}
+:root{--px-res:34;--acc-sombra:#a8400c;--acc-txt:#1a0d05;--acc-suave:#ff6a1a66;--cielo1:#141a26;--cielo2:#1d2433;--pared:#151210;--mesa1:#2a211b;--mesa2:#1c1713;--luz:#ff8a3d33;--marco:#2a2420;--dorso:#1b1715;--sub2:#8a7f76;--txt2:#e4dcd4;--bg:#0f0d0c;--txt:#f3eee9;--sub:#b5aaa0;--acc:#ff6a1a;--chip:#211d1a;--win:#171413ee;--win-borde:#ffffff14;--mono:"JetBrains Mono",ui-monospace,monospace}
+body{font-family:"Inter",system-ui,sans-serif;background:var(--bg);color:var(--txt)}
 /* escena de fondo con profundidad */
 body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;filter:blur(3px);
   background:
-   radial-gradient(circle at 23% 15%,#0f0d0c 0 13px,transparent 14px),
+   radial-gradient(circle at 23% 15%,var(--pared) 0 13px,transparent 14px),
    radial-gradient(circle at 21% 16%,#e9e4d0 0 15px,transparent 16px),
-   linear-gradient(90deg,transparent calc(32% - 3px),#2a2420 calc(32% - 3px) calc(32% + 3px),transparent calc(32% + 3px)) 0 0/100% 34% no-repeat,
-   linear-gradient(transparent calc(50% - 3px),#2a2420 calc(50% - 3px) calc(50% + 3px),transparent calc(50% + 3px)) 6% 4%/52% 28% no-repeat,
-   linear-gradient(#141a26,#1d2433) 6% 4%/52% 28% no-repeat,
-   radial-gradient(ellipse at 88% 38%,#ff8a3d33 0,transparent 45%),
-   linear-gradient(180deg,#151210 0 70%,#2a211b 70% 71%,#1c1713 71%)}
+   linear-gradient(90deg,transparent calc(32% - 3px),var(--marco) calc(32% - 3px) calc(32% + 3px),transparent calc(32% + 3px)) 0 0/100% 34% no-repeat,
+   linear-gradient(transparent calc(50% - 3px),var(--marco) calc(50% - 3px) calc(50% + 3px),transparent calc(50% + 3px)) 6% 4%/52% 28% no-repeat,
+   linear-gradient(var(--cielo1),var(--cielo2)) 6% 4%/52% 28% no-repeat,
+   radial-gradient(ellipse at 88% 38%,var(--luz) 0,transparent 45%),
+   linear-gradient(180deg,var(--pared) 0 70%,var(--mesa1) 70% 71%,var(--mesa2) 71%)}
 .escena{position:fixed;inset:0;z-index:0;pointer-events:none}
 .escena .obj{position:absolute;image-rendering:pixelated;filter:blur(1.5px) brightness(.6);opacity:.8}
 header,.ventana,footer{position:relative;z-index:1}
@@ -18,26 +18,26 @@ header,.ventana,footer{position:relative;z-index:1}
 .barra{display:flex;align-items:center;gap:7px;padding:9px 12px;border-bottom:1px solid var(--win-borde);font-family:var(--mono);font-size:.78rem;color:var(--sub)}
 .barra i{width:11px;height:11px;border-radius:50%;background:#ff5f57}.barra i+i{background:#febc2e}.barra i+i+i{background:#28c840}
 .barra span{margin-left:6px}.barra span b{color:var(--acc);font-weight:700}
-.barra time{margin-left:auto;color:#8a7f76}
+.barra time{margin-left:auto;color:var(--sub2)}
 header{margin:16px 14px 0;padding:0 0 18px;background:var(--win);border:1px solid var(--win-borde);border-radius:14px;
   box-shadow:0 20px 50px #000a;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);overflow:visible}
 header .barra{margin-bottom:18px}
 .cartel{border:0;box-shadow:none;padding:0;position:relative}
 h1{font-family:"Inter",sans-serif;font-weight:900;font-size:2.3rem;letter-spacing:-.5px;text-transform:uppercase;color:var(--txt);text-shadow:none;display:flex;align-items:center;gap:10px}
 h1 .px-emo img{width:44px;height:44px}
-.sticker{position:absolute;right:-18px;top:-22px;transform:rotate(-8deg);background:var(--acc);color:#1a0d05;font-weight:900;font-size:.8rem;letter-spacing:.5px;
-  padding:4px 10px;border-radius:8px;text-transform:uppercase;box-shadow:0 4px 0 #a8400c,0 8px 16px #0008;white-space:nowrap}
+.sticker{position:absolute;right:-18px;top:-22px;transform:rotate(-8deg);background:var(--acc);color:var(--acc-txt);font-weight:900;font-size:.8rem;letter-spacing:.5px;
+  padding:4px 10px;border-radius:8px;text-transform:uppercase;box-shadow:0 4px 0 var(--acc-sombra),0 8px 16px #0008;white-space:nowrap}
 header p{display:inline-block;margin:16px 0 0;background:#000c;border:1px solid #ffffff12;border-radius:12px;padding:8px 16px;
   font-weight:800;text-transform:uppercase;letter-spacing:2px;font-size:.95rem;color:var(--txt)}
 header p em{font-style:normal;color:var(--acc)}
 .botones{margin-top:16px}
-.btnqr{border-radius:12px;background:var(--acc);color:#1a0d05;font-weight:800;padding:12px 18px;box-shadow:0 4px 0 #a8400c}
+.btnqr{border-radius:12px;background:var(--acc);color:var(--acc-txt);font-weight:800;padding:12px 18px;box-shadow:0 4px 0 var(--acc-sombra)}
 .btninst{background:var(--chip);color:var(--txt);box-shadow:0 4px 0 #000;border:1px solid var(--win-borde)}
 .px-emo{display:inline-flex;vertical-align:middle}.px-emo img{width:1.2em;height:1.2em;image-rendering:pixelated}
 .ventana{margin:18px 14px 20px;background:var(--win);border:1px solid var(--win-borde);border-radius:14px;box-shadow:0 20px 50px #000a;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
 .filtros{padding:14px 12px 6px}
 .filtros button{border-radius:10px;background:var(--chip);border:1px solid var(--win-borde);color:var(--txt);font-size:1rem;padding:8px 14px}
-.filtros button.on{background:var(--acc);color:#1a0d05;font-weight:800;border-color:var(--acc)}
+.filtros button.on{background:var(--acc);color:var(--acc-txt);font-weight:800;border-color:var(--acc)}
 .cant{color:var(--sub);font-family:var(--mono);font-size:.95rem}
 .cant input{border-radius:10px;background:#000;border:1px solid var(--win-borde);font-family:var(--mono);color:var(--acc)}
 main{padding:16px 14px 30px;gap:30px 14px}
@@ -45,23 +45,23 @@ main{padding:16px 14px 30px;gap:30px 14px}
 .cara{border-radius:10px;box-shadow:0 10px 24px #000c}
 .frente{filter:saturate(.88) brightness(.94)}
 .frente::before{background:repeating-linear-gradient(135deg,#ffffff12 0 10px,transparent 10px 22px)}
-.caja::after{left:-7px;right:-7px;bottom:-14px;height:8px;border-radius:2px;background:linear-gradient(#3a2e25,#1f1813);box-shadow:0 6px 10px #000}
+.caja::after{left:-7px;right:-7px;bottom:-14px;height:8px;border-radius:2px;background:linear-gradient(var(--mesa1),var(--mesa2));box-shadow:0 6px 10px #000}
 .ilus div{background:radial-gradient(circle,#0000002e,#0000 70%) !important;filter:drop-shadow(0 5px 6px #0007) !important;font-size:0 !important}
 .px-ico{width:84px;height:84px;image-rendering:pixelated;display:block}
 .calif{width:36px;height:36px;font-size:.74rem;border-width:2px}
 .jug{font-family:var(--mono);font-weight:500;background:#000c;font-size:.72rem}
-.casa{transform:rotate(-4deg);background:var(--acc);color:#1a0d05;border-radius:6px;box-shadow:0 3px 0 #a8400c;font-size:.62rem}
+.casa{transform:rotate(-4deg);background:var(--acc);color:var(--acc-txt);border-radius:6px;box-shadow:0 3px 0 var(--acc-sombra);font-size:.62rem}
 .titulo{font-family:"Inter",sans-serif;font-weight:900;letter-spacing:-.2px;text-shadow:0 2px 6px #000a}
 .lema{font-style:normal;color:#ffffffd0}
-.dorso{background:#1b1715;color:var(--txt);border:1px solid #ffffff18}
+.dorso{background:var(--dorso);color:var(--txt);border:1px solid #ffffff18}
 .dorso h2{color:var(--txt);font-weight:900}
-.dorso p{color:#e4dcd4;font-size:.86rem}
-.ficha span{background:#2a2420;color:var(--sub);font-family:var(--mono);border-radius:6px}
-.dorso a{background:var(--acc);color:#1a0d05;border-radius:10px;box-shadow:0 4px 0 #a8400c}
-.dorso small{color:#8a7f76;font-family:var(--mono)}
-.caja.nueva .cara{background:#ffffff08;border:2px dashed #ff6a1a66;border-radius:10px;backdrop-filter:none}
+.dorso p{color:var(--txt2);font-size:.86rem}
+.ficha span{background:var(--marco);color:var(--sub);font-family:var(--mono);border-radius:6px}
+.dorso a{background:var(--acc);color:var(--acc-txt);border-radius:10px;box-shadow:0 4px 0 var(--acc-sombra)}
+.dorso small{color:var(--sub2);font-family:var(--mono)}
+.caja.nueva .cara{background:#ffffff08;border:2px dashed var(--acc-suave);border-radius:10px;backdrop-filter:none}
 .caja.nueva .cara b{color:var(--acc)}
-footer{color:#8a7f76;font-family:var(--mono);font-size:.78rem}
+footer{color:var(--sub2);font-family:var(--mono);font-size:.78rem}
 #lupa{background:#0b0908cc;backdrop-filter:blur(10px) brightness(.8);-webkit-backdrop-filter:blur(10px) brightness(.8)}
 #lupa .pista{display:inline-block;background:#000c;border:1px solid #ffffff12;border-radius:12px;padding:8px 14px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:var(--txt);font-size:.85rem}
 #lupa .cerrar{background:#ffffff1a;border:1px solid #ffffff22}
