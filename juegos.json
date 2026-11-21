@@ -112,6 +112,22 @@
   "lema": "Los fósforos de siempre, en el celu"
  },
  {
+  "nombre": "Ajedrez de mano en mano",
+  "tipo": "Mesa",
+  "min": 2,
+  "max": 2,
+  "edad": "6+",
+  "propio": true,
+  "descripcion": "Ajedrez para dos con un solo celu: se lo pasan y el tablero gira solo, o lo dejan en la mesa frente a frente. Reglas completas (enroque, al paso, coronar, tablas). Reloj opcional de 15 a 1 minuto, ayudas que se pueden apagar y variante mezclada 960 para los que se la saben toda.",
+  "url": "juegos/ajedrez/",
+  "icono": "♟️",
+  "colores": [
+   "#ffb12b",
+   "#1a1430"
+  ],
+  "lema": "Dos cabezas, un celu"
+ },
+ {
   "nombre": "skribbl.io",
   "tipo": "Dibujar",
   "min": 2,

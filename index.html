@@ -272,7 +272,7 @@ function jugadores(g){
   if(g.min==null&&g.max==null) return "? jug.";
   if(g.min==null) return "hasta "+g.max;
   if(g.max==null) return g.min+"+ jug.";
-  return g.min+"–"+g.max+" jug.";
+  return g.min===g.max?g.min+" jug.":g.min+"–"+g.max+" jug.";
 }
 // Calificación al estilo cine argentino: ATP, +13, +16, +18
 function calif(g){
