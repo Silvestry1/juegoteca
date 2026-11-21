@@ -45,3 +45,9 @@ h1 .px-emo img{width:1.25em;height:1.25em}
 #lupa .cerrar{border-radius:0}
 dialog{border-radius:0}
 #lupa .dorso a,#lupa .dorso .extra button{border-radius:0}
+/* ícono más definido que el fondo: más resolución, contorno y halo que tapa las rayas */
+:root{--px-res:34}
+.ilus div::before{background:#00000033;box-shadow:none}
+.ilus div{filter:drop-shadow(4px 4px 0 #0006) !important}
+.px-ico{width:88px;height:88px}
+#lupa .px-ico{width:150px;height:150px}
