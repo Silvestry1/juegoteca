@@ -1,0 +1,8 @@
+/* S · Petróleo + coral + amarillo */
+:root{--bg:#071416;--txt:#effaf8;--sub:#9fc2bf;--acc:#ff6f61;--acc-sombra:#a8362c;--acc-txt:#2a0804;--acc-suave:#ff6f6166;--chip:#12292b;
+  --win:#0b1d20ee;--cielo1:#0c2f35;--cielo2:#13464d;--pared:#08181b;--mesa1:#2c2a22;--mesa2:#171611;--luz:#ffd23f22;--marco:#173638;--dorso:#0f2427;--sub2:#7aa09c;--txt2:#d4ecea;
+  --acc2:#ffd23f;--acc2-sombra:#a88a12}
+/* segundo color: sticker, sello Hecho en casa y la palabra destacada */
+.sticker,.casa{background:var(--acc2);box-shadow:0 4px 0 var(--acc2-sombra),0 8px 16px #0008}
+.casa{box-shadow:0 3px 0 var(--acc2-sombra)}
+.barra span b{color:var(--acc2)}

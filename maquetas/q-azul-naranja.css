@@ -1,0 +1,8 @@
+/* Q · Azul noche + naranja */
+:root{--bg:#0a0f1c;--txt:#eef3ff;--sub:#a3b3cc;--acc:#ff7a1a;--acc-sombra:#a8460c;--acc-txt:#1f0c00;--acc-suave:#ff7a1a66;--chip:#17203a;
+  --win:#0e1528ee;--cielo1:#0f2244;--cielo2:#1d3566;--pared:#0b1222;--mesa1:#3a2a1e;--mesa2:#1e160f;--luz:#ff8a3d30;--marco:#1c2742;--dorso:#111a2e;--sub2:#7f8faa;--txt2:#d8e2f4;
+  --acc2:#ffb03a;--acc2-sombra:#a86a10}
+/* segundo color: sticker, sello Hecho en casa y la palabra destacada */
+.sticker,.casa{background:var(--acc2);box-shadow:0 4px 0 var(--acc2-sombra),0 8px 16px #0008}
+.casa{box-shadow:0 3px 0 var(--acc2-sombra)}
+.barra span b{color:var(--acc2)}
