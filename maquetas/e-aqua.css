@@ -1,0 +1,15 @@
+/* E · Cielo aqua de día: fondo claro con nubes y objetos flotando en pixel; vidrio blanco y botones de gelatina. La más legible. */
+:root{--fondo:linear-gradient(180deg,#8fd8ff 0%,#c6ecff 45%,#f2fbff 100%);
+  --txt:#0f2442;--sub:#355a7f;--vidrio:rgba(255,255,255,.5);--vidrio-borde:rgba(255,255,255,.85);
+  --cromo:linear-gradient(180deg,#0b4f8a 0%,#1f86d0 45%,#0a2f5c 52%,#3aa7ef 85%);
+  --gel:linear-gradient(180deg,#9ff3ff,#1aa7e8);--gel-txt:#052340;--gel-sombra:#1aa7e866;
+  --dorso:rgba(255,255,255,.96);--dorso-txt:#0f2442;--dorso-sub:#5d7896;--chip-dorso:#dff1ff;--lupa:rgba(200,235,255,.5)}
+body{background:linear-gradient(180deg,#8fd8ff 0%,#c6ecff 45%,#f2fbff 100%) fixed}
+header{box-shadow:inset 0 1px 0 #fff,0 10px 30px #1a6fb033}
+header p{font-size:1.1rem}
+.filtros button{font-size:1.08rem;font-weight:600}
+.caja::after{left:-10px;right:-10px;bottom:-14px;height:10px;border-radius:999px;background:linear-gradient(180deg,#ffffffcc,#ffffff55);
+  border:1px solid #fff;box-shadow:0 6px 12px #1a6fb033;backdrop-filter:blur(6px)}
+.titulo{font-size:1.06rem}
+.dorso p{font-size:.92rem}
+#lupa .dorso p{font-size:1.2rem}

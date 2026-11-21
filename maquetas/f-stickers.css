@@ -1,0 +1,18 @@
+/* F · Holográfico con stickers: fondo tornasolado y los objetos pixel pegados como calcomanías; vidrio lechoso y bordes cromados */
+:root{--fondo:#e9d8ff;
+  --txt:#25153d;--sub:#5a4680;--vidrio:rgba(255,255,255,.38);--vidrio-borde:rgba(255,255,255,.9);
+  --cromo:linear-gradient(180deg,#5b2a86 0%,#c04bd6 40%,#2a1450 52%,#7a5cff 85%);
+  --gel:linear-gradient(180deg,#ffc3f0,#ff5ec4);--gel-txt:#3a0a2c;--gel-sombra:#ff5ec466;
+  --dorso:rgba(255,255,255,.95);--dorso-txt:#25153d;--dorso-sub:#7a6a96;--chip-dorso:#f0e4ff;--lupa:rgba(233,216,255,.45)}
+body{background:
+  radial-gradient(circle at 15% 20%,#ffd3f2 0,transparent 40%),radial-gradient(circle at 85% 35%,#c9f7ff 0,transparent 42%),
+  radial-gradient(circle at 30% 80%,#d8ffe9 0,transparent 40%),radial-gradient(circle at 80% 85%,#fff3c4 0,transparent 38%),
+  linear-gradient(135deg,#e9d8ff,#d6e8ff 50%,#ffe0f3) fixed}
+.escena .obj{filter:drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff) drop-shadow(0 3px 0 #fff) drop-shadow(0 -3px 0 #fff) drop-shadow(0 6px 8px #5b2a8644)}
+.escena .obj-brillo{filter:drop-shadow(0 0 6px #fff)}
+header{border:2px solid transparent;background:linear-gradient(var(--vidrio),var(--vidrio)) padding-box,linear-gradient(135deg,#fff,#b9a7d9,#fff,#9fc6e8,#fff) border-box}
+.caja::after{display:none}
+.caja .cara{}
+.frente{box-shadow:inset 0 0 0 3px #16121f,inset 0 0 0 6px #ffffff,inset 9px 9px 0 #ffffff40,inset -6px -6px 0 #00000030 !important}
+.hero .obj{filter:drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff) drop-shadow(0 3px 0 #fff) drop-shadow(0 -3px 0 #fff) drop-shadow(0 6px 8px #5b2a8644)}
+.hero .obj-brillo{filter:drop-shadow(0 0 6px #fff)}
