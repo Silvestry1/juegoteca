@@ -86,7 +86,7 @@ dialog .acciones button.prim{background:#111;color:var(--acc)}
 .caja.nueva .cara small{font-size:.7rem}
 .caja.nueva:active .cara{background:rgba(255,194,61,.12)}
 .loc-tag{position:relative;align-self:flex-start;margin-bottom:5px;background:#e8e3f5;color:#1b1400;font-size:.6rem;font-weight:900;padding:2px 7px;border-radius:4px;letter-spacing:1px;text-transform:uppercase}
-.dorso .extra{display:flex;gap:6px}
+.dorso .extra{display:flex;gap:6px;flex-wrap:wrap}
 .dorso .extra button{flex:1;border:0;border-radius:6px;padding:7px 4px;font-size:.72rem;font-weight:700;background:#ddd6c4;color:#222}
 #agregar{max-width:420px;text-align:left;max-height:calc(100dvh - 32px);overflow:auto}
 #agregar h2{margin:0 0 10px;text-align:center;font-size:1.2rem}
@@ -99,6 +99,17 @@ dialog .acciones button.prim{background:#111;color:var(--acc)}
 #agregar .fila{display:flex;gap:8px}#agregar .fila>div{flex:1}
 #agregar .nota{font-size:.78rem;color:#666;margin:8px 0 0;line-height:1.35}
 #agregar .error{color:#b3261e;font-size:.85rem;font-weight:700;margin-top:8px}
+/* archivados */
+#archivo{max-width:1100px;margin:0 auto 24px;padding:0 16px}
+#archivo summary{cursor:pointer;list-style:none;text-align:center;padding:12px;border-radius:12px;background:var(--chip);color:var(--sub);font-weight:700}
+#archivo summary::-webkit-details-marker{display:none}
+#archivo[open] summary{margin-bottom:8px}
+.archivo-nota{text-align:center;color:var(--sub);font-size:.85rem;margin:4px 0 8px}
+#archivadosGrid{display:grid;gap:22px 14px;padding:12px 0 8px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.caja.archivada .frente{filter:grayscale(.6) brightness(.75)}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:#f4efe3;color:#222;padding:10px 16px;border-radius:999px;
+  font-size:.9rem;font-weight:700;box-shadow:0 4px 14px #000a;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:80;max-width:calc(100% - 32px);text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
 /* lupa: caja ampliada */
 body.sin-scroll{overflow:hidden}
 #lupa{position:fixed;inset:0;z-index:60;background:rgba(10,7,18,.86);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
@@ -143,6 +154,12 @@ body.sin-scroll{overflow:hidden}
 <div class="filtros" id="filtros"></div>
 <div class="cant"><label for="n">Somos</label><input id="n" type="number" min="1" inputmode="numeric" placeholder="—"><span>personas</span></div>
 <main id="lista"></main>
+<details id="archivo" hidden>
+  <summary>📦 Archivados (<span id="archivoCant">0</span>)</summary>
+  <p class="archivo-nota">Los juegos que archivaste en este celu. Tocá uno y elegí <b>↩ Volver al estante</b> para recuperarlo.</p>
+  <div id="archivadosGrid" class="estante"></div>
+</details>
+<div id="toast" role="status" aria-live="polite"></div>
 <footer>Los juegos que agregás con <b>+</b> quedan guardados solo en este celu.</footer>
 
 <div id="lupa" hidden role="dialog" aria-modal="true" aria-label="Detalle del juego">
@@ -237,16 +254,17 @@ function calif(g){
   return "+18";
 }
 function clsCalif(c){return c==="+13"?"mas":c==="+16"?"mas16":c==="+18"?"mas18":""}
-function pinta(){
-  const n=parseInt($("#n").value);
-  const todos=juegos.concat(Locales.lista());
-  const vis=todos.filter(g=>(tipo==="Todos"||g.tipo===tipo)&&
-    (!n||((g.min==null||n>=g.min)&&(g.max==null||n<=g.max))));
-  $("#lista").innerHTML=vis.map(g=>{
+// Archivados: cada celu guarda qué juegos no quiere ver en el estante
+const CLAVE_ARCH="juegoteca-archivados";
+const claveJuego=g=>g.id||g.url;
+function archivados(){try{return new Set(JSON.parse(localStorage.getItem(CLAVE_ARCH))||[]);}catch{return new Set();}}
+function guardarArchivados(set){try{localStorage.setItem(CLAVE_ARCH,JSON.stringify([...set]));}catch{}}
+function cajaHTML(g,arch){
     const [c1,c2]=g.colores||["#444","#111"];const c=calif(g);
     const ilus=g.imagen?`<img src="${esc(g.imagen)}" alt="" style="width:100%;height:100%;object-fit:cover">`:`<div>${esc(g.icono||"🎲")}</div>`;
-    const off=!g.propio&&!navigator.onLine;
-    return `<article class="caja${off?" sinred":""}" tabindex="0" aria-label="${esc(g.nombre)}">
+    const off=!g.propio&&!navigator.onLine;const k=esc(claveJuego(g));
+    const btnArch=arch?`<button type="button" data-desarchivar="${k}">↩ Volver al estante</button>`:`<button type="button" data-archivar="${k}">📦 Archivar</button>`;
+    return `<article class="caja${off?" sinred":""}${arch?" archivada":""}" tabindex="0" aria-label="${esc(g.nombre)}">
       <div class="giro">
         <div class="cara frente" style="background:linear-gradient(160deg,${esc(c1)},${esc(c2)})">
           <div class="lomo"><span>JUEGOTECA</span></div>
@@ -260,15 +278,35 @@ function pinta(){
           <div class="ficha"><span>${esc(g.tipo)}</span><span>👥 ${jugadores(g)}</span><span>${c==="VAR"?"Edad: varía":"Edad "+esc(g.edad)}</span></div>
           <p>${esc(g.descripcion)}</p>
           ${off?'<a class="off" aria-disabled="true">📡 REQUIERE INTERNET</a>':`<a href="${esc(g.url)}"${g.propio?"":' target="_blank" rel="noopener"'}>▶ JUGAR</a>`}
-          ${g.local?`<div class="extra">${g.url.startsWith("jugar.html")?"":`<button type="button" data-copiar="${esc(g.id)}">📋 Copiar ficha</button>`}<button type="button" data-quitar="${esc(g.id)}">🗑 Quitar</button></div>`:""}
+          <div class="extra">${btnArch}${g.local?`${g.url.startsWith("jugar.html")?"":`<button type="button" data-copiar="${esc(g.id)}">📋 Copiar ficha</button>`}<button type="button" data-quitar="${esc(g.id)}">🗑 Quitar</button>`:""}</div>
           <small>Tocá para dar vuelta</small>
         </div>
       </div>
-    </article>`}).join("")+`<article class="caja nueva" tabindex="0" role="button" aria-label="Agregar un juego" id="cajaMas">
-      <div class="giro"><div class="cara"><b>+</b><span>Agregar juego</span><small>Pegá un link o subí los archivos</small></div></div>
     </article>`;
 }
+function pinta(){
+  const n=parseInt($("#n").value);
+  const todos=juegos.concat(Locales.lista());
+  const arch=archivados();
+  const vis=todos.filter(g=>!arch.has(claveJuego(g))&&(tipo==="Todos"||g.tipo===tipo)&&
+    (!n||((g.min==null||n>=g.min)&&(g.max==null||n<=g.max))));
+  $("#lista").innerHTML=vis.map(g=>cajaHTML(g,false)).join("")+`<article class="caja nueva" tabindex="0" role="button" aria-label="Agregar un juego" id="cajaMas">
+      <div class="giro"><div class="cara"><b>+</b><span>Agregar juego</span><small>Pegá un link o subí los archivos</small></div></div>
+    </article>`;
+  const ocultos=todos.filter(g=>arch.has(claveJuego(g)));
+  $("#archivo").hidden=!ocultos.length;
+  $("#archivoCant").textContent=ocultos.length;
+  $("#archivadosGrid").innerHTML=ocultos.map(g=>cajaHTML(g,true)).join("");
+}
+let tAviso;
+function aviso(t){const a=$("#toast");a.textContent=t;a.classList.add("on");clearTimeout(tAviso);tAviso=setTimeout(()=>a.classList.remove("on"),2600);}
 async function accionesLocales(e){
+  const ar=e.target.closest("[data-archivar]");
+  if(ar){const set=archivados();set.add(ar.dataset.archivar);guardarArchivados(set);cerrarLupa();pinta();
+    aviso("Archivado. Lo encontrás al final, en 📦 Archivados.");return true;}
+  const da=e.target.closest("[data-desarchivar]");
+  if(da){const set=archivados();set.delete(da.dataset.desarchivar);guardarArchivados(set);cerrarLupa();pinta();
+    aviso("De vuelta en el estante.");return true;}
   const q=e.target.closest("[data-quitar]");
   if(q){const j=Locales.lista().find(x=>x.id===q.dataset.quitar);
     if(j&&confirm(`¿Quitar "${j.nombre}" de este celu?`)){await Locales.quitar(j.id);cerrarLupa();pinta();}return true;}
@@ -309,6 +347,14 @@ $("#lista").addEventListener("click",async e=>{
   if(e.target.closest("#cajaMas")){abrirAgregar();return;}
   if(await accionesLocales(e))return;
   const c=e.target.closest(".caja"); if(c) abrirLupa(c);
+});
+$("#archivadosGrid").addEventListener("click",async e=>{
+  if(e.target.closest("a"))return;
+  if(await accionesLocales(e))return;
+  const c=e.target.closest(".caja"); if(c) abrirLupa(c);
+});
+$("#archivadosGrid").addEventListener("keydown",e=>{
+  if((e.key==="Enter"||e.key===" ")&&e.target.classList.contains("caja")){e.preventDefault();abrirLupa(e.target);}
 });
 $("#lista").addEventListener("keydown",e=>{
   if((e.key==="Enter"||e.key===" ")&&e.target.id==="cajaMas"){e.preventDefault();abrirAgregar();return;}
