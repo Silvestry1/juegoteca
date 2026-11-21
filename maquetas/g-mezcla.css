@@ -1,0 +1,18 @@
+/* G · Aqua tornasolado: el cielo de E con el brillo holográfico y los stickers de F */
+:root{--fondo:#cdefff;
+  --txt:#13254a;--sub:#3f5a85;--vidrio:rgba(255,255,255,.45);--vidrio-borde:rgba(255,255,255,.95);
+  --cromo:linear-gradient(180deg,#1b4f9c 0%,#5aa8ff 38%,#7a3fd0 52%,#2fb7d9 85%);
+  --gel:linear-gradient(180deg,#b9fbff,#33b6f0 60%,#7d6bff);--gel-txt:#06203f;--gel-sombra:#33b6f066;
+  --dorso:rgba(255,255,255,.96);--dorso-txt:#13254a;--dorso-sub:#5d7396;--chip-dorso:#e3f1ff;--lupa:rgba(205,239,255,.5)}
+body{background:
+  radial-gradient(ellipse at 85% 10%,#ffd6f3 0,transparent 45%),radial-gradient(ellipse at 10% 45%,#e2d4ff 0,transparent 40%),
+  radial-gradient(ellipse at 80% 75%,#c8fff0 0,transparent 40%),linear-gradient(180deg,#9edfff 0%,#cdefff 50%,#f4fbff 100%) fixed}
+.hero .obj:not(.obj-nube):not(.obj-sol):not(.obj-estrella){filter:drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff) drop-shadow(0 3px 0 #fff) drop-shadow(0 -3px 0 #fff) drop-shadow(0 8px 10px #2a5fa044)}
+.hero .obj-sol{opacity:.9}
+.hero .obj-estrella{filter:drop-shadow(0 0 6px #fff)}
+header{border:2px solid transparent;background:linear-gradient(var(--vidrio),var(--vidrio)) padding-box,linear-gradient(135deg,#fff,#a8d8ff,#ffd6f3,#fff,#c8fff0,#fff) border-box}
+.caja::after{left:-10px;right:-10px;bottom:-14px;height:10px;border-radius:999px;background:linear-gradient(90deg,#ffd6f3cc,#c8fff0cc,#a8d8ffcc);border:1px solid #fff;box-shadow:0 6px 12px #2a5fa033}
+/* brillo de lámina holográfica que cruza la caja */
+.frente::after{content:"";position:absolute;inset:3px;pointer-events:none;mix-blend-mode:soft-light;
+  background:linear-gradient(115deg,transparent 30%,#ffffffaa 42%,#ff9bd6 48%,#9bffe1 54%,#ffffff88 60%,transparent 70%)}
+.titulo{font-size:1.05rem}

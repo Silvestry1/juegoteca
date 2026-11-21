@@ -94,10 +94,30 @@
     r(6, 10, 10, 3, "#b8407a"); r(7, 11, 1, 1, K); r(14, 11, 1, 1, K);
   });
   S.tablon = () => lienzo(16, 6, r => { r(0, 0, 16, 6, "#8a5a2b"); r(0, 0, 16, 1, "#c08850"); r(0, 5, 16, 1, "#4d2f14"); r(5, 2, 4, 1, "#6e4520"); r(11, 3, 3, 1, "#a26a35"); });
+  S.estrella = (c = "#ffffff") => lienzo(11, 11, r => { r(5, 0, 1, 11, c); r(0, 5, 11, 1, c); r(4, 3, 3, 5, c); r(3, 4, 5, 3, c); r(5, 5, 1, 1, "#fff"); });
+  S.sol = () => lienzo(40, 40, r => {
+    const cols = ["#fff3a8", "#ffd98a", "#ffb7a0", "#ff9bc4", "#e08ad8"];
+    for (let j = 0; j < 40; j++) for (let i = 0; i < 40; i++) {
+      const d = Math.hypot(i - 19.5, j - 19.5); if (d > 19.6) continue;
+      if (j > 22 && (j % 4 === 0 || (j > 30 && j % 4 === 1))) continue;
+      r(i, j, 1, 1, cols[Math.min(4, Math.floor(j / 8))]);
+    }
+  });
+  S.dado = () => lienzo(16, 16, r => {
+    r(1, 0, 14, 16, K); r(0, 1, 16, 14, K); r(1, 1, 14, 14, "#fdfbff"); r(1, 13, 14, 2, "#c9c2e0"); r(13, 1, 2, 14, "#ddd7ef");
+    [[3, 3], [10, 3], [6, 7], [3, 10], [10, 10]].forEach(([x, y]) => r(x, y, 3, 3, "#ff5ec4"));
+  });
+  S.carta = () => lienzo(14, 20, r => {
+    r(1, 0, 12, 20, K); r(0, 1, 14, 18, K); r(1, 1, 12, 18, "#ffffff"); r(2, 2, 10, 16, "#7cc8ff"); r(3, 3, 8, 14, "#b9e3ff");
+    r(6, 6, 2, 1, "#ff5ec4"); r(5, 7, 4, 3, "#ff5ec4"); r(6, 10, 2, 1, "#ff5ec4"); r(6, 13, 2, 2, "#ffd84a");
+  });
   S.icono = () => S.tele("#ffd84a");
   window.Sprites = S;
 
   const ESC = {
+    mezcla: [["nube", [], 5, "-10%", "60%"], ["nube", [], 4, "70%", "80%"], ["cd", [], 4, "80%", "40%"], ["estrella", [], 3, "10%", "40%"]],
+    burbujas: [["estrella", [], 3, "8%", "50%"], ["estrella", [], 2, "85%", "70%"]],
+    atardecer: [["nube", [], 4, "-8%", "55%"], ["nube", [], 3, "72%", "78%"], ["estrella", [], 2, "84%", "45%"]],
     living: [
       ["ventana", [], 4, "6%", "12%"],
       ["lava", [], 4, "84%", "15%"],
@@ -135,6 +155,19 @@
       ["cassette", [], 4, 150, 132, -5], ["control", [], 3, 30, 168, 6], ["lava", [], 3, 254, 128, -8],
       ["brillo", [], 3, 140, 18], ["brillo", ["#fff6a8"], 3, 280, 96], ["brillo", [], 2, 118, 120] ] },
   };
+  HERO.mezcla = { alto: 250, items: [
+      ["nube", [], 5, -24, 150], ["nube", [], 4, 250, 176], ["sol", [], 3, 270, 4],
+      ["tele", ["#b9f3ff"], 4, 16, 22, -6], ["vhs", ["#ff5ec4"], 4, 162, 30, 7], ["cd", [], 4, 300, 108, 0],
+      ["celu", [], 3, 150, 126, -10], ["dado", [], 4, 218, 122, 12], ["cassette", [], 3, 34, 160, 5],
+      ["estrella", [], 3, 128, 10], ["estrella", ["#fff6a8"], 2, 252, 96], ["estrella", [], 2, 110, 120] ] };
+  HERO.burbujas = { alto: 250, items: [
+      ["tele", ["#9ff3ff"], 3, 20, 30, 0, 0, "burbuja"], ["cd", [], 3, 160, 8, 0, 0, "burbuja"], ["control", [], 3, 270, 40, 0, 0, "burbuja"],
+      ["dado", [], 3, 112, 128, 0, 0, "burbuja"], ["celu", [], 2, 230, 150, 0, 0, "burbuja"], ["carta", [], 3, 330, 140, 0, 0, "burbuja"],
+      ["estrella", [], 2, 96, 30], ["estrella", [], 3, 330, 10], ["estrella", [], 2, 40, 180] ] };
+  HERO.atardecer = { alto: 250, piso: 176, items: [
+      ["sol", [], 4, 115, 22], ["nube", [], 3, 10, 70], ["nube", [], 3, 290, 50],
+      ["tele", ["#ffc3f0"], 3, 12, 106], ["pilaVhs", [], 2, 112, 128], ["consola", [], 2, 180, 152], ["lava", [], 2, 252, 124], ["planta", [], 3, 316, 104],
+      ["estrella", [], 2, 70, 20], ["estrella", ["#fff6a8"], 2, 330, 14], ["estrella", [], 2, 270, 100] ] };
   function sprite(n, a, esc, rot, ancho) {
     if (n === "tablon") { const d = document.createElement("div"); d.className = "obj obj-tablon"; Object.assign(d.style, { width: ancho + "px", height: "18px", background: `url(${S.tablon().url}) 0 0/48px 18px repeat-x`, imageRendering: "pixelated" }); return d; }
     const s = S[n](...a); const i = new Image(); i.src = s.url; i.className = "obj obj-" + n;
@@ -146,7 +179,10 @@
     const z = document.createElement("div"); z.className = "hero"; z.setAttribute("aria-hidden", "true"); z.style.height = h.alto + "px";
     const in_ = document.createElement("div"); in_.className = "hero-in"; z.appendChild(in_);
     if (h.piso) { const f = document.createElement("div"); f.className = "piso"; f.style.top = h.piso + "px"; in_.appendChild(f); }
-    h.items.forEach(([n, a, esc, l, t, rot, ancho]) => { const o = sprite(n, a, esc, rot, ancho); o.style.left = l + "px"; o.style.top = t + "px"; in_.appendChild(o); });
+    h.items.forEach(([n, a, esc, l, t, rot, ancho, extra]) => {
+      let o = sprite(n, a, esc, rot, ancho);
+      if (extra === "burbuja") { const b = document.createElement("div"); b.className = "burbuja"; o.style.position = "static"; b.appendChild(o); o = b; }
+      o.style.left = l + "px"; o.style.top = t + "px"; in_.appendChild(o); });
     document.body.prepend(z);
   }
   function armar() {
