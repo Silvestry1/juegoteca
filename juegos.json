@@ -128,6 +128,22 @@
   "lema": "Dos cabezas, un celu"
  },
  {
+  "nombre": "Estampame esta",
+  "tipo": "Dibujar",
+  "min": 3,
+  "max": 20,
+  "edad": "ATP / +18",
+  "propio": true,
+  "descripcion": "Cada uno en su celu: dibujás, escribís frases y con lo que hicieron los otros armás una remera. Después se enfrentan de a dos y se vota hasta la campeona; con mucha gente, primero se vota en la vitrina y pasan las 8 mejores. De 3 a 20, se suman con código o QR. Largo, reloj, consignas difíciles y +18 se eligen al armar la partida; letra grande para la abuela.",
+  "url": "juegos/estampame/",
+  "icono": "👕",
+  "colores": [
+   "#ff7a1a",
+   "#0f2244"
+  ],
+  "lema": "Dibujo tuyo, frase de otro, remera de nadie"
+ },
+ {
   "nombre": "skribbl.io",
   "tipo": "Dibujar",
   "min": 2,

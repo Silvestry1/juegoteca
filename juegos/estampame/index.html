@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0f1c">
+<title>Estampame esta</title>
+<style>
+:root{--bg:#0a0f1c;--card:#0e1528;--chip:#17203a;--txt:#eef3ff;--sub:#a3b3cc;--acc:#ff7a1a;--acc-txt:#1f0c00;--acc2:#ffb03a;--ok:#3ddc84;--mal:#ff6b5c;--a:#ff7a1a;--b:#4fa3ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html{font-size:16px}
+html.grande{font-size:20px}
+html,body{min-height:100%}
+html{background:var(--bg)}
+body{margin:0;background:radial-gradient(ellipse at 50% -10%,#1d3566 0,#0f2244 30%,var(--bg) 70%) fixed;color:var(--txt);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior:none}
+.wrap{min-height:100vh;padding:10px 14px calc(70px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;max-width:640px;margin:0 auto}
+button{font:inherit;border:0;border-radius:12px;padding:12px;background:var(--chip);color:var(--txt);font-weight:800;cursor:pointer;touch-action:manipulation}
+button:active{filter:brightness(1.25)}
+button:disabled{opacity:.35}
+button.prin{background:var(--acc);color:var(--acc-txt)}
+button.grande{padding:16px;font-size:1.2rem}
+button.chico{padding:8px 10px;font-size:.85rem}
+button.claro{background:transparent;color:var(--sub);font-weight:700}
+h1{margin:6px 0 0;font-size:2rem;text-align:center;text-transform:uppercase;line-height:1.05}
+h1 em{font-style:normal;color:var(--acc)}
+h2{margin:0;font-size:1.35rem;text-align:center}
+.sub{color:var(--sub);text-align:center;margin:0;line-height:1.4}
+.caja{background:var(--card);border:1px solid #ffffff14;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.caja h3{margin:0;font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--sub)}
+input[type=text]{width:100%;padding:12px;border-radius:12px;border:2px solid #ffffff26;background:#00000040;color:var(--txt);font:inherit;font-size:1.15rem;font-weight:800}
+input[type=text]:focus{outline:none;border-color:var(--acc)}
+#codigo{text-transform:uppercase;letter-spacing:6px;text-align:center;font-size:1.6rem}
+.selector{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:5px;background:#00000040;border-radius:12px;padding:4px}
+.selector button{padding:11px 3px;background:transparent;color:var(--sub);font-size:.95rem}
+.selector button.on{background:var(--acc);color:var(--acc-txt)}
+.et{font-size:.85rem;color:var(--sub);font-weight:700}
+.nota{font-size:.82rem;color:var(--sub);margin:0;line-height:1.4}
+.pantalla{display:none;flex-direction:column;gap:12px}
+.pantalla.on{display:flex}
+.err{color:var(--mal);text-align:center;min-height:1.2em;margin:0;font-weight:700}
+.red{font-size:.85rem;color:var(--sub);text-align:center;margin:0}
+.red.mal{color:var(--mal);font-weight:800}
+details.reglas{color:var(--sub);font-size:.92rem;line-height:1.45}
+details.reglas summary{font-weight:800;color:var(--txt);cursor:pointer}
+details.reglas ol{margin:8px 0 0;padding-left:20px}
+details.reglas li{margin:4px 0}
+details.reglas b{color:var(--txt)}
+.fila{display:flex;gap:8px;align-items:center}
+.fila>*{flex:1}
+
+/* sala */
+.codigoGrande{font-size:3rem;font-weight:900;letter-spacing:10px;text-align:center;color:var(--acc);line-height:1;font-family:"JetBrains Mono",ui-monospace,monospace}
+#qr{background:#fff;padding:10px;border-radius:12px;align-self:center;line-height:0}
+#qr svg{width:min(52vw,220px);height:auto}
+.jugadores{display:flex;flex-wrap:wrap;gap:6px}
+.jugador{background:var(--chip);border-radius:10px;padding:8px 12px;font-weight:800;display:flex;gap:6px;align-items:center}
+.jugador.off{opacity:.45}
+.jugador.yo{outline:2px solid var(--acc)}
+.jugador .ok{color:var(--ok)}
+.jugador small{color:var(--sub);font-weight:700}
+
+/* barra de juego */
+.tope{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid #ffffff14;border-radius:12px;padding:8px 10px;position:sticky;top:6px;z-index:5}
+.tope .etapa{flex:1;font-weight:900;font-size:.95rem;line-height:1.15}
+.tope .etapa small{display:block;color:var(--sub);font-weight:700;font-size:.78rem}
+.reloj{font-family:"JetBrains Mono",ui-monospace,monospace;font-weight:700;font-size:1.3rem;color:var(--acc2);min-width:3.2em;text-align:right}
+.reloj.poco{color:var(--mal);animation:late .8s ease-in-out infinite}
+@keyframes late{50%{opacity:.45}}
+#bLetra{padding:6px 9px;font-size:.85rem}
+.espera{text-align:center;color:var(--sub);font-weight:700;line-height:1.4}
+.espera b{color:var(--txt)}
+.listos{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+.listos span{background:var(--chip);border-radius:8px;padding:4px 8px;font-size:.85rem;font-weight:800;color:var(--sub)}
+.listos span.si{background:#3ddc8426;color:var(--ok)}
+.seguir{align-self:center}
+
+/* dibujo */
+.consigna{background:var(--acc);color:var(--acc-txt);border-radius:12px;padding:10px 12px;text-align:center;font-weight:900;font-size:1.15rem;line-height:1.2}
+.consigna small{display:block;font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;opacity:.75}
+.lienzo{position:relative;width:min(100%,460px);aspect-ratio:1;align-self:center;border-radius:12px;overflow:hidden;background:
+  conic-gradient(#e9e6df 25%,#f6f4ef 0 50%,#e9e6df 0 75%,#f6f4ef 0) 0 0/28px 28px;box-shadow:0 8px 24px #0009;touch-action:none}
+.lienzo canvas{width:100%;height:100%;display:block;touch-action:none}
+.paleta{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
+.paleta button{width:36px;height:36px;padding:0;border-radius:50%;border:3px solid #ffffff30;background:var(--c)}
+html.grande .paleta button{width:48px;height:48px}
+.paleta button.on{border-color:var(--acc);transform:scale(1.12);box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--acc)}
+.herr{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:6px}
+.herr button{padding:10px 4px;font-size:.95rem}
+.herr button.on{background:var(--acc2);color:var(--acc-txt)}
+.grosor{display:flex;align-items:center;justify-content:center}
+.grosor i{display:block;border-radius:50%;background:currentColor}
+
+/* frases */
+.mias{display:flex;flex-direction:column;gap:6px}
+.mias div{background:var(--chip);border-radius:10px;padding:9px 12px;font-weight:700}
+.cuenta{font-size:.85rem;color:var(--sub);text-align:right;margin-top:-6px}
+
+/* remera */
+.remera{position:relative;width:100%;aspect-ratio:1;container-type:inline-size}
+.remera svg.tela{position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(0 6px 10px #0009)}
+.remera .estampa{position:absolute;left:31%;right:31%;top:24%;bottom:9%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2cqw}
+.remera.arriba .estampa{flex-direction:column-reverse;justify-content:center}
+.remera .estampa img{width:100%;aspect-ratio:1;object-fit:contain;display:block}
+.remera .estampa .sinimg{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:16cqw;opacity:.35}
+.remera .frase{font-weight:900;text-transform:uppercase;text-align:center;line-height:1.02;font-size:4.6cqw;color:var(--tc);word-break:break-word;letter-spacing:-.02em;max-width:100%}
+.remera .frase.l{font-size:3.6cqw}.remera .frase.xl{font-size:2.9cqw}
+.remera.sinfrase .frase{display:none}
+
+/* armado */
+.vista{width:min(100%,400px);align-self:center}
+.piezas{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.pieza{width:31%;max-width:130px;aspect-ratio:1;border-radius:12px;padding:4px;background:conic-gradient(#e9e6df 25%,#f6f4ef 0 50%,#e9e6df 0 75%,#f6f4ef 0) 0 0/20px 20px;border:4px solid transparent}
+.pieza img{width:100%;height:100%;object-fit:contain;display:block}
+.pieza.on{border-color:var(--acc)}
+.frasesMano{display:flex;flex-direction:column;gap:6px}
+.frasesMano button{text-align:left;font-weight:800;background:var(--chip);padding:12px}
+.frasesMano button.on{background:var(--acc);color:var(--acc-txt)}
+.colores{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.colores button{width:38px;height:38px;padding:0;border-radius:50%;background:var(--c);border:3px solid #ffffff40}
+html.grande .colores button{width:48px;height:48px}
+.colores button.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--acc)}
+
+/* duelo */
+.ring{display:grid;grid-template-columns:1fr 1fr;gap:8px;position:relative}
+html.grande .ring{grid-template-columns:1fr}
+.lado{background:var(--card);border:3px solid #ffffff14;border-radius:14px;padding:6px 6px 8px;display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:transform .15s}
+.lado.a{border-color:#ff7a1a55}.lado.b{border-color:#4fa3ff55}
+.lado.voto{transform:scale(1.02)}
+.lado.a.voto{border-color:var(--a);box-shadow:0 0 18px #ff7a1a66}
+.lado.b.voto{border-color:var(--b);box-shadow:0 0 18px #4fa3ff66}
+.lado.gana{animation:brillo 1.2s ease-in-out infinite}
+.lado.pierde{opacity:.5}
+@keyframes brillo{50%{box-shadow:0 0 28px var(--acc2)}}
+.lado button{width:100%}
+.lado.a button.on{background:var(--a);color:var(--acc-txt)}
+.lado.b button.on{background:var(--b);color:#00142b}
+.vs{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%) rotate(-8deg);background:var(--acc2);color:var(--acc-txt);font-weight:900;font-size:1.1rem;padding:4px 10px;border-radius:8px;box-shadow:0 4px 0 #a86a10;z-index:2;pointer-events:none}
+html.grande .vs{display:none}
+.res{text-align:center;font-weight:900;font-size:1.05rem}
+.res .n{font-size:2rem;line-height:1}
+.lado.a .res .n{color:var(--a)}.lado.b .res .n{color:var(--b)}
+.cred{font-size:.78rem;color:var(--sub);line-height:1.35;text-align:center}
+.cred b{color:var(--txt)}
+.quienes{font-size:.75rem;color:var(--sub);text-align:center}
+.cartel{text-align:center;font-weight:900;font-size:1.25rem;color:var(--acc2)}
+
+/* vitrina */
+.vitrina .it{cursor:pointer;border:3px solid transparent}
+.vitrina .it.voto{border-color:var(--acc);box-shadow:0 0 14px #ff7a1a66}
+.vitrina .it.mia{opacity:.55;cursor:default}
+.vitrina .it.pasa{border-color:var(--ok)}
+.vitrina .it.queda{opacity:.4}
+.vitrina .eti{text-align:center;font-weight:800;font-size:.85rem;color:var(--sub)}
+.vitrina .it.voto .eti{color:var(--acc)}
+.vitrina .it.pasa .eti{color:var(--ok)}
+html.grande .galeria.vitrina{grid-template-columns:1fr 1fr}
+
+/* podio */
+.campeona{width:min(100%,380px);align-self:center}
+.tabla{display:flex;flex-direction:column;gap:5px}
+.tabla div{display:flex;justify-content:space-between;align-items:center;background:var(--chip);border-radius:10px;padding:9px 12px;font-weight:800}
+.tabla div.yo{outline:2px solid var(--acc)}
+.tabla div b{font-family:"JetBrains Mono",ui-monospace,monospace;color:var(--acc2)}
+.galeria{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.galeria .it{background:var(--card);border:1px solid #ffffff14;border-radius:12px;padding:6px;display:flex;flex-direction:column;gap:4px}
+.galeria .it button{padding:7px;font-size:.8rem}
+.aviso{position:fixed;left:50%;top:30%;transform:translate(-50%,calc(-100% - 40px));opacity:0;background:var(--acc);color:var(--acc-txt);font-weight:900;font-size:1.1rem;padding:10px 18px;border-radius:14px;box-shadow:0 8px 24px #000a;transition:transform .3s,opacity .3s;z-index:20;text-align:center;max-width:92vw;pointer-events:none}
+.aviso.on{transform:translate(-50%,0);opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- INICIO -->
+<section class="pantalla" id="pInicio">
+  <h1>👕 Estampame <em>esta</em></h1>
+  <p class="sub">Dibujás, escribís frases y con lo que hicieron los otros armás una remera. Después se enfrentan de a dos y se vota desde los celus.</p>
+  <div class="caja">
+    <h3>Tu nombre</h3>
+    <input type="text" id="nombre" maxlength="14" placeholder="Cómo te dicen" autocomplete="off">
+  </div>
+  <div class="caja" id="volverMesa" hidden>
+    <h3>Tenés una partida abierta</h3>
+    <button class="prin" id="btnVolver">Volver a la partida</button>
+  </div>
+  <div class="fila">
+    <button class="prin grande" id="btnArmar">Armar partida</button>
+  </div>
+  <div class="caja">
+    <h3>Sumarme a una partida</h3>
+    <input type="text" id="codigo" maxlength="4" placeholder="CÓDIGO" autocomplete="off" autocapitalize="characters">
+    <button id="btnUnirme">Sumarme</button>
+  </div>
+  <p class="err" id="errInicio"></p>
+  <button id="bLetraInicio">🔍 Letra grande: apagada</button>
+  <details class="reglas">
+    <summary>Cómo se juega</summary>
+    <ol>
+      <li><b>Dibujá.</b> Cada uno hace sus dibujos en el celu (con consigna o libres, según cómo se armó la partida).</li>
+      <li><b>Escribí frases.</b> Las que te parezcan buenas para una remera. Si no se te ocurre nada, tocá 🎲.</li>
+      <li><b>Armá tu remera.</b> Te tocan dibujos y frases de los demás, mezclados. Elegís uno de cada uno y el color.</li>
+      <li><b>Torneo.</b> Las remeras se enfrentan de a dos sin decir de quién son. Votan todos menos los dueños de esas dos. La que gana sigue hasta la final.</li>
+      <li><b>Puntos.</b> Cada voto: 100 al que armó la remera, 50 al que dibujó y 50 al de la frase. Ganar un duelo y ser la campeona suma extra.</li>
+    </ol>
+    <p class="nota">De 3 a 20 jugadores. Con más de 8, antes del torneo se vota en la vitrina y pasan las 8 remeras más votadas. Todos necesitan internet (wifi o datos): los celus se conectan directo entre ellos, sin cuentas.</p>
+  </details>
+</section>
+
+<!-- SALA -->
+<section class="pantalla" id="pSala">
+  <h2>Partida</h2>
+  <div class="codigoGrande" id="salaCodigo">····</div>
+  <div id="qr"></div>
+  <button id="btnCompartir">📤 Mandar el link</button>
+  <div class="caja">
+    <h3>Jugadores <span id="salaCant"></span></h3>
+    <div class="jugadores" id="salaJug"></div>
+  </div>
+  <div class="caja" id="salaCfgHost" hidden>
+    <h3>Cómo la jugamos</h3>
+    <div class="et">Largo</div>
+    <div class="selector" data-k="largo"><button data-v="corta">Corta</button><button data-v="normal">Normal</button><button data-v="larga">Larga</button></div>
+    <p class="nota" id="notaLargo"></p>
+    <div class="et">Ritmo</div>
+    <div class="selector" data-k="ritmo"><button data-v="tranqui">Tranqui</button><button data-v="normal">Normal</button><button data-v="picante">Apurado</button></div>
+    <p class="nota" id="notaRitmo"></p>
+    <div class="et">Qué se dibuja</div>
+    <div class="selector" data-k="consignas"><button data-v="libre">Libre</button><button data-v="consigna">Consigna</button><button data-v="dificil">Difícil</button></div>
+    <p class="nota" id="notaCons"></p>
+    <div class="et">Contenido</div>
+    <div class="selector" data-k="contenido"><button data-v="atp">ATP</button><button data-v="adultos">+18</button><button data-v="mezcla">Mezcla</button></div>
+  </div>
+  <p class="sub" id="salaCfg"></p>
+  <button class="prin grande" id="btnEmpezar" hidden>Empezar</button>
+  <p class="espera" id="salaEstado"></p>
+  <p class="red" id="redSala"></p>
+  <button class="claro" id="btnSalirSala">Salir</button>
+</section>
+
+<!-- JUEGO -->
+<section class="pantalla" id="pJuego">
+  <div class="tope">
+    <div class="etapa" id="etapa"></div>
+    <div class="reloj" id="reloj"></div>
+    <button id="bLetra" title="Letra grande">A+</button>
+  </div>
+
+  <!-- dibujo -->
+  <div class="pantalla" id="eDibujo">
+    <div class="consigna" id="consigna"></div>
+    <div class="lienzo"><canvas id="lienzo" width="600" height="600"></canvas></div>
+    <div class="paleta" id="paleta"></div>
+    <div class="herr" id="herr">
+      <button data-g="6" class="grosor"><i style="width:6px;height:6px"></i></button>
+      <button data-g="14" class="grosor"><i style="width:12px;height:12px"></i></button>
+      <button data-g="30" class="grosor"><i style="width:20px;height:20px"></i></button>
+      <button data-h="goma">Goma</button>
+      <button data-h="deshacer">↶</button>
+      <button data-h="borrar">Borrar</button>
+    </div>
+    <button class="prin grande" id="bMandarDib">Listo, mandar dibujo</button>
+    <p class="nota" style="text-align:center">El fondo cuadriculado es transparente: va sobre el color de la remera.</p>
+  </div>
+
+  <!-- frases -->
+  <div class="pantalla" id="eFrases">
+    <div class="consigna"><small>Escribí</small>Frases para estampar en una remera</div>
+    <input type="text" id="fraTxt" maxlength="70" placeholder="Una frase corta y con gancho" autocomplete="off">
+    <div class="cuenta" id="fraCuenta">0/70</div>
+    <div class="fila"><button id="bIdea" style="flex:0 0 auto">🎲 Idea</button><button class="prin" id="bMandarFra">Mandar frase</button></div>
+    <div class="mias" id="fraMias"></div>
+  </div>
+
+  <!-- armado -->
+  <div class="pantalla" id="eArmado">
+    <div class="vista" id="armVista"></div>
+    <div class="caja" id="armCtrl">
+      <h3>Dibujo</h3>
+      <div class="piezas" id="armDib"></div>
+      <h3>Frase</h3>
+      <div class="frasesMano" id="armFra"></div>
+      <h3>Color de la remera</h3>
+      <div class="colores" id="armCol"></div>
+      <h3>La frase va</h3>
+      <div class="selector" id="armPos"><button data-v="arriba">Arriba del dibujo</button><button data-v="abajo">Abajo</button></div>
+      <button class="prin grande" id="bEstampar">Estampar</button>
+    </div>
+  </div>
+
+  <!-- vitrina (con mucha gente) -->
+  <div class="pantalla" id="eVitrina">
+    <div class="cartel" id="vitCartel"></div>
+    <div class="galeria vitrina" id="vitGal"></div>
+  </div>
+
+  <!-- duelo -->
+  <div class="pantalla" id="eDuelo">
+    <div class="cartel" id="dueloCartel"></div>
+    <div class="ring" id="ring"></div>
+  </div>
+
+  <!-- podio -->
+  <div class="pantalla" id="ePodio">
+    <h2 id="podioTit">🏆 La remera campeona</h2>
+    <div class="campeona" id="podioCamp"></div>
+    <div class="cred" id="podioCred"></div>
+    <div class="caja"><h3>Puntos</h3><div class="tabla" id="podioTabla"></div></div>
+    <div class="caja"><h3>Todas las remeras</h3><div class="galeria" id="podioGal"></div></div>
+    <button class="prin grande" id="bOtra" hidden>Otra ronda (siguen los puntos)</button>
+  </div>
+
+  <div class="espera" id="espera"></div>
+  <div class="listos" id="listos"></div>
+  <button class="seguir" id="bSeguir" hidden>Seguir sin esperar</button>
+  <p class="red" id="redJuego"></p>
+  <button class="claro" id="btnSalirJuego">Salir de la partida</button>
+</section>
+
+</div>
+<div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+
+<script src="../comun/qrcode.js"></script>
+<script src="../comun/peerjs.min.js"></script>
+<script src="banco.js"></script>
+<script src="motor.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const leer=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}};
+const grabar=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}};
+const borrar=k=>{try{localStorage.removeItem(k)}catch(e){}};
+const vibrar=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
+const PREF="juegoteca-estampame-";
+const params=new URLSearchParams(location.search);
+const MI_ID=leer("estampame-id",null)||(()=>{const v=Math.random().toString(36).slice(2,10)+Date.now().toString(36);grabar("estampame-id",v);return v})();
+const MAX_JUG=20,MIN_JUG=3;
+let cfgArmar=Object.assign({largo:"normal",ritmo:"normal",consignas:"consigna",contenido:"atp"},leer("estampame-cfg",{}));
+
+function opcionesPeer(){
+  const srv=params.get("srv"); // solo para pruebas con un servidor propio: ?srv=localhost:9000
+  if(srv){const [host,port]=srv.split(":");return {host,port:+port||443,path:"/",secure:location.protocol==="https:",debug:1}}
+  return {debug:1,config:{iceServers:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"}]}};
+}
+const conSrv=q=>q+(params.get("srv")?(q?"&":"?")+"srv="+params.get("srv"):"");
+function pantalla(id){document.querySelectorAll(".wrap>.pantalla").forEach(p=>p.classList.toggle("on",p.id===id))}
+let tAviso;function avisar(t){const a=$("aviso");a.textContent=t;a.classList.add("on");clearTimeout(tAviso);tAviso=setTimeout(()=>a.classList.remove("on"),2600)}
+function red(txt,mal){["redSala","redJuego"].forEach(i=>{const e=$(i);e.textContent=txt||"";e.classList.toggle("mal",!!mal)})}
+const nuevoCodigo=()=>Array.from({length:4},()=>"ABCDEFGHJKLMNPQRSTUVWXYZ"[Math.floor(Math.random()*24)]).join("");
+let cerrojo=null;async function prendida(){try{if("wakeLock" in navigator&&!cerrojo){cerrojo=await navigator.wakeLock.request("screen");cerrojo.addEventListener("release",()=>cerrojo=null)}}catch(e){}}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")prendida()});
+
+// ---- letra grande (de cada celu) ----
+let GRANDE=!!leer("estampame-grande",false);
+function ponerLetra(){document.documentElement.classList.toggle("grande",GRANDE);$("bLetraInicio").textContent="🔍 Letra grande: "+(GRANDE?"prendida":"apagada");$("bLetra").textContent=GRANDE?"A−":"A+";pintarPaleta()}
+function cambiarLetra(){GRANDE=!GRANDE;grabar("estampame-grande",GRANDE);ponerLetra();if(ULT)mostrar(ULT)}
+$("bLetraInicio").onclick=cambiarLetra;$("bLetra").onclick=cambiarLetra;
+
+// ================== ANFITRIÓN: arma la partida, aplica las reglas y lleva el reloj ==================
+let H=null; // {codigo, cfg, jugadores:[{id,nombre}], G, fin, clave}
+let peer=null;const conns=new Map();const enviadas=new Map(); // id -> conn ; id -> Set de dibujos ya mandados
+const BANCO={banco:window.Banco};
+
+let tGuardar;function guardarHost(){clearTimeout(tGuardar);tGuardar=setTimeout(()=>{if(H&&!grabar("estampame-host",{...H,ts:Date.now()})){const G=H.G?{...H.G,imgs:{}}:null;grabar("estampame-host",{...H,G,ts:Date.now()})}},400)}
+function armarPartida(){
+  const nombre=$("nombre").value.trim();if(!nombre){$("errInicio").textContent="Poné tu nombre primero";$("nombre").focus();return}
+  H={codigo:nuevoCodigo(),cfg:{...cfgArmar},jugadores:[{id:MI_ID,nombre}],G:null,fin:null,clave:""};
+  guardarHost();abrirHost(true);
+}
+function abrirHost(nueva){
+  history.replaceState(null,"",conSrv("?sala="+H.codigo));
+  difundir();red("Abriendo la partida…");
+  if(peer)try{peer.destroy()}catch(e){}
+  peer=new Peer(PREF+H.codigo,opcionesPeer());
+  peer.on("open",()=>red(""));
+  peer.on("connection",conn=>{
+    conn.on("data",d=>alRecibirHost(conn,d));
+    conn.on("close",()=>{for(const [id,c] of conns)if(c===conn){conns.delete(id);difundir();revisar()}});
+  });
+  peer.on("disconnected",()=>{red("Reconectando…",true);setTimeout(()=>{try{peer.reconnect()}catch(e){}},1500)});
+  peer.on("error",e=>{
+    if(e.type==="unavailable-id"){
+      if(nueva&&!H.G&&H.jugadores.length===1){H.codigo=nuevoCodigo();guardarHost();abrirHost(true)}
+      else{red("Recuperando la partida…",true);setTimeout(()=>abrirHost(false),3000)}
+    }else if(["network","server-error","socket-error","socket-closed"].includes(e.type)){red("Sin conexión con el servidor. Reintentando…",true);setTimeout(()=>abrirHost(false),4000)}
+  });
+  arrancarReloj();
+}
+function alRecibirHost(conn,d){
+  if(!d||typeof d!=="object")return;
+  if(d.t==="hola"){
+    const nombre=String(d.nombre||"").trim().slice(0,14)||"Sin nombre";
+    let j=H.jugadores.find(x=>x.id===d.id);
+    if(!j){
+      if(H.jugadores.length>=MAX_JUG){conn.send({t:"error",txt:"La partida está completa"});return}
+      j={id:d.id,nombre};H.jugadores.push(j);
+      if(H.G)Motor.sumar(H.G,d.id,nombre);
+    }else if(!H.G)j.nombre=nombre;
+    const vieja=conns.get(d.id);if(vieja&&vieja!==conn)try{vieja.close()}catch(e){}
+    conns.set(d.id,conn);enviadas.set(d.id,new Set());guardarHost();difundir();revisar();return;
+  }
+  const id=[...conns].find(([k,c])=>c===conn)?.[0];if(!id)return;
+  if(d.t==="acc")hacer(id,d.a,conn);
+  else if(d.t==="chau"){conns.delete(id);if(!H.G)H.jugadores=H.jugadores.filter(x=>x.id!==id);guardarHost();difundir()}
+}
+function presentes(){return H.jugadores.map(j=>j.id).filter(id=>id===MI_ID||(conns.has(id)&&conns.get(id).open))}
+function hacer(id,a,conn){
+  if(!H.G||!a)return;
+  const err=Motor.accion(H.G,id,a);
+  if(err){if(conn)conn.send({t:"error",txt:err});else avisar(err);return}
+  guardarHost();difundir();revisar();
+}
+function empezar(){
+  if(H.G||H.jugadores.length<MIN_JUG)return;
+  H.G=Motor.nueva(H.cfg,H.jugadores,BANCO);H.clave="";
+  guardarHost();revisar();difundir();
+}
+function otraRonda(){if(!H.G)return;H.G.cfg={...H.G.cfg,...H.cfg};Motor.otraRonda(H.G,BANCO);H.clave="";guardarHost();revisar();difundir()}
+function forzar(){if(!H.G)return;Motor.avanzar(H.G,BANCO);guardarHost();revisar();difundir()}
+
+// Reloj: cada etapa tiene su tiempo según el ritmo. Si todos terminaron, pasa sola.
+function claveDe(G){const d=Motor.dueloActual(G);return G.ronda+":"+G.fase+(G.fase==="duelo"&&d?":"+G.torneo.r+"."+G.torneo.i+"."+d.estado:"")+(G.fase==="vitrina"?":"+G.vitrina.estado:"")}
+function duracion(G){
+  const R=Motor.RITMOS[G.cfg.ritmo],L=Motor.LARGOS[G.cfg.largo];
+  if(G.fase==="dibujo")return R.dib&&R.dib*L.dib;
+  if(G.fase==="frases")return R.fra&&Math.round(R.fra*L.fra/3);
+  if(G.fase==="armado")return R.arm;
+  if(G.fase==="duelo")return Motor.dueloActual(G).estado==="votar"?R.voto:(R.res||null);
+  if(G.fase==="vitrina")return G.vitrina.estado==="votar"?R.voto&&R.voto*3:(R.res&&R.res*2);
+  return null;
+}
+let tTodos=null;
+function revisar(){
+  if(!H||!H.G)return;const G=H.G,k=claveDe(G);
+  if(k!==H.clave){H.clave=k;const s=duracion(G);H.fin=s?Date.now()+s*1000:null;clearTimeout(tTodos);tTodos=null;guardarHost()}
+  const enEspera=G.fase==="dibujo"||G.fase==="frases"||G.fase==="armado"||(G.fase==="duelo"&&Motor.dueloActual(G).estado==="votar")||(G.fase==="vitrina"&&G.vitrina.estado==="votar");
+  if(enEspera&&Motor.pendientes(G,presentes()).length===0&&!tTodos){
+    const clave=k;tTodos=setTimeout(()=>{tTodos=null;if(H&&H.G&&claveDe(H.G)===clave&&Motor.pendientes(H.G,presentes()).length===0)forzar()},G.fase==="duelo"?900:600);
+  }
+}
+let tReloj=null;
+function arrancarReloj(){clearInterval(tReloj);tReloj=setInterval(()=>{
+  if(!H||!H.G||!H.fin)return;
+  const G=H.G,gracia=G.fase==="dibujo"||G.fase==="frases"||G.fase==="armado"?2500:0; // los celus mandan lo que tenían al vencer
+  if(Date.now()>H.fin+gracia){H.fin=null;forzar()}
+},400)}
+function sala(){return {codigo:H.codigo,cfg:H.cfg,arrancada:!!H.G,host:MI_ID,jugadores:H.jugadores.map(j=>({id:j.id,nombre:j.nombre,on:j.id===MI_ID||conns.has(j.id)}))}}
+function difundir(){
+  const sl=sala(),P=H.G?presentes():null,resta=H.fin?Math.max(0,H.fin-Date.now()):null;
+  for(const [id,c] of conns){
+    if(!c.open)continue;
+    const v=H.G?Motor.vista(H.G,id,P):null,imgs={};
+    if(v){const ya=enviadas.get(id)||new Set();enviadas.set(id,ya);for(const i of v.imgs)if(!ya.has(i)&&H.G.imgs[i]){imgs[i]=H.G.imgs[i];ya.add(i)}}
+    try{c.send({t:"estado",sala:sl,v,resta,imgs})}catch(e){}
+  }
+  mostrar({sala:sl,v:H.G?Motor.vista(H.G,MI_ID,P):null,resta,imgs:{}});
+}
+
+// ================== INVITADO ==================
+let C=null;
+function unirme(codigo){
+  const nombre=$("nombre").value.trim();if(!nombre){$("errInicio").textContent="Poné tu nombre primero";$("nombre").focus();return}
+  codigo=codigo.toUpperCase().replace(/[^A-Z]/g,"");if(codigo.length!==4){$("errInicio").textContent="El código tiene 4 letras";return}
+  C={codigo,conn:null};grabar("estampame-invitado",{codigo,ts:Date.now()});
+  history.replaceState(null,"",conSrv("?sala="+codigo));
+  pantalla("pSala");$("salaCodigo").textContent=codigo;$("salaEstado").textContent="Buscando la partida…";$("salaJug").innerHTML="";$("qr").innerHTML="";
+  if(peer)try{peer.destroy()}catch(e){}
+  peer=new Peer(opcionesPeer());
+  peer.on("open",conectar);
+  peer.on("disconnected",()=>setTimeout(()=>{try{peer.reconnect()}catch(e){}},1500));
+  peer.on("error",e=>{
+    if(e.type==="peer-unavailable")red(C&&C.visto?"Se cortó con la partida. Reintentando…":"No encuentro la partida "+(C?C.codigo:"")+". Reintentando…",true);
+    else if(["network","server-error","socket-error","socket-closed"].includes(e.type))red("Sin conexión. Reintentando…",true);
+  });
+}
+let tReint=null;
+function conectar(){
+  if(!C)return;clearTimeout(tReint);
+  if(C.conn)try{C.conn.close()}catch(e){}
+  const conn=peer.connect(PREF+C.codigo,{reliable:true});C.conn=conn;
+  const vigia=setTimeout(()=>{if(!conn.open){try{conn.close()}catch(e){}reintentar()}},7000);
+  conn.on("open",()=>{clearTimeout(vigia);red("");conn.send({t:"hola",id:MI_ID,nombre:$("nombre").value.trim()||leer("estampame-nombre","")})});
+  conn.on("data",d=>{
+    if(!d||!C)return;C.visto=true;
+    if(d.t==="estado")mostrar(d);
+    else if(d.t==="error"){avisar(d.txt);if(/completa/.test(d.txt)&&!ULT){salir(true);$("errInicio").textContent=d.txt}}
+  });
+  conn.on("close",()=>{clearTimeout(vigia);if(C&&C.conn===conn){red("Se cortó con la partida. Reconectando…",true);reintentar()}});
+  conn.on("error",()=>{});
+}
+function reintentar(){clearTimeout(tReint);tReint=setTimeout(()=>{if(!C||!peer)return;if(peer.disconnected)try{peer.reconnect()}catch(e){};conectar()},2500)}
+function enviar(a){
+  if(H){hacer(MI_ID,a,null);return}
+  if(C&&C.conn&&C.conn.open)C.conn.send({t:"acc",a});else avisar("Sin conexión con la partida");
+}
+
+// ================== PANTALLAS ==================
+const IMGS={};const imgDe=id=>id&&(IMGS[id]||(H&&H.G&&H.G.imgs[id]))||null;let ULT=null,finLocal=null,ultClave="";
+const soyHost=()=>!!H;
+function mostrar(d){
+  ULT=d;Object.assign(IMGS,d.imgs||{});
+  const sl=d.sala,v=d.v;
+  if(!v){pintarSala(sl);pantalla("pSala");return}
+  finLocal=d.resta!=null?Date.now()+d.resta:null;
+  pantalla("pJuego");prendida();
+  const clave=v.ronda+v.fase+(v.duelo?v.duelo.n+v.duelo.etapa+v.duelo.estado:"")+(v.vitrina?v.vitrina.estado:"");
+  const nueva=clave!==ultClave;if(nueva){ultClave=clave;vibrar(40);scrollTo(0,0)}
+  ["eDibujo","eFrases","eArmado","eVitrina","eDuelo","ePodio"].forEach(e=>$(e).classList.toggle("on",e==={dibujo:"eDibujo",frases:"eFrases",armado:"eArmado",vitrina:"eVitrina",duelo:"eDuelo",podio:"ePodio"}[v.fase]));
+  const nom={dibujo:"Dibujá",frases:"Escribí frases",armado:"Armá tu remera",vitrina:"La vitrina",duelo:v.duelo?v.duelo.etapa:"Duelo",podio:"Resultado"}[v.fase];
+  let det="Ronda "+v.ronda;
+  if(v.fase==="dibujo"||v.fase==="frases")det=`Llevás ${Math.min(v.hechos,v.meta)} de ${v.meta}`;
+  if(v.fase==="duelo")det=`Duelo ${v.duelo.n} de ${v.duelo.de}`;
+  if(v.fase==="vitrina")det=`Pasan ${v.vitrina.cupo} al torneo`;
+  $("etapa").innerHTML=`${esc(nom)}<small>${esc(det)}</small>`;
+  ({dibujo:pintarDibujo,frases:pintarFrases,armado:pintarArmado,vitrina:pintarVitrina,duelo:pintarDuelo,podio:pintarPodio})[v.fase](v,nueva);
+  pintarEspera(v,sl);
+  tic();
+}
+function pintarSala(sl){
+  $("salaCodigo").textContent=sl.codigo;
+  const link=location.href.split("?")[0]+conSrv("?sala="+sl.codigo);
+  if($("qr").dataset.l!==link){try{const q=qrcode(0,"M");q.addData(link);q.make();$("qr").innerHTML=q.createSvgTag({cellSize:5,margin:2,scalable:true})}catch(e){}$("qr").dataset.l=link}
+  $("salaCant").textContent=`(${sl.jugadores.length} de ${MAX_JUG})`;
+  $("salaJug").innerHTML=sl.jugadores.map(j=>`<div class="jugador${j.on?"":" off"}${j.id===MI_ID?" yo":""}">${j.id===sl.host?"👑 ":""}${esc(j.nombre)}${j.id===MI_ID?" <small>(vos)</small>":""}</div>`).join("");
+  $("salaCfgHost").hidden=!soyHost();
+  if(soyHost())pintarCfg();
+  $("salaCfg").textContent=resumenCfg(sl.cfg);
+  $("salaCfg").hidden=soyHost();
+  const falta=MIN_JUG-sl.jugadores.length;
+  $("btnEmpezar").hidden=!soyHost();$("btnEmpezar").disabled=falta>0;
+  $("salaEstado").innerHTML=falta>0?`Faltan <b>${falta}</b> para arrancar (mínimo ${MIN_JUG})`:soyHost()?"Cuando estén todos, tocá Empezar":"Esperando que empiece el que armó la partida";
+}
+const NOM={largo:{corta:"Corta",normal:"Normal",larga:"Larga"},ritmo:{tranqui:"sin reloj",normal:"ritmo normal",picante:"apurada"},consignas:{libre:"dibujo libre",consigna:"con consigna",dificil:"consignas difíciles"},contenido:{atp:"ATP",adultos:"+18",mezcla:"ATP y +18"}};
+const resumenCfg=c=>`${NOM.largo[c.largo]} · ${NOM.ritmo[c.ritmo]} · ${NOM.consignas[c.consignas]} · ${NOM.contenido[c.contenido]}`;
+function pintarCfg(){
+  document.querySelectorAll("#salaCfgHost .selector").forEach(s=>s.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.v===H.cfg[s.dataset.k])));
+  const L=Motor.LARGOS[H.cfg.largo],R=Motor.RITMOS[H.cfg.ritmo];
+  $("notaLargo").textContent=`Cada uno hace ${L.dib} ${L.dib>1?"dibujos":"dibujo"} y ${L.fra} frases.`;
+  $("notaRitmo").textContent=R.dib?`${R.dib} s por dibujo, ${R.voto} s para votar cada duelo.`:"Sin reloj: se pasa cuando terminan todos. Ideal para la abuela.";
+  $("notaCons").textContent={libre:"Cada uno dibuja lo que quiere.",consigna:"A cada uno le toca algo para dibujar.",dificil:"Consignas mezcladas y rebuscadas, del tipo «un tero haciendo yoga en la Luna»."}[H.cfg.consignas];
+}
+document.querySelectorAll("#salaCfgHost .selector").forEach(s=>s.onclick=e=>{
+  const b=e.target.closest("button");if(!b||!H||H.G)return;
+  H.cfg[s.dataset.k]=b.dataset.v;cfgArmar={...H.cfg};grabar("estampame-cfg",cfgArmar);guardarHost();difundir();
+});
+function nombreDe(id){const j=ULT&&ULT.v&&ULT.v.jug.find(x=>x.id===id);return j?j.nombre:""}
+function pintarEspera(v,sl){
+  const enEspera=v.fase==="dibujo"||v.fase==="frases"||v.fase==="armado";
+  let txt="";
+  if(enEspera){
+    const yoListo=(v.jug.find(j=>j.id===MI_ID)||{}).listo;
+    txt=yoListo?(v.faltan?`Listo. Faltan <b>${v.faltan}</b>…`:"Listo. Ya pasamos…"):"";
+    $("listos").innerHTML=v.jug.filter(j=>j.on).map(j=>`<span class="${j.listo?"si":""}">${j.listo?"✓ ":""}${esc(j.nombre)}</span>`).join("");
+  }else $("listos").innerHTML="";
+  if(v.fase==="duelo"&&v.duelo.estado==="votar"){
+    txt=!v.duelo.puedo?"Una de estas es tuya: esta no la votás.":v.duelo.miVoto?"Voto guardado. Podés cambiarlo.":"Tocá la que más te guste.";
+    txt+=`<br><small>Votaron ${v.duelo.votaron} de ${v.duelo.votantes}</small>`;
+  }
+  if(v.fase==="vitrina"){const V=v.vitrina;
+    if(V.estado==="votar")txt=(V.miVoto?"Voto guardado. Podés cambiarlo.":"Tocá tu favorita (la tuya no se puede).")+`<br><small>Votaron ${V.votaron} de ${V.votantes}</small>`;
+    else if(!finLocal&&!soyHost())txt=`Esperando que ${esc(nombreDe(sl.host))} arranque el torneo`;}
+  if(v.fase==="duelo"&&v.duelo.estado==="res"&&!finLocal)txt=soyHost()?"":`Esperando que ${esc(nombreDe(sl.host))} pase al siguiente`;
+  $("espera").innerHTML=txt;
+  const b=$("bSeguir");
+  if(soyHost()&&v.fase==="vitrina"&&v.vitrina.estado==="res"){b.hidden=false;b.className="prin grande seguir";b.textContent="Arrancar el torneo"}
+  else if(soyHost()&&v.fase==="duelo"&&v.duelo.estado==="res"){b.hidden=false;b.className="prin grande seguir";b.textContent=v.duelo.etapa==="La final"?"Ver la campeona":"Siguiente duelo"}
+  else if(soyHost()&&v.faltan>0&&(enEspera||v.fase==="duelo"||v.fase==="vitrina")){b.hidden=false;b.className="seguir";b.textContent="Seguir sin esperar"}
+  else b.hidden=true;
+}
+$("bSeguir").onclick=()=>{if(H)forzar()};
+let tTic=null;
+function tic(){
+  clearTimeout(tTic);const r=$("reloj");
+  if(!finLocal){r.textContent="";return}
+  const s=Math.max(0,Math.ceil((finLocal-Date.now())/1000));
+  r.textContent=Math.floor(s/60)+":"+String(s%60).padStart(2,"0");r.classList.toggle("poco",s<=10);
+  if(s===0)alVencer();
+  if(s>0)tTic=setTimeout(tic,250);
+}
+let vencido="";
+function alVencer(){ // se acabó el tiempo: mando lo que tenga a medio hacer
+  const v=ULT&&ULT.v;if(!v||vencido===ultClave)return;vencido=ultClave;
+  if(v.fase==="dibujo"&&trazos.length&&v.hechos<v.meta)mandarDibujo();
+  if(v.fase==="frases"&&$("fraTxt").value.trim()&&v.hechos<v.meta)mandarFrase();
+  if(v.fase==="armado"&&v.mano&&!v.mia&&ARM.dib!==undefined&&ARM.fra)estampar();
+}
+
+// ---- remera ----
+const TELA="M62 22 L84 12 Q100 26 116 12 L138 22 L190 52 L172 92 L150 82 L150 192 L50 192 L50 82 L28 92 L10 52 Z";
+const claro=hex=>{const n=parseInt(hex.slice(1),16),r=n>>16,g=n>>8&255,b=n&255;return (r*299+g*587+b*114)/1000>150};
+function remeraHTML(r){
+  if(!r)return"";
+  const tc=claro(r.color)?"#16161a":"#f7f5f0",largo=(r.txt||"").length;
+  const img=imgDe(r.dib)?`<img src="${imgDe(r.dib)}" alt="">`:r.dib?`<div class="sinimg">⏳</div>`:"";
+  return `<div class="remera ${r.pos==="arriba"?"arriba":""}${r.txt?"":" sinfrase"}" style="--tc:${tc}">
+    <svg class="tela" viewBox="0 0 200 200"><path d="${TELA}" fill="${r.color}" stroke="#00000040" stroke-width="1.5"/><path d="M84 12 Q100 30 116 12" fill="none" stroke="${tc}" stroke-opacity=".25" stroke-width="3"/>
+    <path d="M50 82 L50 192 M150 82 L150 192" stroke="#00000020" stroke-width="1"/></svg>
+    <div class="estampa">${img}<div class="frase${largo>44?" xl":largo>24?" l":""}">${esc(r.txt)}</div></div></div>`;
+}
+function guardarRemera(r){ // la dibuja en un canvas y la baja (o la comparte)
+  const c=document.createElement("canvas"),S=1000;c.width=c.height=S;const x=c.getContext("2d");
+  x.fillStyle="#0a0f1c";x.fillRect(0,0,S,S);x.save();x.scale(S/200,S/200);x.fillStyle=r.color;x.fill(new Path2D(TELA));x.restore();
+  const tc=claro(r.color)?"#16161a":"#f7f5f0",L=S*.31,W=S*.38;
+  const fin=()=>{
+    c.toBlob(async b=>{
+      const nom="remera-"+(r.txt||"estampame").toLowerCase().replace(/[^a-z0-9ñáéíóú]+/g,"-").slice(0,30)+".png";
+      try{const f=new File([b],nom,{type:"image/png"});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:"Estampame esta"});return}}catch(e){if(e&&e.name==="AbortError")return}
+      const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=nom;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);
+    },"image/png");
+  };
+  // texto en renglones
+  const fs=r.txt.length>44?S*.029:r.txt.length>24?S*.036:S*.046;
+  x.font=`900 ${fs}px Inter,system-ui,sans-serif`;x.fillStyle=tc;x.textAlign="center";x.textBaseline="top";
+  const pal=(r.txt||"").toUpperCase().split(" "),ren=[];let act="";
+  for(const p of pal){const t=act?act+" "+p:p;if(x.measureText(t).width>W&&act){ren.push(act);act=p}else act=t}if(act)ren.push(act);
+  const altoT=ren.length*fs*1.05,img=imgDe(r.dib);
+  const altoTot=(img?W:0)+(ren.length?altoT+S*.02:0),y0=S*.24+(S*(1-.24-.09)-altoTot)/2;
+  const yImg=r.pos==="arriba"?y0+altoT+S*.02:y0,yTxt=r.pos==="arriba"?y0:y0+(img?W+S*.02:0);
+  ren.forEach((t,i)=>x.fillText(t,S/2,yTxt+i*fs*1.05));
+  if(img){const im=new Image();im.onload=()=>{x.drawImage(im,L,yImg,W,W);fin()};im.onerror=fin;im.src=img}else fin();
+}
+
+// ---- dibujo ----
+const COL_TODOS=["#16161a","#ffffff","#8d939c","#d8322f","#ff7a1a","#f2c230","#2f8f4e","#7fd1ff","#1f4fa8","#6a3fb5","#ff8fb1","#7a4a26"];
+const COL_SIMPLE=["#16161a","#ffffff","#d8322f","#f2c230","#1f4fa8","#2f8f4e"];
+let pincel={c:"#16161a",g:14,goma:false},trazos=[],actual=null;
+const lz=$("lienzo"),cx=lz.getContext("2d");
+function pintarPaleta(){
+  const cols=GRANDE?COL_SIMPLE:COL_TODOS;if(!cols.includes(pincel.c))pincel.c=cols[0];
+  $("paleta").innerHTML=cols.map(c=>`<button data-c="${c}" style="--c:${c}" class="${!pincel.goma&&pincel.c===c?"on":""}" aria-label="color"></button>`).join("");
+  document.querySelectorAll("#herr button").forEach(b=>{
+    if(b.dataset.g)b.classList.toggle("on",+b.dataset.g===pincel.g);
+    if(b.dataset.h==="goma")b.classList.toggle("on",pincel.goma);
+    if(b.dataset.g==="6")b.hidden=GRANDE;
+  });
+}
+$("paleta").onclick=e=>{const b=e.target.closest("button[data-c]");if(!b)return;pincel.c=b.dataset.c;pincel.goma=false;pintarPaleta()};
+$("herr").onclick=e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.g){pincel.g=+b.dataset.g;pintarPaleta();return}
+  if(b.dataset.h==="goma"){pincel.goma=!pincel.goma;pintarPaleta();return}
+  if(b.dataset.h==="deshacer"){trazos.pop();redibujar();return}
+  if(b.dataset.h==="borrar"){if(!trazos.length)return;if(!b.dataset.armado){b.dataset.armado=1;b.textContent="¿Seguro?";setTimeout(()=>{delete b.dataset.armado;b.textContent="Borrar"},2500);return}delete b.dataset.armado;b.textContent="Borrar";trazos=[];redibujar()}
+};
+function trazar(t){
+  cx.save();cx.globalCompositeOperation=t.goma?"destination-out":"source-over";cx.strokeStyle=t.c;cx.fillStyle=t.c;cx.lineWidth=t.g;cx.lineCap="round";cx.lineJoin="round";
+  const p=t.p;
+  if(p.length===1){cx.beginPath();cx.arc(p[0][0],p[0][1],t.g/2,0,7);cx.fill()}
+  else{cx.beginPath();cx.moveTo(p[0][0],p[0][1]);for(let i=1;i<p.length-1;i++){const mx=(p[i][0]+p[i+1][0])/2,my=(p[i][1]+p[i+1][1])/2;cx.quadraticCurveTo(p[i][0],p[i][1],mx,my)}const u=p[p.length-1];cx.lineTo(u[0],u[1]);cx.stroke()}
+  cx.restore();
+}
+function redibujar(){cx.clearRect(0,0,600,600);trazos.forEach(trazar)}
+const punto=e=>{const r=lz.getBoundingClientRect();return [Math.round((e.clientX-r.left)*600/r.width),Math.round((e.clientY-r.top)*600/r.height)]};
+lz.addEventListener("pointerdown",e=>{e.preventDefault();lz.setPointerCapture(e.pointerId);actual={c:pincel.c,g:pincel.goma?pincel.g*2:pincel.g,goma:pincel.goma,p:[punto(e)]};trazos.push(actual);redibujar()});
+lz.addEventListener("pointermove",e=>{if(!actual)return;const q=punto(e),u=actual.p[actual.p.length-1];if(Math.hypot(q[0]-u[0],q[1]-u[1])<2)return;actual.p.push(q);redibujar()});
+const soltar=()=>{actual=null};lz.addEventListener("pointerup",soltar);lz.addEventListener("pointercancel",soltar);
+function exportar(){ // 360×360 PNG transparente
+  const c=document.createElement("canvas");c.width=c.height=360;c.getContext("2d").drawImage(lz,0,0,360,360);return c.toDataURL("image/png");
+}
+function mandarDibujo(){
+  if(!trazos.length){avisar("Dibujá algo primero");return}
+  const img=exportar();trazos=[];redibujar();vibrar(25);enviar({t:"dib",img});
+}
+$("bMandarDib").onclick=mandarDibujo;
+function pintarDibujo(v,nueva){
+  const fin=v.hechos>=v.meta;
+  $("consigna").innerHTML=fin?"<small>Listo</small>Ya mandaste tus dibujos":v.consigna?`<small>Dibujá ${v.meta>1?`(${v.hechos+1} de ${v.meta})`:""}</small>${esc(v.consigna)}`:`<small>Dibujo ${v.hechos+1} de ${v.meta}</small>Lo que quieras: después alguien le pone la frase`;
+  document.querySelector("#eDibujo .lienzo").hidden=fin;$("paleta").hidden=fin;$("herr").hidden=fin;$("bMandarDib").hidden=fin;
+  document.querySelector("#eDibujo .nota").hidden=fin;
+  if(nueva){trazos=[];redibujar();pintarPaleta()}
+  $("bMandarDib").textContent=v.hechos+1<v.meta?"Listo, mandar y hacer otro":"Listo, mandar dibujo";
+}
+
+// ---- frases ----
+function mandarFrase(){const t=$("fraTxt").value.trim();if(!t){avisar("Escribí una frase");return}$("fraTxt").value="";$("fraCuenta").textContent="0/70";vibrar(20);enviar({t:"fra",txt:t})}
+$("bMandarFra").onclick=mandarFrase;
+$("fraTxt").onkeydown=e=>{if(e.key==="Enter")mandarFrase()};
+$("fraTxt").oninput=()=>$("fraCuenta").textContent=$("fraTxt").value.length+"/70";
+$("bIdea").onclick=()=>{
+  const c=ULT&&ULT.v?ULT.v.cfg.contenido:"atp",B=window.Banco;
+  const lista=[...(c!=="adultos"?B.frases:[]),...(c!=="atp"?B.frasesAdultos:[])];
+  $("fraTxt").value=lista[Math.floor(Math.random()*lista.length)];$("fraTxt").oninput();$("fraTxt").focus();
+};
+function pintarFrases(v,nueva){
+  const fin=v.hechos>=v.meta;
+  $("fraTxt").hidden=fin;$("bMandarFra").parentNode.hidden=fin;$("fraCuenta").hidden=fin;
+  $("bMandarFra").textContent=`Mandar frase (${Math.min(v.hechos+1,v.meta)} de ${v.meta})`;
+  $("fraMias").innerHTML=v.mias.map(t=>`<div>✓ ${esc(t)}</div>`).join("");
+  if(nueva&&!fin)setTimeout(()=>$("fraTxt").focus(),150);
+}
+
+// ---- armado ----
+let ARM={};
+function pintarArmado(v,nueva){
+  if(nueva||!ARM.ok){ARM={ok:true,dib:v.mano&&v.mano.dib.length?v.mano.dib[0]:null,fra:null,color:v.colores[0],pos:"abajo"}}
+  if(!v.mano){$("armVista").innerHTML="";$("armCtrl").hidden=true;return}
+  if(v.mia){$("armVista").innerHTML=remeraHTML(v.mia);$("armCtrl").hidden=true;return}
+  $("armCtrl").hidden=false;
+  const fraTxt=(v.mano.fra.find(f=>f.id===ARM.fra)||{}).txt||"";
+  $("armVista").innerHTML=remeraHTML({dib:ARM.dib,txt:fraTxt||"(elegí una frase)",color:ARM.color,pos:ARM.pos});
+  $("armDib").innerHTML=v.mano.dib.length?v.mano.dib.map(id=>`<button class="pieza${ARM.dib===id?" on":""}" data-id="${id}">${imgDe(id)?`<img src="${imgDe(id)}" alt="">`:"⏳"}</button>`).join(""):'<p class="nota">Esta vez no hubo dibujos: va solo la frase.</p>';
+  $("armFra").innerHTML=v.mano.fra.map(f=>`<button data-id="${f.id}" class="${ARM.fra===f.id?"on":""}">${esc(f.txt)}</button>`).join("");
+  $("armCol").innerHTML=v.colores.map(c=>`<button data-c="${c}" style="--c:${c}" class="${ARM.color===c?"on":""}" aria-label="color"></button>`).join("");
+  $("armPos").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.v===ARM.pos));
+  $("bEstampar").disabled=!ARM.fra;
+}
+const reArmar=()=>ULT&&ULT.v&&pintarArmado(ULT.v,false);
+$("armDib").onclick=e=>{const b=e.target.closest("[data-id]");if(b){ARM.dib=b.dataset.id;reArmar()}};
+$("armFra").onclick=e=>{const b=e.target.closest("[data-id]");if(b){ARM.fra=b.dataset.id;reArmar()}};
+$("armCol").onclick=e=>{const b=e.target.closest("[data-c]");if(b){ARM.color=b.dataset.c;reArmar()}};
+$("armPos").onclick=e=>{const b=e.target.closest("[data-v]");if(b){ARM.pos=b.dataset.v;reArmar()}};
+function estampar(){if(!ARM.fra){avisar("Elegí una frase");return}vibrar(30);enviar({t:"rem",dib:ARM.dib,fra:ARM.fra,color:ARM.color,pos:ARM.pos})}
+$("bEstampar").onclick=estampar;
+
+// ---- vitrina: con mucha gente, todos votan su favorita y pasan las más votadas al torneo ----
+function pintarVitrina(v){
+  const V=v.vitrina,res=V.estado==="res";
+  $("vitCartel").textContent=res?`Pasan al torneo las ${V.cupo} más votadas`:`Votá tu favorita: pasan ${V.cupo} al torneo`;
+  $("vitGal").innerHTML=V.rems.map(r=>{
+    const cl=res?(r.pasa?" pasa":" queda"):(r.mia?" mia":V.miVoto===r.id?" voto":"");
+    const eti=res?`${r.pasa?"✓ Pasa":"Queda afuera"} · ${r.votos} ${r.votos===1?"voto":"votos"}`:r.mia?"La tuya":V.miVoto===r.id?"✓ Tu voto":"Tocá para votar";
+    return `<div class="it${cl}" data-rem="${r.id}">${remeraHTML(r)}<div class="eti">${eti}</div></div>`;
+  }).join("");
+}
+$("vitGal").onclick=e=>{
+  const it=e.target.closest("[data-rem]");const v=ULT&&ULT.v;if(!it||!v||v.fase!=="vitrina"||v.vitrina.estado!=="votar")return;
+  const r=v.vitrina.rems.find(x=>x.id===it.dataset.rem);if(!r||r.mia||v.vitrina.miVoto===r.id)return;
+  vibrar(20);enviar({t:"vitrina",rem:r.id});
+};
+
+// ---- duelo ----
+function credHTML(r){
+  if(!r||!r.cred)return"";const c=r.cred;
+  return `<div class="cred">La armó <b>${esc(c.armo)}</b>${c.dibujo?` · dibujo de <b>${esc(c.dibujo)}</b>`:""} · frase de <b>${esc(c.frase)}</b>${c.consigna?`<br><i>Consigna: ${esc(c.consigna)}</i>`:""}</div>`;
+}
+function pintarDuelo(v){
+  const d=v.duelo,res=d.estado==="res";
+  $("dueloCartel").textContent=res?(d.empate?"¡Empate! Lo definió la moneda":"¡Gana la "+(d.gana==="a"?"naranja":"azul")+"!"):d.etapa==="La final"?"¡La final! ¿Cuál es la campeona?":"¿Cuál te pondrías?";
+  const lado=k=>{
+    const r=d[k],voto=d.miVoto===k,cl=res?(d.gana===k?" gana":" pierde"):(voto?" voto":"");
+    let pie="";
+    if(res)pie=`<div class="res"><div class="n">${d["v"+k]}</div>${d["v"+k]===1?"voto":"votos"}</div>${credHTML(r)}<div class="quienes">${d.quienes[k].length?"Votaron: "+esc(d.quienes[k].join(", ")):""}</div>`;
+    else if(d.puedo)pie=`<button class="${voto?"on":""}" data-lado="${k}">${voto?"✓ Votada":"Esta"}</button>`;
+    return `<div class="lado ${k}${cl}" data-lado="${k}">${remeraHTML(r)}${pie}</div>`;
+  };
+  $("ring").innerHTML=lado("a")+(res?"":'<div class="vs">VS</div>')+lado("b");
+}
+$("ring").onclick=e=>{
+  const l=e.target.closest("[data-lado]");const v=ULT&&ULT.v;if(!l||!v||v.fase!=="duelo"||v.duelo.estado!=="votar"||!v.duelo.puedo)return;
+  if(v.duelo.miVoto===l.dataset.lado)return;vibrar(20);enviar({t:"voto",lado:l.dataset.lado});
+};
+
+// ---- podio ----
+function pintarPodio(v){
+  const c=v.campeona;
+  $("podioTit").textContent=c?"🏆 La remera campeona":"No hubo remeras esta vez";
+  $("podioCamp").innerHTML=c?remeraHTML(c):"";
+  $("podioCred").innerHTML=c?credHTML(c)+`<button class="chico" data-g="${c.id}" style="margin-top:6px">💾 Guardar imagen</button>`:"";
+  const tabla=[...v.jug].sort((a,b)=>b.pts-a.pts);
+  $("podioTabla").innerHTML=tabla.map((j,i)=>`<div class="${j.id===MI_ID?"yo":""}"><span>${["🥇","🥈","🥉"][i]||i+1+"."} ${esc(j.nombre)}</span><b>${j.pts}</b></div>`).join("");
+  $("podioGal").innerHTML=v.galeria.map(r=>`<div class="it">${remeraHTML(r)}${credHTML(r)}<button data-g="${r.id}">💾 Guardar</button></div>`).join("");
+  $("bOtra").hidden=!soyHost();
+}
+$("ePodio").onclick=e=>{const b=e.target.closest("[data-g]");if(!b||!ULT||!ULT.v)return;const r=ULT.v.galeria.find(x=>x.id===b.dataset.g);if(r)guardarRemera(r)};
+$("bOtra").onclick=()=>{if(H)otraRonda()};
+
+// ---- salir ----
+function salir(confirmado){
+  if(!confirmado){const b=$("btnSalirJuego");if(!b.dataset.armado){b.dataset.armado=1;b.textContent="¿Seguro? Tocá de nuevo para salir";setTimeout(()=>{delete b.dataset.armado;b.textContent="Salir de la partida"},3000);return}}
+  if(C&&C.conn&&C.conn.open)try{C.conn.send({t:"chau"})}catch(e){}
+  if(H)borrar("estampame-host");else borrar("estampame-invitado");
+  try{peer&&peer.destroy()}catch(e){}
+  clearInterval(tReloj);clearTimeout(tTic);
+  peer=null;H=null;C=null;conns.clear();ULT=null;finLocal=null;ultClave="";
+  history.replaceState(null,"",location.pathname+conSrv(""));
+  iniciar();
+}
+
+// ================== INICIO ==================
+$("nombre").value=leer("estampame-nombre","")||leer("truco-mesa-nombre","");
+$("nombre").oninput=()=>{grabar("estampame-nombre",$("nombre").value.trim());$("errInicio").textContent=""};
+$("btnArmar").onclick=armarPartida;
+$("btnUnirme").onclick=()=>unirme($("codigo").value);
+$("codigo").onkeydown=e=>{if(e.key==="Enter")unirme($("codigo").value)};
+$("btnEmpezar").onclick=()=>{if(H)empezar()};
+$("btnSalirSala").onclick=()=>salir(true);
+$("btnSalirJuego").onclick=()=>salir(false);
+$("btnCompartir").onclick=async()=>{
+  const link=$("qr").dataset.l||location.href;
+  try{if(navigator.share){await navigator.share({title:"Estampame esta",text:"Sumate a armar remeras",url:link});return}}catch(e){return}
+  location.href="https://wa.me/?text="+encodeURIComponent("Sumate a armar remeras: "+link);
+};
+$("btnVolver").onclick=()=>{const g=leer("estampame-host",null);if(g){H=g;abrirHost(false)}};
+function iniciar(){
+  pantalla("pInicio");
+  const g=leer("estampame-host",null),fresco=g&&Date.now()-g.ts<12*3600e3;
+  $("volverMesa").hidden=!fresco;
+  if(fresco)$("btnVolver").textContent="Volver a tu partida "+g.codigo;
+}
+ponerLetra();
+(function arranque(){
+  const m=(params.get("sala")||"").toUpperCase();
+  const g=leer("estampame-host",null);
+  if(m&&g&&g.codigo===m){H=g;abrirHost(false);return}
+  iniciar();
+  if(m){$("codigo").value=m;if($("nombre").value.trim())unirme(m);else{$("errInicio").textContent="Poné tu nombre y tocá Sumarme";$("nombre").focus()}}
+})();
+</script>
+<script src="../../inicio.js"></script>
+<script>if("serviceWorker" in navigator)navigator.serviceWorker.register("../../sw.js",{scope:"../../"});</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 // Service worker de la Juegoteca.
 // Al agregar un juego propio nuevo, sumá su carpeta a PROPIOS y subí VERSION.
-const VERSION = "v13";
+const VERSION = "v14";
 const CACHE = "juegoteca-" + VERSION;
 const PROPIOS = [
   "./",
@@ -35,7 +35,10 @@ const PROPIOS = [
   "juegos/ajedrez/",
   "juegos/comun/cartas-propias.js",
   "juegos/comun/tema.css",
-  "juegos/comun/tema.js"
+  "juegos/comun/tema.js",
+  "juegos/estampame/",
+  "juegos/estampame/motor.js",
+  "juegos/estampame/banco.js"
 ];
 
 self.addEventListener("install", e => {
