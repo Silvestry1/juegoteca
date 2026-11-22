@@ -145,6 +145,17 @@ html.grande .vs{display:none}
 .quienes{font-size:.75rem;color:var(--sub);text-align:center}
 .cartel{text-align:center;font-weight:900;font-size:1.25rem;color:var(--acc2)}
 
+/* vitrina */
+.vitrina .it{cursor:pointer;border:3px solid transparent}
+.vitrina .it.voto{border-color:var(--acc);box-shadow:0 0 14px #ff7a1a66}
+.vitrina .it.mia{opacity:.55;cursor:default}
+.vitrina .it.pasa{border-color:var(--ok)}
+.vitrina .it.queda{opacity:.4}
+.vitrina .eti{text-align:center;font-weight:800;font-size:.85rem;color:var(--sub)}
+.vitrina .it.voto .eti{color:var(--acc)}
+.vitrina .it.pasa .eti{color:var(--ok)}
+html.grande .galeria.vitrina{grid-template-columns:1fr 1fr}
+
 /* podio */
 .campeona{width:min(100%,380px);align-self:center}
 .tabla{display:flex;flex-direction:column;gap:5px}
@@ -192,7 +203,7 @@ html.grande .vs{display:none}
       <li><b>Torneo.</b> Las remeras se enfrentan de a dos sin decir de quién son. Votan todos menos los dueños de esas dos. La que gana sigue hasta la final.</li>
       <li><b>Puntos.</b> Cada voto: 100 al que armó la remera, 50 al que dibujó y 50 al de la frase. Ganar un duelo y ser la campeona suma extra.</li>
     </ol>
-    <p class="nota">De 3 a 12 jugadores. Todos necesitan internet (wifi o datos): los celus se conectan directo entre ellos, sin cuentas.</p>
+    <p class="nota">De 3 a 20 jugadores. Con más de 8, antes del torneo se vota en la vitrina y pasan las 8 remeras más votadas. Todos necesitan internet (wifi o datos): los celus se conectan directo entre ellos, sin cuentas.</p>
   </details>
 </section>
 
@@ -277,6 +288,12 @@ html.grande .vs{display:none}
     </div>
   </div>
 
+  <!-- vitrina (con mucha gente) -->
+  <div class="pantalla" id="eVitrina">
+    <div class="cartel" id="vitCartel"></div>
+    <div class="galeria vitrina" id="vitGal"></div>
+  </div>
+
   <!-- duelo -->
   <div class="pantalla" id="eDuelo">
     <div class="cartel" id="dueloCartel"></div>
@@ -317,7 +334,7 @@ const vibrar=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
 const PREF="juegoteca-estampame-";
 const params=new URLSearchParams(location.search);
 const MI_ID=leer("estampame-id",null)||(()=>{const v=Math.random().toString(36).slice(2,10)+Date.now().toString(36);grabar("estampame-id",v);return v})();
-const MAX_JUG=12,MIN_JUG=3;
+const MAX_JUG=20,MIN_JUG=3;
 let cfgArmar=Object.assign({largo:"normal",ritmo:"normal",consignas:"consigna",contenido:"atp"},leer("estampame-cfg",{}));
 
 function opcionesPeer(){
@@ -402,20 +419,21 @@ function otraRonda(){if(!H.G)return;H.G.cfg={...H.G.cfg,...H.cfg};Motor.otraRond
 function forzar(){if(!H.G)return;Motor.avanzar(H.G,BANCO);guardarHost();revisar();difundir()}
 
 // Reloj: cada etapa tiene su tiempo según el ritmo. Si todos terminaron, pasa sola.
-function claveDe(G){const d=Motor.dueloActual(G);return G.ronda+":"+G.fase+(G.fase==="duelo"&&d?":"+G.torneo.r+"."+G.torneo.i+"."+d.estado:"")}
+function claveDe(G){const d=Motor.dueloActual(G);return G.ronda+":"+G.fase+(G.fase==="duelo"&&d?":"+G.torneo.r+"."+G.torneo.i+"."+d.estado:"")+(G.fase==="vitrina"?":"+G.vitrina.estado:"")}
 function duracion(G){
   const R=Motor.RITMOS[G.cfg.ritmo],L=Motor.LARGOS[G.cfg.largo];
   if(G.fase==="dibujo")return R.dib&&R.dib*L.dib;
   if(G.fase==="frases")return R.fra&&Math.round(R.fra*L.fra/3);
   if(G.fase==="armado")return R.arm;
   if(G.fase==="duelo")return Motor.dueloActual(G).estado==="votar"?R.voto:(R.res||null);
+  if(G.fase==="vitrina")return G.vitrina.estado==="votar"?R.voto&&R.voto*3:(R.res&&R.res*2);
   return null;
 }
 let tTodos=null;
 function revisar(){
   if(!H||!H.G)return;const G=H.G,k=claveDe(G);
   if(k!==H.clave){H.clave=k;const s=duracion(G);H.fin=s?Date.now()+s*1000:null;clearTimeout(tTodos);tTodos=null;guardarHost()}
-  const enEspera=G.fase==="dibujo"||G.fase==="frases"||G.fase==="armado"||(G.fase==="duelo"&&Motor.dueloActual(G).estado==="votar");
+  const enEspera=G.fase==="dibujo"||G.fase==="frases"||G.fase==="armado"||(G.fase==="duelo"&&Motor.dueloActual(G).estado==="votar")||(G.fase==="vitrina"&&G.vitrina.estado==="votar");
   if(enEspera&&Motor.pendientes(G,presentes()).length===0&&!tTodos){
     const clave=k;tTodos=setTimeout(()=>{tTodos=null;if(H&&H.G&&claveDe(H.G)===clave&&Motor.pendientes(H.G,presentes()).length===0)forzar()},G.fase==="duelo"?900:600);
   }
@@ -485,15 +503,16 @@ function mostrar(d){
   if(!v){pintarSala(sl);pantalla("pSala");return}
   finLocal=d.resta!=null?Date.now()+d.resta:null;
   pantalla("pJuego");prendida();
-  const clave=v.ronda+v.fase+(v.duelo?v.duelo.n+v.duelo.etapa+v.duelo.estado:"");
+  const clave=v.ronda+v.fase+(v.duelo?v.duelo.n+v.duelo.etapa+v.duelo.estado:"")+(v.vitrina?v.vitrina.estado:"");
   const nueva=clave!==ultClave;if(nueva){ultClave=clave;vibrar(40);scrollTo(0,0)}
-  ["eDibujo","eFrases","eArmado","eDuelo","ePodio"].forEach(e=>$(e).classList.toggle("on",e==={dibujo:"eDibujo",frases:"eFrases",armado:"eArmado",duelo:"eDuelo",podio:"ePodio"}[v.fase]));
-  const nom={dibujo:"Dibujá",frases:"Escribí frases",armado:"Armá tu remera",duelo:v.duelo?v.duelo.etapa:"Duelo",podio:"Resultado"}[v.fase];
+  ["eDibujo","eFrases","eArmado","eVitrina","eDuelo","ePodio"].forEach(e=>$(e).classList.toggle("on",e==={dibujo:"eDibujo",frases:"eFrases",armado:"eArmado",vitrina:"eVitrina",duelo:"eDuelo",podio:"ePodio"}[v.fase]));
+  const nom={dibujo:"Dibujá",frases:"Escribí frases",armado:"Armá tu remera",vitrina:"La vitrina",duelo:v.duelo?v.duelo.etapa:"Duelo",podio:"Resultado"}[v.fase];
   let det="Ronda "+v.ronda;
   if(v.fase==="dibujo"||v.fase==="frases")det=`Llevás ${Math.min(v.hechos,v.meta)} de ${v.meta}`;
   if(v.fase==="duelo")det=`Duelo ${v.duelo.n} de ${v.duelo.de}`;
+  if(v.fase==="vitrina")det=`Pasan ${v.vitrina.cupo} al torneo`;
   $("etapa").innerHTML=`${esc(nom)}<small>${esc(det)}</small>`;
-  ({dibujo:pintarDibujo,frases:pintarFrases,armado:pintarArmado,duelo:pintarDuelo,podio:pintarPodio})[v.fase](v,nueva);
+  ({dibujo:pintarDibujo,frases:pintarFrases,armado:pintarArmado,vitrina:pintarVitrina,duelo:pintarDuelo,podio:pintarPodio})[v.fase](v,nueva);
   pintarEspera(v,sl);
   tic();
 }
@@ -537,11 +556,15 @@ function pintarEspera(v,sl){
     txt=!v.duelo.puedo?"Una de estas es tuya: esta no la votás.":v.duelo.miVoto?"Voto guardado. Podés cambiarlo.":"Tocá la que más te guste.";
     txt+=`<br><small>Votaron ${v.duelo.votaron} de ${v.duelo.votantes}</small>`;
   }
+  if(v.fase==="vitrina"){const V=v.vitrina;
+    if(V.estado==="votar")txt=(V.miVoto?"Voto guardado. Podés cambiarlo.":"Tocá tu favorita (la tuya no se puede).")+`<br><small>Votaron ${V.votaron} de ${V.votantes}</small>`;
+    else if(!finLocal&&!soyHost())txt=`Esperando que ${esc(nombreDe(sl.host))} arranque el torneo`;}
   if(v.fase==="duelo"&&v.duelo.estado==="res"&&!finLocal)txt=soyHost()?"":`Esperando que ${esc(nombreDe(sl.host))} pase al siguiente`;
   $("espera").innerHTML=txt;
   const b=$("bSeguir");
-  if(soyHost()&&v.fase==="duelo"&&v.duelo.estado==="res"){b.hidden=false;b.className="prin grande seguir";b.textContent=v.duelo.etapa==="La final"?"Ver la campeona":"Siguiente duelo"}
-  else if(soyHost()&&v.faltan>0&&(enEspera||v.fase==="duelo")){b.hidden=false;b.className="seguir";b.textContent="Seguir sin esperar"}
+  if(soyHost()&&v.fase==="vitrina"&&v.vitrina.estado==="res"){b.hidden=false;b.className="prin grande seguir";b.textContent="Arrancar el torneo"}
+  else if(soyHost()&&v.fase==="duelo"&&v.duelo.estado==="res"){b.hidden=false;b.className="prin grande seguir";b.textContent=v.duelo.etapa==="La final"?"Ver la campeona":"Siguiente duelo"}
+  else if(soyHost()&&v.faltan>0&&(enEspera||v.fase==="duelo"||v.fase==="vitrina")){b.hidden=false;b.className="seguir";b.textContent="Seguir sin esperar"}
   else b.hidden=true;
 }
 $("bSeguir").onclick=()=>{if(H)forzar()};
@@ -688,6 +711,22 @@ $("armCol").onclick=e=>{const b=e.target.closest("[data-c]");if(b){ARM.color=b.d
 $("armPos").onclick=e=>{const b=e.target.closest("[data-v]");if(b){ARM.pos=b.dataset.v;reArmar()}};
 function estampar(){if(!ARM.fra){avisar("Elegí una frase");return}vibrar(30);enviar({t:"rem",dib:ARM.dib,fra:ARM.fra,color:ARM.color,pos:ARM.pos})}
 $("bEstampar").onclick=estampar;
+
+// ---- vitrina: con mucha gente, todos votan su favorita y pasan las más votadas al torneo ----
+function pintarVitrina(v){
+  const V=v.vitrina,res=V.estado==="res";
+  $("vitCartel").textContent=res?`Pasan al torneo las ${V.cupo} más votadas`:`Votá tu favorita: pasan ${V.cupo} al torneo`;
+  $("vitGal").innerHTML=V.rems.map(r=>{
+    const cl=res?(r.pasa?" pasa":" queda"):(r.mia?" mia":V.miVoto===r.id?" voto":"");
+    const eti=res?`${r.pasa?"✓ Pasa":"Queda afuera"} · ${r.votos} ${r.votos===1?"voto":"votos"}`:r.mia?"La tuya":V.miVoto===r.id?"✓ Tu voto":"Tocá para votar";
+    return `<div class="it${cl}" data-rem="${r.id}">${remeraHTML(r)}<div class="eti">${eti}</div></div>`;
+  }).join("");
+}
+$("vitGal").onclick=e=>{
+  const it=e.target.closest("[data-rem]");const v=ULT&&ULT.v;if(!it||!v||v.fase!=="vitrina"||v.vitrina.estado!=="votar")return;
+  const r=v.vitrina.rems.find(x=>x.id===it.dataset.rem);if(!r||r.mia||v.vitrina.miVoto===r.id)return;
+  vibrar(20);enviar({t:"vitrina",rem:r.id});
+};
 
 // ---- duelo ----
 function credHTML(r){
