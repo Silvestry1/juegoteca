@@ -1,6 +1,6 @@
 // Service worker de la Juegoteca.
 // Al agregar un juego propio nuevo, sumá su carpeta a PROPIOS y subí VERSION.
-const VERSION = "v14";
+const VERSION = "v15";
 const CACHE = "juegoteca-" + VERSION;
 const PROPIOS = [
   "./",
@@ -38,7 +38,27 @@ const PROPIOS = [
   "juegos/comun/tema.js",
   "juegos/estampame/",
   "juegos/estampame/motor.js",
-  "juegos/estampame/banco.js"
+  "juegos/estampame/banco.js",
+  "juegos/mafia/",
+  "juegos/mafia/motor.js",
+  "juegos/mafia/cartas/dorso.png",
+  "juegos/mafia/cartas/jefa.png",
+  "juegos/mafia/cartas/mafia.png",
+  "juegos/mafia/cartas/policia.png",
+  "juegos/mafia/cartas/medico.png",
+  "juegos/mafia/cartas/enfermero.png",
+  "juegos/mafia/cartas/carnicero.png",
+  "juegos/mafia/cartas/trabajadora.png",
+  "juegos/mafia/cartas/medium.png",
+  "juegos/mafia/cartas/amantes.png",
+  "juegos/mafia/cartas/kamikaze.png",
+  "juegos/mafia/cartas/impostor.png",
+  "juegos/mafia/cartas/ladron.png",
+  "juegos/mafia/cartas/pueblo-guitarra.png",
+  "juegos/mafia/cartas/pueblo-pelota.png",
+  "juegos/mafia/cartas/pueblo-skate.png",
+  "juegos/mafia/cartas/fantasma-bondadoso.png",
+  "juegos/mafia/cartas/fantasma-travieso.png"
 ];
 
 self.addEventListener("install", e => {

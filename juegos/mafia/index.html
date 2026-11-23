@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1b1024">
+<title>Mafia</title>
+<style>
+:root{--bg:#1b1024;--card:#2a1838;--chip:#3b2350;--txt:#fff4ee;--sub:#cdb6da;--acc:#ff9ecd;--acc-txt:#2b163a;--acc2:#c6e4ec;--lila:#c876fc;--dur:#ffe0d2;--ok:#78c896;--mal:#ff6f8f;--out:#2b163a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html{font-size:16px;background:var(--bg)}
+html.grande{font-size:20px}
+html,body{min-height:100%}
+body{margin:0;background:
+  linear-gradient(135deg,#ff9ecd14 0 25%,transparent 25% 50%,#c876fc12 50% 75%,transparent 75%) 0 0/120px 120px fixed,
+  radial-gradient(ellipse at 50% -10%,#54306e 0,#2b1a3c 35%,var(--bg) 75%) fixed;color:var(--txt);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior:none}
+.wrap{min-height:100vh;padding:10px 14px calc(70px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;max-width:640px;margin:0 auto}
+button{font:inherit;border:0;border-radius:12px;padding:12px;background:var(--chip);color:var(--txt);font-weight:800;cursor:pointer;touch-action:manipulation}
+button:active{filter:brightness(1.2)}
+button:disabled{opacity:.35}
+button.prin{background:var(--acc);color:var(--acc-txt)}
+button.sec{background:var(--acc2);color:var(--acc-txt)}
+button.grande{padding:16px;font-size:1.2rem}
+button.chico{padding:8px 10px;font-size:.85rem}
+button.claro{background:transparent;color:var(--sub);font-weight:700}
+button.peligro{background:var(--mal);color:#2b0010}
+h1{margin:6px 0 0;font-size:2.4rem;text-align:center;text-transform:uppercase;line-height:1;color:var(--acc);text-shadow:3px 3px 0 var(--out),-1px -1px 0 var(--out),1px -1px 0 var(--out),-1px 1px 0 var(--out)}
+h2{margin:0;font-size:1.35rem;text-align:center}
+.sub{color:var(--sub);text-align:center;margin:0;line-height:1.4}
+.caja{background:var(--card);border:1px solid #ffffff14;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.caja h3{margin:0;font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--sub)}
+input[type=text]{width:100%;padding:12px;border-radius:12px;border:2px solid #ffffff26;background:#00000040;color:var(--txt);font:inherit;font-size:1.15rem;font-weight:800}
+input[type=text]:focus{outline:none;border-color:var(--acc)}
+#codigo{text-transform:uppercase;letter-spacing:6px;text-align:center;font-size:1.6rem}
+.nota{font-size:.85rem;color:var(--sub);margin:0;line-height:1.4}
+.pantalla{display:none;flex-direction:column;gap:12px}
+.pantalla.on{display:flex}
+.err{color:var(--mal);text-align:center;min-height:1.2em;margin:0;font-weight:700}
+.red{font-size:.85rem;color:var(--sub);text-align:center;margin:0}
+.red.mal{color:var(--mal);font-weight:800}
+details.reglas{color:var(--sub);font-size:.92rem;line-height:1.45}
+details.reglas summary{font-weight:800;color:var(--txt);cursor:pointer}
+details.reglas p{margin:8px 0}
+details.reglas b{color:var(--txt)}
+.fila{display:flex;gap:8px;align-items:center}
+.fila>*{flex:1}
+img.px{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+.portada{width:min(46vw,190px);align-self:center;filter:drop-shadow(0 8px 18px #000a)}
+
+/* sala */
+.codigoGrande{font-size:3rem;font-weight:900;letter-spacing:10px;text-align:center;color:var(--acc);line-height:1;font-family:"JetBrains Mono",ui-monospace,monospace}
+#qr{background:#fff;padding:10px;border-radius:12px;align-self:center;line-height:0}
+#qr svg{width:min(48vw,200px);height:auto}
+.jugadores{display:flex;flex-wrap:wrap;gap:6px}
+.jugador{background:var(--chip);border-radius:10px;padding:8px 12px;font-weight:800;display:flex;gap:6px;align-items:center}
+.jugador.off{opacity:.45}
+.jugador.yo{outline:2px solid var(--acc)}
+.jugador small{color:var(--sub);font-weight:700}
+
+/* mesa de cartas para armar el mazo */
+.mesa{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:8px}
+html.grande .mesa{grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}
+.mc{position:relative;padding:0;background:none;border-radius:8px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+.mc img{width:100%;border-radius:6px;transition:filter .15s,opacity .15s,transform .15s}
+.mc.off img{filter:grayscale(1) brightness(.45);opacity:.6;transform:scale(.94)}
+.mc .tilde{position:absolute;right:-4px;top:-4px;background:var(--acc);color:var(--acc-txt);border:2px solid var(--out);border-radius:50%;width:24px;height:24px;font-size:.8rem;display:flex;align-items:center;justify-content:center;font-weight:900}
+.mc.off .tilde{display:none}
+.cuentaMazo{font-weight:900;text-align:center;font-size:1.05rem}
+.cuentaMazo.bien{color:var(--ok)}
+.cuentaMazo.mal{color:var(--mal)}
+
+/* carta del jugador */
+.cartaYo{position:relative;width:min(72vw,300px);align-self:center;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;cursor:pointer}
+html.grande .cartaYo{width:min(86vw,360px)}
+.cartaYo img{width:100%;border-radius:10px;filter:drop-shadow(0 10px 22px #000c)}
+.cartaYo .cara{position:absolute;inset:0;opacity:0}
+.cartaYo.ver .cara{opacity:1}
+.cartaYo.ver .dorso{opacity:0}
+.cartaYo .pie{position:absolute;left:6%;right:6%;bottom:-14px;background:var(--acc);color:var(--acc-txt);border:3px solid var(--out);border-radius:10px;padding:6px 8px;font-weight:900;text-align:center;font-size:.95rem;opacity:0}
+.cartaYo.ver .pie:not(:empty){opacity:1}
+.ayuda{text-align:center;color:var(--sub);font-size:.9rem;margin:6px 0 0}
+.estado{text-align:center;font-weight:900;font-size:1.15rem}
+.estado.muerto{color:var(--mal)}
+.robar{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.robar button{padding:0;background:none;border:3px solid transparent;border-radius:10px}
+.robar button.on{border-color:var(--acc)}
+.robar button.bloq img{filter:grayscale(1) brightness(.45)}
+.robar img{width:100%;border-radius:8px}
+
+/* barra */
+.tope{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid #ffffff14;border-radius:12px;padding:8px 10px;position:sticky;top:6px;z-index:5}
+.tope .etapa{flex:1;font-weight:900;font-size:1rem;line-height:1.15}
+.tope .etapa small{display:block;color:var(--sub);font-weight:700;font-size:.78rem}
+.tope img{width:34px;border-radius:4px}
+.btnChat{position:relative;padding:6px 10px;background:transparent;font-size:1.1rem}
+.btnChat i{position:absolute;right:4px;top:4px;width:9px;height:9px;border-radius:50%;background:var(--acc);display:none}
+.btnChat.nuevo i{display:block}
+
+/* jefa */
+.pestanas{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;background:#00000040;border-radius:12px;padding:4px}
+.pestanas button{padding:10px 4px;background:transparent;color:var(--sub)}
+.pestanas button.on{background:var(--acc);color:var(--acc-txt)}
+.filas{display:flex;flex-direction:column;gap:6px}
+.fj{display:flex;gap:10px;align-items:center;background:var(--chip);border-radius:12px;padding:6px 10px 6px 6px;text-align:left;width:100%}
+.fj .mini{width:52px;height:52px;border-radius:8px;overflow:hidden;flex:0 0 auto;border:2px solid var(--out);background:var(--dur)}
+html.grande .fj .mini{width:64px;height:64px}
+.fj .mini img{width:100%;margin-top:-4%;image-rendering:auto;transform:scale(1.25);transform-origin:50% 0}
+.fj .q{flex:1;min-width:0}
+.fj .q b{display:block;font-size:1.05rem}
+.fj .q small{display:block;color:var(--sub);font-weight:700;font-size:.82rem}
+.fj .bd{font-size:.72rem;font-weight:900;padding:3px 7px;border-radius:7px;text-transform:uppercase;letter-spacing:.5px}
+.bd.mafia{background:var(--mal);color:#2b0010}.bd.pueblo{background:var(--acc2);color:var(--acc-txt)}.bd.solo{background:var(--lila);color:var(--acc-txt)}
+.fj.muerto{opacity:.6}
+.fj.muerto .mini img{filter:grayscale(.8)}
+.fj.falta{outline:2px dashed var(--acc)}
+.banner{background:var(--acc);color:var(--acc-txt);border-radius:12px;padding:12px;font-weight:900;text-align:center;display:flex;flex-direction:column;gap:8px}
+.banner.suave{background:var(--chip);color:var(--txt)}
+.banner button{background:var(--out);color:var(--acc)}
+.paso{display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center}
+.paso img{width:min(36vw,150px);border-radius:8px}
+.paso .tit{font-size:1.5rem;font-weight:900;color:var(--acc)}
+.paso .leer{background:var(--dur);color:var(--out);border-radius:12px;padding:14px;font-size:1.3rem;font-weight:800;line-height:1.3;width:100%}
+.paso .leer small{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:1px;opacity:.65;margin-bottom:4px}
+.paso .quienes{font-weight:800;color:var(--acc2)}
+.paso .nota2{color:var(--sub);line-height:1.4;font-size:.95rem}
+.paso .cierre{font-weight:900;font-size:1.1rem}
+.puntos{display:flex;gap:5px;justify-content:center;flex-wrap:wrap}
+.puntos i{width:9px;height:9px;border-radius:50%;background:var(--chip)}
+.puntos i.on{background:var(--acc)}
+.manual{display:flex;flex-direction:column;gap:10px}
+.manual .it{display:flex;gap:12px;align-items:flex-start;background:var(--card);border-radius:12px;padding:10px}
+.manual .it img{width:84px;border-radius:6px;flex:0 0 auto;cursor:zoom-in}
+.manual .it h4{margin:0 0 4px;font-size:1.05rem;color:var(--acc)}
+.manual .it p{margin:0 0 5px;color:var(--sub);font-size:.9rem;line-height:1.4}
+
+/* fin */
+.ganador{font-size:1.6rem;font-weight:900;text-align:center;color:var(--acc);line-height:1.2}
+.reparto{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.reparto div{text-align:center;font-weight:800;font-size:.85rem}
+.reparto div img{width:100%;border-radius:6px;margin-bottom:4px}
+.reparto div.muerto img{filter:grayscale(.85) brightness(.7)}
+.reparto small{display:block;color:var(--sub);font-weight:700}
+
+/* hoja (modal) */
+.velo{position:fixed;inset:0;background:#0b0610cc;z-index:30;display:flex;align-items:flex-end;justify-content:center}
+.hoja{background:var(--card);border-top:3px solid var(--acc);border-radius:18px 18px 0 0;width:100%;max-width:640px;max-height:92vh;overflow:auto;padding:16px 16px calc(18px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}
+.hoja h3{margin:0;font-size:1.3rem;text-align:center}
+.hoja .grande{width:min(62vw,260px);align-self:center;border-radius:10px}
+.hoja p{margin:0;line-height:1.45;color:var(--sub)}
+.hoja p b{color:var(--txt)}
+.hoja .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.hoja .grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.hoja .et{font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--sub);font-weight:800}
+
+/* chat de amantes */
+.chat{display:flex;flex-direction:column;gap:6px;min-height:120px;max-height:46vh;overflow:auto;padding:4px}
+.chat div{max-width:82%;padding:8px 12px;border-radius:14px;line-height:1.3;font-weight:600;word-break:break-word}
+.chat div.mio{align-self:flex-end;background:var(--acc);color:var(--acc-txt);border-bottom-right-radius:4px}
+.chat div.otro{align-self:flex-start;background:var(--acc2);color:var(--acc-txt);border-bottom-left-radius:4px}
+.chat .vacio{align-self:center;background:none;color:var(--sub);font-weight:700;text-align:center}
+.cuenta{font-size:.8rem;color:var(--sub);text-align:right}
+.aviso{position:fixed;left:50%;top:22%;transform:translate(-50%,calc(-100% - 40px));opacity:0;background:var(--acc);color:var(--acc-txt);font-weight:900;font-size:1.05rem;padding:10px 18px;border-radius:14px;border:3px solid var(--out);box-shadow:0 8px 24px #000a;transition:transform .3s,opacity .3s;z-index:40;text-align:center;max-width:92vw;pointer-events:none}
+.aviso.on{transform:translate(-50%,0);opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- INICIO -->
+<section class="pantalla" id="pInicio">
+  <h1>Mafia</h1>
+  <img class="px portada" src="cartas/dorso.png" alt="">
+  <p class="sub">Cada uno ve su carta en el celu. La Jefa dirige: de noche llama a cada rol y a la mañana cuenta qué pasó. Para mayores de 13.</p>
+  <div class="caja">
+    <h3>Tu nombre</h3>
+    <input type="text" id="nombre" maxlength="14" placeholder="Cómo te dicen" autocomplete="off">
+  </div>
+  <div class="caja" id="volverMesa" hidden>
+    <h3>Tenés una partida abierta</h3>
+    <button class="prin" id="btnVolver">Volver a la partida</button>
+  </div>
+  <button class="prin grande" id="btnArmar">Armar partida (soy la Jefa)</button>
+  <div class="caja">
+    <h3>Sumarme a una partida</h3>
+    <input type="text" id="codigo" maxlength="4" placeholder="CÓDIGO" autocomplete="off" autocapitalize="characters">
+    <button id="btnUnirme">Sumarme</button>
+  </div>
+  <p class="err" id="errInicio"></p>
+  <button id="bLetraInicio">🔍 Letra grande: apagada</button>
+  <details class="reglas">
+    <summary>Cómo se juega</summary>
+    <p><b>La Jefa</b> dirige el juego y no tiene rol. Es la única que nunca cierra los ojos. De noche llama a cada rol, que le indica a quién mata, salva, cura, corta, acuesta, etc. A la mañana da el informe de lo que pasó.</p>
+    <p><b>Ganan:</b> el Pueblo si elimina a toda la Mafia; la Mafia si llega a ser mayoría. Todos los que no son Mafia ni Impostor son del Pueblo.</p>
+    <p><b>Orden de la noche:</b> Amantes (solo la primera), Trabajadora sexual, Policía, Mafia, Carnicero, Enfermero, Médico, Médium.</p>
+    <p><b>En el celu:</b> la Jefa arma la partida y los demás se suman con el código o el QR. Cada uno mantiene apretada su carta para verla. La votación se hace en la mesa, como siempre.</p>
+    <p class="nota">De 4 a 18 jugadores más la Jefa. Todos necesitan internet (wifi o datos): los celus se conectan directo entre ellos, sin cuentas.</p>
+  </details>
+</section>
+
+<!-- SALA -->
+<section class="pantalla" id="pSala">
+  <h2 id="salaTit">Partida</h2>
+  <div class="codigoGrande" id="salaCodigo">····</div>
+  <div id="qr"></div>
+  <button id="btnCompartir">📤 Mandar el link</button>
+  <div class="caja">
+    <h3>Jugadores <span id="salaCant"></span></h3>
+    <div class="jugadores" id="salaJug"></div>
+  </div>
+  <div class="caja" id="salaMazo" hidden>
+    <h3>Cartas en juego</h3>
+    <p class="nota">Ya están elegidas las sugeridas para esta cantidad. Tocá una carta para sacarla o sumarla. Mantenela apretada para ver qué hace.</p>
+    <div class="mesa" id="mesa"></div>
+    <div class="cuentaMazo" id="cuentaMazo"></div>
+    <button class="chico" id="btnSugerencia">↺ Volver a la sugerencia</button>
+  </div>
+  <button class="prin grande" id="btnRepartir" hidden>Repartir</button>
+  <p class="sub" id="salaEstado"></p>
+  <p class="red" id="redSala"></p>
+  <button class="claro" id="btnSalirSala">Salir</button>
+</section>
+
+<!-- JUGADOR -->
+<section class="pantalla" id="pJugador">
+  <div class="tope">
+    <div class="etapa" id="jTope"></div>
+    <button class="btnChat" id="btnChat" hidden title="Mensajes">💌<i></i></button>
+    <button class="chico" id="bLetra" title="Letra grande">A+</button>
+  </div>
+  <div class="estado" id="jEstado"></div>
+  <div class="caja" id="jRobar" hidden>
+    <h3>Robá una carta</h3>
+    <p class="nota" id="robarNota"></p>
+    <div class="robar" id="robarOps"></div>
+    <button class="prin" id="btnRobar" disabled>Elegí una carta</button>
+  </div>
+  <div class="cartaYo" id="cartaYo">
+    <img class="px dorso" src="cartas/dorso.png" alt="Tu carta, tapada">
+    <img class="px cara" id="cartaCara" alt="">
+    <div class="pie" id="cartaPie"></div>
+  </div>
+  <p class="ayuda">Mantené apretada la carta para verla. Soltala para taparla.</p>
+  <button id="btnComo">📖 Cómo se juega mi rol</button>
+  <p class="red" id="redJuego"></p>
+  <button class="claro" id="btnSalirJuego">Salir de la partida</button>
+</section>
+
+<!-- JEFA -->
+<section class="pantalla" id="pJefa">
+  <div class="tope">
+    <img class="px" src="cartas/jefa.png" alt="">
+    <div class="etapa" id="fTope"></div>
+    <button class="chico" id="bLetra2" title="Letra grande">A+</button>
+  </div>
+  <div class="pestanas" id="pestanas"><button data-p="mesa" class="on">Mesa</button><button data-p="noche">Noche</button><button data-p="manual">Manual</button></div>
+
+  <div id="tabMesa" class="pantalla on">
+    <div class="banner suave" id="fLadron" hidden></div>
+    <div class="banner" id="fFinal" hidden></div>
+    <p class="nota">Solo vos ves esta lista. Tocá a alguien para marcar que murió, asignarle su fantasma o corregir.</p>
+    <div class="filas" id="fFilas"></div>
+    <div class="caja" id="fSobran"></div>
+    <details class="reglas">
+      <summary>Terminar la partida a mano</summary>
+      <div class="grid3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px">
+        <button data-fin="pueblo">Gana el Pueblo</button><button data-fin="mafia">Gana la Mafia</button><button data-fin="impostor">Gana el Impostor</button>
+      </div>
+    </details>
+  </div>
+
+  <div id="tabNoche" class="pantalla">
+    <div class="puntos" id="nPuntos"></div>
+    <div class="paso" id="nPaso"></div>
+    <div class="fila"><button id="nAnt">← Anterior</button><button class="prin" id="nSig">Siguiente →</button></div>
+  </div>
+
+  <div id="tabManual" class="pantalla">
+    <div class="manual" id="manual"></div>
+  </div>
+
+  <p class="red" id="redJefa"></p>
+  <button class="claro" id="btnSalirJefa">Cerrar la partida</button>
+</section>
+
+<!-- FIN -->
+<section class="pantalla" id="pFin">
+  <h1>Mafia</h1>
+  <div class="ganador" id="finGanador"></div>
+  <div class="caja"><h3>Quién era quién</h3><div class="reparto" id="finReparto"></div></div>
+  <button class="prin grande" id="btnOtra" hidden>Otra partida con los mismos</button>
+  <button id="btnSeguirJugando" hidden>Volver a la mesa (seguir jugando)</button>
+  <p class="sub" id="finEspera"></p>
+  <button class="claro" id="btnSalirFin">Salir</button>
+</section>
+
+</div>
+<div class="velo" id="velo" hidden><div class="hoja" id="hoja"></div></div>
+<div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+
+<script src="../comun/qrcode.js"></script>
+<script src="../comun/peerjs.min.js"></script>
+<script src="motor.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const leer=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}};
+const grabar=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}};
+const borrar=k=>{try{localStorage.removeItem(k)}catch(e){}};
+const vibrar=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
+const PREF="juegoteca-mafia-";
+const params=new URLSearchParams(location.search);
+const MI_ID=leer("mafia-id",null)||(()=>{const v=Math.random().toString(36).slice(2,10)+Date.now().toString(36);grabar("mafia-id",v);return v})();
+const IMG=k=>"cartas/"+k+".png";
+const R=Motor.ROLES;
+const nomRol=r=>r==="pueblo"?"Pueblo":R[r].nombre;
+
+function opcionesPeer(){
+  const srv=params.get("srv"); // solo para pruebas con un servidor propio: ?srv=localhost:9000
+  if(srv){const [host,port]=srv.split(":");return {host,port:+port||443,path:"/",secure:location.protocol==="https:",debug:1}}
+  return {debug:1,config:{iceServers:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"}]}};
+}
+const conSrv=q=>q+(params.get("srv")?(q?"&":"?")+"srv="+params.get("srv"):"");
+function pantalla(id){document.querySelectorAll(".wrap>.pantalla").forEach(p=>p.classList.toggle("on",p.id===id))}
+let tAviso;function avisar(t,ms){const a=$("aviso");a.textContent=t;a.classList.add("on");clearTimeout(tAviso);tAviso=setTimeout(()=>a.classList.remove("on"),ms||2800)}
+function red(txt,mal){["redSala","redJuego","redJefa"].forEach(i=>{const e=$(i);e.textContent=txt||"";e.classList.toggle("mal",!!mal)})}
+const nuevoCodigo=()=>Array.from({length:4},()=>"ABCDEFGHJKLMNPQRSTUVWXYZ"[Math.floor(Math.random()*24)]).join("");
+let cerrojo=null;async function prendida(){try{if("wakeLock" in navigator&&!cerrojo){cerrojo=await navigator.wakeLock.request("screen");cerrojo.addEventListener("release",()=>cerrojo=null)}}catch(e){}}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")prendida()});
+
+// ---- letra grande ----
+let GRANDE=!!leer("mafia-grande",false);
+function ponerLetra(){document.documentElement.classList.toggle("grande",GRANDE);$("bLetraInicio").textContent="🔍 Letra grande: "+(GRANDE?"prendida":"apagada");$("bLetra").textContent=$("bLetra2").textContent=GRANDE?"A−":"A+"}
+function cambiarLetra(){GRANDE=!GRANDE;grabar("mafia-grande",GRANDE);ponerLetra()}
+$("bLetraInicio").onclick=$("bLetra").onclick=$("bLetra2").onclick=cambiarLetra;
+
+// ---- hoja (modal) ----
+function abrirHoja(html,alAbrir){$("hoja").innerHTML=html+`<button class="claro" data-cerrar>Cerrar</button>`;$("velo").hidden=false;if(alAbrir)alAbrir($("hoja"))}
+function cerrarHoja(){$("velo").hidden=true;$("hoja").innerHTML="";HOJA=null}
+let HOJA=null; // qué hoja está abierta, para refrescarla si cambia el estado
+$("velo").onclick=e=>{if(e.target===$("velo")||e.target.closest("[data-cerrar]"))cerrarHoja()};
+function hojaRol(r,img){
+  const x=r==="jefa"?Motor.JEFA:Motor.FANTASMAS[r]||R[r];
+  abrirHoja(`<h3>${esc(x.nombre)}</h3><img class="px grande" src="${IMG(img||x.img)}" alt="">${x.como.map(t=>`<p>${esc(t)}</p>`).join("")}`);
+}
+// apretar y mantener → ver la descripción; toque corto → acción
+function mantener(el,alMantener,alTocar){
+  let t=null,largo=false;
+  el.addEventListener("pointerdown",e=>{largo=false;clearTimeout(t);t=setTimeout(()=>{largo=true;vibrar(25);alMantener(e)},450)});
+  ["pointerup","pointerleave","pointercancel"].forEach(ev=>el.addEventListener(ev,()=>clearTimeout(t)));
+  el.addEventListener("contextmenu",e=>e.preventDefault());
+  el.addEventListener("click",e=>{if(largo){largo=false;e.preventDefault();return}alTocar&&alTocar(e)});
+}
+
+// ================== JEFA: arma la partida y lleva la mesa ==================
+let H=null; // {codigo, jefa, jugadores:[{id,nombre}], sel:[], manual, G, paso, pest}
+let peer=null;const conns=new Map();
+function guardarHost(){if(H)grabar("mafia-host",{...H,ts:Date.now()})}
+function armarPartida(){
+  const nombre=$("nombre").value.trim();if(!nombre){$("errInicio").textContent="Poné tu nombre primero";$("nombre").focus();return}
+  H={codigo:nuevoCodigo(),jefa:nombre,jugadores:[],sel:Motor.sugerido(Motor.MIN_JUG),manual:false,G:null,paso:0,pest:"mesa"};
+  guardarHost();abrirHost(true);
+}
+function abrirHost(nueva){
+  history.replaceState(null,"",conSrv("?sala="+H.codigo));
+  difundir();red("Abriendo la partida…");
+  if(peer)try{peer.destroy()}catch(e){}
+  peer=new Peer(PREF+H.codigo,opcionesPeer());
+  peer.on("open",()=>red(""));
+  peer.on("connection",conn=>{
+    conn.on("data",d=>alRecibirHost(conn,d));
+    conn.on("close",()=>{for(const [id,c] of conns)if(c===conn){conns.delete(id);difundir()}});
+  });
+  peer.on("disconnected",()=>{red("Reconectando…",true);setTimeout(()=>{try{peer.reconnect()}catch(e){}},1500)});
+  peer.on("error",e=>{
+    if(e.type==="unavailable-id"){
+      if(nueva&&!H.G&&!H.jugadores.length){H.codigo=nuevoCodigo();guardarHost();abrirHost(true)}
+      else{red("Recuperando la partida…",true);setTimeout(()=>abrirHost(false),3000)}
+    }else if(["network","server-error","socket-error","socket-closed"].includes(e.type)){red("Sin conexión con el servidor. Reintentando…",true);setTimeout(()=>abrirHost(false),4000)}
+  });
+}
+function alRecibirHost(conn,d){
+  if(!d||typeof d!=="object")return;
+  if(d.t==="hola"){
+    const nombre=String(d.nombre||"").trim().slice(0,14)||"Sin nombre";
+    let j=H.jugadores.find(x=>x.id===d.id);
+    if(!j){
+      if(H.jugadores.length>=Motor.MAX_JUG){conn.send({t:"error",txt:"La partida está completa"});return}
+      j={id:d.id,nombre};H.jugadores.push(j);
+      if(!H.G&&!H.manual)H.sel=sugeridoPara(H.jugadores.length);
+    }else if(!H.G)j.nombre=nombre;
+    const vieja=conns.get(d.id);if(vieja&&vieja!==conn)try{vieja.close()}catch(e){}
+    conns.set(d.id,conn);guardarHost();difundir();return;
+  }
+  const id=[...conns].find(([k,c])=>c===conn)?.[0];if(!id)return;
+  if(d.t==="acc"&&H.G){
+    const err=Motor.accionJugador(H.G,id,d.a);
+    if(err){conn.send({t:"error",txt:err});return}
+    guardarHost();difundir();
+  }else if(d.t==="chau"){
+    conns.delete(id);
+    if(!H.G){H.jugadores=H.jugadores.filter(x=>x.id!==id);if(!H.manual)H.sel=sugeridoPara(H.jugadores.length)}
+    guardarHost();difundir();
+  }
+}
+const conLadron=()=>H.sel.includes("ladron1");
+function sugeridoPara(n,ladron){return (ladron&&n+1<=Motor.MAX_JUG)?Motor.sugeridoConLadron(n):Motor.sugerido(n)}
+function tocarCarta(id){
+  if(!H||H.G)return;
+  const c=Motor.carta(id),n=H.jugadores.length;
+  if(c.rol==="ladron"&&!H.manual){H.sel=sugeridoPara(n,!conLadron());}
+  else{
+    const ids=c.rol==="amantes"?["amantes1","amantes2"]:[id];
+    const esta=H.sel.includes(id);
+    H.sel=esta?H.sel.filter(x=>!ids.includes(x)):[...new Set([...H.sel,...ids])];
+    H.manual=true;
+  }
+  guardarHost();difundir();
+}
+function repartir(){
+  if(!H||H.G)return;
+  const err=Motor.validar(H.jugadores,H.sel);if(err){avisar(err);return}
+  H.G=Motor.repartir(H.jugadores,H.sel);H.paso=0;H.pest="mesa";
+  guardarHost();difundir();vibrar(60);
+}
+function jefa(a){
+  if(!H||!H.G)return;
+  const r=Motor.accionJefa(H.G,a);
+  if(r.err){avisar(r.err);return}
+  if(r.avisos&&r.avisos.length)avisar(r.avisos.join(" "),5200);
+  guardarHost();difundir();
+}
+function otraPartida(){if(!H)return;H.G=null;H.paso=0;if(!H.manual)H.sel=sugeridoPara(H.jugadores.length,conLadron());guardarHost();difundir()}
+function sala(){return {codigo:H.codigo,jefa:H.jefa,arrancada:!!H.G,jugadores:H.jugadores.map(j=>({id:j.id,nombre:j.nombre,on:conns.has(j.id)}))}}
+function difundir(){
+  const sl=sala();
+  for(const [id,c] of conns){
+    if(!c.open)continue;
+    const v=H.G?Motor.vistaJugador(H.G,id):null;
+    try{c.send({t:"estado",sala:sl,v})}catch(e){}
+  }
+  mostrarJefa(sl);
+}
+
+// ================== INVITADO ==================
+let C=null;
+function unirme(codigo){
+  const nombre=$("nombre").value.trim();if(!nombre){$("errInicio").textContent="Poné tu nombre primero";$("nombre").focus();return}
+  codigo=codigo.toUpperCase().replace(/[^A-Z]/g,"");if(codigo.length!==4){$("errInicio").textContent="El código tiene 4 letras";return}
+  C={codigo,conn:null};grabar("mafia-invitado",{codigo,ts:Date.now()});
+  history.replaceState(null,"",conSrv("?sala="+codigo));
+  pantalla("pSala");$("salaCodigo").textContent=codigo;$("salaEstado").textContent="Buscando la partida…";$("salaJug").innerHTML="";$("qr").innerHTML="";$("salaMazo").hidden=true;$("btnRepartir").hidden=true;
+  if(peer)try{peer.destroy()}catch(e){}
+  peer=new Peer(opcionesPeer());
+  peer.on("open",conectar);
+  peer.on("disconnected",()=>setTimeout(()=>{try{peer.reconnect()}catch(e){}},1500));
+  peer.on("error",e=>{
+    if(e.type==="peer-unavailable")red(C&&C.visto?"Se cortó con la partida. Reintentando…":"No encuentro la partida "+(C?C.codigo:"")+". Reintentando…",true);
+    else if(["network","server-error","socket-error","socket-closed"].includes(e.type))red("Sin conexión. Reintentando…",true);
+  });
+}
+let tReint=null;
+function conectar(){
+  if(!C)return;clearTimeout(tReint);
+  if(C.conn)try{C.conn.close()}catch(e){}
+  const conn=peer.connect(PREF+C.codigo,{reliable:true});C.conn=conn;
+  const vigia=setTimeout(()=>{if(!conn.open){try{conn.close()}catch(e){}reintentar()}},7000);
+  conn.on("open",()=>{clearTimeout(vigia);red("");conn.send({t:"hola",id:MI_ID,nombre:$("nombre").value.trim()||leer("mafia-nombre","")})});
+  conn.on("data",d=>{
+    if(!d||!C)return;C.visto=true;
+    if(d.t==="estado")mostrarJugador(d);
+    else if(d.t==="error"){avisar(d.txt);if(/completa/.test(d.txt)&&!ULT){salir(true);$("errInicio").textContent=d.txt}}
+  });
+  conn.on("close",()=>{clearTimeout(vigia);if(C&&C.conn===conn){red("Se cortó con la partida. Reconectando…",true);reintentar()}});
+  conn.on("error",()=>{});
+}
+function reintentar(){clearTimeout(tReint);tReint=setTimeout(()=>{if(!C||!peer)return;if(peer.disconnected)try{peer.reconnect()}catch(e){};conectar()},2500)}
+function enviar(a){if(C&&C.conn&&C.conn.open)C.conn.send({t:"acc",a});else avisar("Sin conexión con la partida")}
+
+// ================== PANTALLAS: SALA ==================
+function pintarSala(sl,soyJefa){
+  pantalla("pSala");
+  $("salaTit").textContent=soyJefa?"Tu partida":"Partida de "+sl.jefa;
+  $("salaCodigo").textContent=sl.codigo;
+  const link=location.href.split("?")[0]+conSrv("?sala="+sl.codigo);
+  if($("qr").dataset.l!==link){try{const q=qrcode(0,"M");q.addData(link);q.make();$("qr").innerHTML=q.createSvgTag({cellSize:5,margin:2,scalable:true})}catch(e){}$("qr").dataset.l=link}
+  $("salaCant").textContent=`(${sl.jugadores.length}, más la Jefa)`;
+  $("salaJug").innerHTML=`<div class="jugador">👑 ${esc(sl.jefa)} <small>Jefa</small></div>`+sl.jugadores.map(j=>`<div class="jugador${j.on?"":" off"}${j.id===MI_ID?" yo":""}">${esc(j.nombre)}${j.id===MI_ID?" <small>(vos)</small>":""}</div>`).join("");
+  $("salaMazo").hidden=$("btnRepartir").hidden=!soyJefa;
+  if(soyJefa){
+    pintarMesa();
+    const err=Motor.validar(H.jugadores,H.sel);
+    $("btnRepartir").disabled=!!err;
+    $("salaEstado").textContent=sl.jugadores.length<Motor.MIN_JUG?`Faltan ${Motor.MIN_JUG-sl.jugadores.length} para arrancar (mínimo ${Motor.MIN_JUG} más la Jefa). Que escaneen el QR.`:"Cuando estén todos, revisá las cartas y tocá Repartir.";
+  }else $("salaEstado").textContent=sl.arrancada?"La partida ya arrancó: entrás en la próxima.":"Esperando que la Jefa reparta las cartas…";
+}
+function pintarMesa(){
+  const sel=new Set(H.sel);
+  $("mesa").innerHTML=Motor.MAZO.map(c=>`<button class="mc${sel.has(c.id)?"":" off"}" data-c="${c.id}" aria-label="${esc(nomRol(c.rol))}"><img class="px" src="${IMG(c.img)}" alt="" draggable="false"><span class="tilde">✓</span></button>`).join("");
+  $("mesa").querySelectorAll(".mc").forEach(b=>mantener(b,()=>{const c=Motor.carta(b.dataset.c);hojaRol(c.rol,c.img)},()=>tocarCarta(b.dataset.c)));
+  const n=H.jugadores.length,nec=Motor.cartasNecesarias(n,H.sel),err=Motor.validar(H.jugadores,H.sel);
+  const e=$("cuentaMazo");
+  e.className="cuentaMazo "+(err?"mal":"bien");
+  e.textContent=err&&n>=Motor.MIN_JUG?err:`${H.sel.length} cartas para ${n} jugadores${conLadron()?" (con Ladrón sobran 2)":""}${err?"":" ✓"}`;
+  $("btnSugerencia").hidden=!H.manual;
+}
+$("btnSugerencia").onclick=()=>{if(!H||H.G)return;H.manual=false;H.sel=sugeridoPara(H.jugadores.length,conLadron());guardarHost();difundir()};
+$("btnRepartir").onclick=repartir;
+
+// ================== PANTALLAS: JUGADOR ==================
+let ULT=null,antes=null,elegidaRobo=null;
+function mostrarJugador(d){
+  ULT=d;const v=d.v;
+  if(!v){pintarSala(d.sala,false);antes=null;return}
+  prendida();
+  if(v.fase==="fin"){pintarFin(v.fin,false);return}
+  pantalla("pJugador");
+  const y=v.yo;
+  // avisos discretos cuando cambia algo
+  if(antes){
+    if(antes.vivo&&!y.vivo){vibrar([80,60,80]);avisar("Moriste. Mirá tu carta.")}
+    else if(antes.img!==y.img||antes.fantasma!==y.fantasma){vibrar(60);avisar("Algo cambió en tu carta")}
+  }
+  antes={vivo:y.vivo,img:y.img,fantasma:y.fantasma};
+  $("jTope").innerHTML=`${esc($("nombre").value.trim()||"Jugador")}<small>Partida de ${esc(d.sala.jefa)} · ${esc(d.sala.codigo)}</small>`;
+  const est=$("jEstado");
+  est.className="estado"+(y.vivo?"":" muerto");
+  est.textContent=y.vivo?"Estás vivo":"💀 Moriste "+(y.causa==="votacion"?"en la votación":"de noche");
+  // carta: si murió y ya tiene fantasma, muestra el fantasma
+  const img=!y.vivo&&y.fantasma?Motor.FANTASMAS[y.fantasma].img:y.img;
+  $("cartaCara").src=IMG(img);
+  let pie="";
+  if(!y.vivo&&!y.fantasma)pie="La Jefa te está asignando tu fantasma";
+  else if(y.convertido)pie="Ahora sos de la Mafia";
+  else if(y.pareja)pie="Tu pareja: "+y.pareja;
+  else if(y.sinPareja)pie="Tu pareja quedó afuera: jugás como Pueblo";
+  else if(y.ladron&&y.ladron.elegida)pie="Robaste esta carta";
+  $("cartaPie").textContent=pie;
+  // ladrón
+  const L=y.ladron&&!y.ladron.elegida?y.ladron.opciones:null;
+  $("jRobar").hidden=!L;
+  if(L){
+    if(!L.some(o=>o.id===elegidaRobo&&!o.bloqueada))elegidaRobo=null;
+    const oblig=L.find(o=>o.rol==="mafia"&&L.some(x=>x.bloqueada));if(oblig)elegidaRobo=oblig.id;
+    $("robarNota").textContent=oblig?"Sos el Ladrón. Sobró una carta de Mafia: la tenés que robar, así que ahora sos de la Mafia. Que nadie vea tu pantalla.":"Sos el Ladrón. Estas son las 2 cartas que sobraron: elegí con cuál jugás. Que nadie vea tu pantalla.";
+    $("robarOps").innerHTML=L.map(o=>`<button data-c="${o.id}" class="${o.id===elegidaRobo?"on":""}${o.bloqueada?" bloq":""}"><img class="px" src="${IMG(o.img)}" alt="${esc(nomRol(o.rol))}" draggable="false"></button>`).join("");
+    $("robarOps").querySelectorAll("button").forEach(b=>mantener(b,()=>{const c=Motor.carta(b.dataset.c);hojaRol(c.rol,c.img)},()=>{if(b.classList.contains("bloq"))return;elegidaRobo=b.dataset.c;mostrarJugador(ULT)}));
+    $("btnRobar").disabled=!elegidaRobo;
+    $("btnRobar").textContent=elegidaRobo?"Me quedo con "+nomRol(Motor.carta(elegidaRobo).rol):"Elegí una carta";
+  }
+  // chat
+  $("btnChat").hidden=!v.chat;
+  if(v.chat){
+    const otros=v.chat.msjs.filter(m=>!m.mio).length,vistos=leer("mafia-chat-visto-"+d.sala.codigo,0);
+    const abierto=HOJA==="chat";
+    if(abierto&&otros>vistos)grabar("mafia-chat-visto-"+d.sala.codigo,otros);
+    $("btnChat").classList.toggle("nuevo",!abierto&&otros>vistos);
+    if(!abierto&&otros>vistos&&otros>(C&&C.avisados||0)){vibrar(30);if(C)C.avisados=otros}
+    if(abierto)pintarChat();
+  }else if(HOJA==="chat")cerrarHoja();
+}
+$("btnRobar").onclick=()=>{if(elegidaRobo){enviar({t:"robar",carta:elegidaRobo});elegidaRobo=null}};
+// carta: mantener apretada para ver
+(()=>{const c=$("cartaYo");const ver=on=>c.classList.toggle("ver",on);
+  c.addEventListener("pointerdown",e=>{e.preventDefault();ver(true);vibrar(15)});
+  ["pointerup","pointerleave","pointercancel"].forEach(ev=>c.addEventListener(ev,()=>ver(false)));
+  c.addEventListener("contextmenu",e=>e.preventDefault());
+  document.addEventListener("visibilitychange",()=>ver(false));
+})();
+$("btnComo").onclick=()=>{
+  const y=ULT&&ULT.v&&ULT.v.yo;if(!y)return;
+  if(!y.vivo&&y.fantasma){const f=Motor.FANTASMAS[y.fantasma];abrirHoja(`<h3>${esc(f.nombre)}</h3><img class="px grande" src="${IMG(f.img)}" alt="">${f.como.map(t=>`<p>${esc(t)}</p>`).join("")}<p>Tu rol era <b>${esc(y.nombreRol)}</b>.</p>`);return}
+  const r=y.convertido?"mafia":y.rol,x=R[r];
+  abrirHoja(`<h3>${esc(y.nombreRol)}</h3><img class="px grande" src="${IMG(y.img)}" alt="">${y.convertido?"<p><b>Eras el Impostor y te mató la Mafia: ahora jugás con ellos.</b></p>":""}${x.como.map(t=>`<p>${esc(t)}</p>`).join("")}${y.pareja?`<p>Tu pareja es <b>${esc(y.pareja)}</b>.</p>`:""}`);
+};
+
+// ---- chat de los Amantes ----
+$("btnChat").onclick=()=>{
+  if(!ULT||!ULT.v||!ULT.v.chat)return;
+  HOJA="chat";
+  abrirHoja(`<h3>💌 ${esc(ULT.v.yo.pareja||"")}</h3><p class="nota" style="text-align:center">Solo lo ven ustedes dos. Mensajes cortos: no podés mandar otro hasta que te contesten.</p>
+    <div class="chat" id="chatLista"></div>
+    <input type="text" id="chatTxt" maxlength="${ULT.v.chat.max}" placeholder="Un mensaje a escondidas" autocomplete="off">
+    <div class="cuenta" id="chatCuenta"></div>
+    <button class="prin" id="chatMandar">Mandar</button>`,h=>{
+      $("chatTxt").oninput=pintarCuentaChat;
+      $("chatTxt").onkeydown=e=>{if(e.key==="Enter")mandarChat()};
+      $("chatMandar").onclick=mandarChat;
+    });
+  HOJA="chat";
+  const otros=ULT.v.chat.msjs.filter(m=>!m.mio).length;grabar("mafia-chat-visto-"+ULT.sala.codigo,otros);$("btnChat").classList.remove("nuevo");
+  pintarChat();
+};
+function pintarCuentaChat(){const ch=ULT.v.chat,n=$("chatTxt").value.length;$("chatCuenta").textContent=ch.puedo?`${n}/${ch.max}`:"Esperá que te conteste";$("chatMandar").disabled=!ch.puedo||!$("chatTxt").value.trim();$("chatTxt").disabled=!ch.puedo}
+function pintarChat(){
+  const ch=ULT&&ULT.v&&ULT.v.chat;if(!ch||!$("chatLista"))return;
+  const l=$("chatLista");
+  l.innerHTML=ch.msjs.length?ch.msjs.map(m=>`<div class="${m.mio?"mio":"otro"}">${esc(m.txt)}</div>`).join(""):`<div class="vacio">Todavía no hay mensajes. Arrancá vos.</div>`;
+  l.scrollTop=l.scrollHeight;pintarCuentaChat();
+}
+function mandarChat(){const t=$("chatTxt").value.trim();if(!t||!ULT.v.chat.puedo)return;enviar({t:"chat",txt:t});$("chatTxt").value="";pintarCuentaChat()}
+
+// ================== PANTALLAS: JEFA ==================
+function mostrarJefa(sl){
+  if(!H)return;
+  if(!H.G){pintarSala(sl,true);return}
+  prendida();
+  const v=Motor.vistaJefa(H.G);
+  if(v.fase==="fin"){pintarFin(Motor.vistaJugador(H.G,H.G.jug[0].id).fin,true);return}
+  pantalla("pJefa");
+  const vivos=v.jug.filter(j=>j.vivo).length;
+  $("fTope").innerHTML=`Sos la Jefa · Noche ${v.noche}<small>${vivos} vivos de ${v.jug.length} · Código ${esc(H.codigo)}</small>`;
+  document.querySelectorAll("#pestanas button").forEach(b=>b.classList.toggle("on",b.dataset.p===H.pest));
+  $("tabMesa").classList.toggle("on",H.pest==="mesa");$("tabNoche").classList.toggle("on",H.pest==="noche");$("tabManual").classList.toggle("on",H.pest==="manual");
+  // mesa
+  $("fLadron").hidden=!v.ladronPendiente;
+  if(v.ladronPendiente)$("fLadron").textContent=`${v.ladronPendiente} es el Ladrón y está eligiendo su carta…`;
+  $("fFinal").hidden=!v.sugerido;
+  if(v.sugerido)$("fFinal").innerHTML=`${esc(v.sugerido.txt)}<button data-fin="${v.sugerido.gana}">Terminar y mostrar quién era quién</button>`;
+  const on=new Set(conns.keys());
+  $("fFilas").innerHTML=v.jug.map(j=>{
+    const det=j.vivo?(j.pareja?"Amante de "+j.pareja:j.ladron?(j.eligiendo?"Ladrón, eligiendo…":"Ladrón, robó esta"):""):`Murió ${j.causa==="votacion"?"en la votación":"de noche"} · ${j.fantasma?"Fantasma "+j.fantasma:"falta el fantasma"}`;
+    return `<button class="fj${j.vivo?"":" muerto"}${!j.vivo&&!j.fantasma?" falta":""}" data-j="${j.id}"><span class="mini"><img src="${IMG(j.vivo||!j.fantasma?j.img:Motor.FANTASMAS[j.fantasma].img)}" alt=""></span><span class="q"><b>${j.vivo?"":"💀 "}${esc(j.nombre)}${on.has(j.id)?"":" 📵"}</b><small>${esc(j.nombreRol)}${det?" · "+esc(det):""}</small></span><span class="bd ${j.bando}">${j.bando==="solo"?"Solo":j.bando==="mafia"?"Mafia":"Pueblo"}</span></button>`;
+  }).join("");
+  $("fSobran").innerHTML=v.sobran.length?`<h3>Cartas que quedaron afuera</h3><div class="fila">${v.sobran.map(s=>`<img class="px" style="width:70px;flex:0 0 auto;border-radius:5px" src="${IMG(s.img)}" alt="${esc(nomRol(s.rol))}">`).join("")}</div>`:"";
+  $("fSobran").hidden=!v.sobran.length;
+  // noche
+  const pasos=v.guion;H.paso=Math.max(0,Math.min(H.paso,pasos.length-1));
+  const p=pasos[H.paso];
+  $("nPuntos").innerHTML=pasos.map((_,i)=>`<i class="${i===H.paso?"on":""}"></i>`).join("");
+  const imgPaso=p.rol==="jefa"?"jefa":p.rol==="pueblo"?"pueblo-pelota":R[p.rol].img;
+  $("nPaso").innerHTML=`<div class="tit">${esc(p.titulo)}</div><img class="px" src="${IMG(imgPaso)}" alt="">
+    <div class="leer"><small>Leé en voz alta</small>${esc(p.leer)}</div>
+    ${p.quienes?`<div class="quienes">Son: ${esc(p.quienes)}</div>`:""}
+    ${p.nota?`<div class="nota2">${esc(p.nota)}</div>`:""}
+    ${p.fin?`<div class="leer"><small>Al terminar</small>${esc(p.fin)}</div>`:""}`;
+  $("nAnt").disabled=H.paso===0;
+  $("nSig").textContent=H.paso===pasos.length-1?`Empezar la noche ${v.noche+1} →`:"Siguiente →";
+  if(HOJA&&HOJA.startsWith("j:"))hojaJugador(HOJA.slice(2));
+}
+document.querySelectorAll("#pestanas button").forEach(b=>b.onclick=()=>{if(!H)return;H.pest=b.dataset.p;guardarHost();mostrarJefa(sala());scrollTo(0,0)});
+$("nAnt").onclick=()=>{if(!H)return;H.paso--;guardarHost();mostrarJefa(sala())};
+$("nSig").onclick=()=>{
+  if(!H||!H.G)return;const n=Motor.guion(H.G).length;
+  if(H.paso>=n-1){jefa({t:"noche",n:H.G.noche+1});H.paso=0;guardarHost();mostrarJefa(sala());avisar("Noche "+H.G.noche);return}
+  H.paso++;guardarHost();mostrarJefa(sala());vibrar(15);
+};
+$("fFilas").onclick=e=>{const b=e.target.closest("[data-j]");if(b)hojaJugador(b.dataset.j)};
+$("pJefa").addEventListener("click",e=>{const b=e.target.closest("[data-fin]");if(b)jefa({t:"fin",gana:b.dataset.fin})});
+function hojaJugador(id){
+  const v=Motor.vistaJefa(H.G),j=v.jug.find(x=>x.id===id);if(!j){cerrarHoja();return}
+  const fan=`<div class="grid3"><button data-f="bondadoso">😇 Bondadoso</button><button data-f="travieso">😈 Travieso</button><button data-f="azar">🎲 Al azar</button></div>`;
+  let html=`<h3>${esc(j.nombre)}</h3><p style="text-align:center"><b>${esc(j.nombreRol)}</b>${j.pareja?" · Amante de "+esc(j.pareja):""}</p>`;
+  if(j.vivo){
+    html+=`<div class="et">¿Murió?</div><div class="grid2"><button data-causa="noche" class="${ESTADO_HOJA.causa==="noche"?"prin":""}">🌙 De noche</button><button data-causa="votacion" class="${ESTADO_HOJA.causa==="votacion"?"prin":""}">✋ En la votación</button></div>`;
+    if(ESTADO_HOJA.causa)html+=`<div class="et">Su fantasma</div>${fan}`;
+    if(j.rol==="impostor"&&!j.convertido)html+=`<div class="et">Si lo eligió la Mafia</div><button data-conv>Pasa a ser Mafia (no muere)</button>`;
+    if(j.convertido)html+=`<button data-conv>Deshacer: vuelve a ser Impostor</button>`;
+  }else{
+    html+=`<p style="text-align:center">Murió ${j.causa==="votacion"?"en la votación":"de noche"} · ${j.fantasma?"<b>Fantasma "+j.fantasma+"</b>":"<b>falta asignarle el fantasma</b>"}</p><div class="et">${j.fantasma?"Cambiar el fantasma":"Asignale un fantasma"}</div>${fan}<button data-revive>Me equivoqué: está vivo</button>`;
+  }
+  HOJA="j:"+id;
+  abrirHoja(html,h=>{
+    h.querySelectorAll("[data-causa]").forEach(b=>b.onclick=()=>{ESTADO_HOJA.causa=b.dataset.causa;hojaJugador(id)});
+    h.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{
+      if(j.vivo)jefa({t:"muere",id,causa:ESTADO_HOJA.causa,fantasma:b.dataset.f});else jefa({t:"fantasma",id,fantasma:b.dataset.f});
+      ESTADO_HOJA.causa=null;cerrarHoja();
+    });
+    const rv=h.querySelector("[data-revive]");if(rv)rv.onclick=()=>{jefa({t:"revive",id});cerrarHoja()};
+    const cv=h.querySelector("[data-conv]");if(cv)cv.onclick=()=>{jefa({t:"convierte",id});cerrarHoja()};
+  });
+  HOJA="j:"+id;
+}
+const ESTADO_HOJA={causa:null};
+$("velo").addEventListener("click",e=>{if(e.target===$("velo")||e.target.closest("[data-cerrar]"))ESTADO_HOJA.causa=null},true);
+function pintarManual(){
+  const x=(t,img,como,rol)=>`<div class="it"><img class="px" src="${IMG(img)}" alt="" data-rol="${rol}" data-img="${img}"><div><h4>${esc(t)}</h4>${como.map(c=>`<p>${esc(c)}</p>`).join("")}</div></div>`;
+  $("manual").innerHTML=
+    `<div class="caja"><h3>Reglas especiales</h3>
+     <p class="nota"><b>Sobredosis:</b> si el Médico y el Enfermero eligen a la misma persona, esa persona muere.</p>
+     <p class="nota"><b>Policía:</b> le contestás sí o no. Solo le mentís si esa noche la Trabajadora sexual se acostó con un policía. Al Impostor le decís que no es Mafia.</p>
+     <p class="nota"><b>Impostor:</b> si lo vota el Pueblo, gana él y pierden todos. Si lo mata la Mafia, pasa a ser Mafia.</p>
+     <p class="nota"><b>Amantes:</b> si muere uno, mueren los dos. La app marca al otro sola.</p>
+     <p class="nota"><b>Kamikaze:</b> cuando muere, siempre se lleva a alguien.</p>
+     <p class="nota"><b>Final:</b> gana el Pueblo si no queda Mafia; gana la Mafia si es mayoría. La app te avisa y vos confirmás.</p></div>`+
+    x(Motor.JEFA.nombre,"jefa",Motor.JEFA.como,"jefa")+
+    ["mafia","policia","trabajadora","carnicero","enfermero","medico","medium","amantes","kamikaze","impostor","ladron","pueblo"].map(r=>x(nomRol(r)==="Amante"?"Amantes":nomRol(r),R[r].img,R[r].como,r)).join("")+
+    ["bondadoso","travieso"].map(f=>x(Motor.FANTASMAS[f].nombre,Motor.FANTASMAS[f].img,Motor.FANTASMAS[f].como,f)).join("");
+}
+$("manual").onclick=e=>{const i=e.target.closest("img[data-rol]");if(i)hojaRol(i.dataset.rol,i.dataset.img)};
+pintarManual();
+
+// ================== FIN ==================
+function pintarFin(f,soyJefa){
+  pantalla("pFin");if(HOJA)cerrarHoja();
+  $("finGanador").textContent={pueblo:"🏆 Ganó el Pueblo",mafia:"🔫 Ganó la Mafia",impostor:"🎭 Ganó el Impostor: pierden todos"}[f.gana];
+  $("finReparto").innerHTML=f.jug.map(j=>`<div class="${j.vivo?"":"muerto"}"><img class="px" src="${IMG(j.img)}" alt="">${j.vivo?"":"💀 "}${esc(j.nombre)}<small>${esc(j.rol)}</small></div>`).join("");
+  $("btnOtra").hidden=$("btnSeguirJugando").hidden=!soyJefa;
+  $("finEspera").textContent=soyJefa?"":"Si la Jefa arma otra partida, te llega la carta nueva acá.";
+}
+$("btnOtra").onclick=otraPartida;
+$("btnSeguirJugando").onclick=()=>jefa({t:"sigue"});
+
+// ---- salir ----
+function salir(confirmado,boton){
+  if(!confirmado){const b=boton;if(!b.dataset.armado){b.dataset.orig=b.textContent;b.dataset.armado=1;b.textContent="¿Seguro? Tocá de nuevo";setTimeout(()=>{delete b.dataset.armado;b.textContent=b.dataset.orig},3000);return}delete b.dataset.armado;b.textContent=b.dataset.orig}
+  if(C&&C.conn&&C.conn.open)try{C.conn.send({t:"chau"})}catch(e){}
+  if(H)borrar("mafia-host");else borrar("mafia-invitado");
+  try{peer&&peer.destroy()}catch(e){}
+  peer=null;H=null;C=null;conns.clear();ULT=null;antes=null;cerrarHoja();
+  history.replaceState(null,"",location.pathname+conSrv(""));
+  iniciar();
+}
+$("btnSalirSala").onclick=()=>salir(true);
+$("btnSalirJuego").onclick=e=>salir(false,e.currentTarget);
+$("btnSalirJefa").onclick=e=>salir(false,e.currentTarget);
+$("btnSalirFin").onclick=e=>salir(false,e.currentTarget);
+
+// ================== INICIO ==================
+$("nombre").value=leer("mafia-nombre","")||leer("estampame-nombre","")||leer("truco-mesa-nombre","");
+$("nombre").oninput=()=>{grabar("mafia-nombre",$("nombre").value.trim());$("errInicio").textContent=""};
+$("btnArmar").onclick=armarPartida;
+$("btnUnirme").onclick=()=>unirme($("codigo").value);
+$("codigo").onkeydown=e=>{if(e.key==="Enter")unirme($("codigo").value)};
+$("btnCompartir").onclick=async()=>{
+  const link=$("qr").dataset.l||location.href;
+  try{if(navigator.share){await navigator.share({title:"Mafia",text:"Sumate a la Mafia",url:link});return}}catch(e){return}
+  location.href="https://wa.me/?text="+encodeURIComponent("Sumate a la Mafia: "+link);
+};
+$("btnVolver").onclick=()=>{const g=leer("mafia-host",null);if(g){H=g;abrirHost(false)}};
+function iniciar(){
+  pantalla("pInicio");
+  const g=leer("mafia-host",null),fresco=g&&Date.now()-g.ts<12*3600e3;
+  $("volverMesa").hidden=!fresco;
+  if(fresco)$("btnVolver").textContent="Volver a tu partida "+g.codigo;
+}
+ponerLetra();
+(function arranque(){
+  const m=(params.get("sala")||"").toUpperCase();
+  const g=leer("mafia-host",null);
+  if(m&&g&&g.codigo===m){H=g;abrirHost(false);return}
+  iniciar();
+  if(m){$("codigo").value=m;if($("nombre").value.trim())unirme(m);else{$("errInicio").textContent="Poné tu nombre y tocá Sumarme";$("nombre").focus()}}
+})();
+</script>
+<script src="../../inicio.js"></script>
+<script>if("serviceWorker" in navigator)navigator.serviceWorker.register("../../sw.js",{scope:"../../"});</script>
+</body>
+</html>
