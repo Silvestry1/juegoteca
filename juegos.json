@@ -144,6 +144,22 @@
   "lema": "Dibujo tuyo, frase de otro, remera de nadie"
  },
  {
+  "nombre": "Mafia",
+  "tipo": "Deducción",
+  "min": 5,
+  "max": 19,
+  "edad": "13+",
+  "propio": true,
+  "descripcion": "El juego de cartas de esqueletos, ahora en el celu. La Jefa arma la partida, elige qué cartas entran y reparte; cada uno mantiene apretada su carta para verla. La Jefa tiene el guion de la noche, marca los muertos y les asigna su fantasma. Los Amantes tienen un chat secreto. De 4 a 18 jugadores más la Jefa, con código o QR.",
+  "url": "juegos/mafia/",
+  "icono": "💀",
+  "colores": [
+   "#ff9ecd",
+   "#2b163a"
+  ],
+  "lema": "Que nada se te escape"
+ },
+ {
   "nombre": "skribbl.io",
   "tipo": "Dibujar",
   "min": 2,
