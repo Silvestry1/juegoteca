@@ -110,7 +110,7 @@
       carta: "Al principio de la partida robá una carta: elegí quién querés ser.", lema: "ojo, estás dejando un personaje afuera",
       como: [
         "Al empezar ves las 2 cartas que sobraron del reparto y elegís una. Pasás a ser ese personaje, con su bando.",
-        "Si elegís una carta de Mafia, jugás para la Mafia.",
+        "Si entre las que sobraron hay una de Mafia, tenés que robar esa: sos de la Mafia y la Mafia no pierde a nadie.",
         "Tu carta de Ladrón y la otra quedan afuera."
       ]
     },
@@ -191,7 +191,21 @@
 
   function repartir(jugadores, sel, rnd = Math.random) {
     const err = validar(jugadores, sel); if (err) throw new Error(err);
-    const cartas = mezclar(sel, rnd);
+    let cartas = mezclar(sel, rnd);
+    if (sel.includes("ladron1")) {
+      // Con Ladrón: el Ladrón siempre se reparte y entre las 2 que sobran hay como mucho una Mafia.
+      // Si sobra una Mafia, el Ladrón la tiene que robar: así la cantidad de Mafia no disminuye.
+      const resto = cartas.filter(x => x !== "ladron1");
+      const esM = x => carta(x).rol === "mafia";
+      let sobran = null;
+      for (let k = 0; k < 200 && !sobran; k++) {
+        const m = mezclar(resto, rnd), par = m.slice(0, 2);
+        if (par.filter(esM).length <= 1) sobran = par;
+      }
+      sobran = sobran || resto.filter(x => !esM(x)).slice(0, 2);
+      const mano = mezclar(resto.filter(x => !sobran.includes(x)).concat("ladron1"), rnd);
+      cartas = mano.concat(sobran);
+    }
     const G = {
       seq: 1, fase: "juego", noche: 1, fin: null,
       jug: jugadores.map((j, i) => ({ id: j.id, nombre: j.nombre, carta: cartas[i], elegida: null, vivo: true, causa: null, fantasma: null, convertido: false })),
@@ -224,6 +238,7 @@
       if (carta(j.carta).rol !== "ladron") return "No sos el Ladrón";
       if (j.elegida) return "Ya elegiste";
       if (!G.sobran.includes(a.carta)) return "Esa carta no está";
+      if (carta(a.carta).rol !== "mafia" && G.sobran.some(x => carta(x).rol === "mafia")) return "Sobró una carta de Mafia: tenés que robar esa";
       j.elegida = a.carta; G.seq++; return "";
     }
     if (a.t === "chat") {
@@ -316,7 +331,7 @@
         rol: j.convertido ? "mafia" : r, img: imgDe(j), nombreRol: j.convertido ? "Mafia" : (r === "pueblo" ? "Pueblo" : ROLES[r].nombre),
         bando: bando(j), convertido: j.convertido, vivo: j.vivo, causa: j.causa,
         fantasma: j.vivo ? null : j.fantasma,
-        ladron: c.rol === "ladron" ? { elegida: j.elegida, opciones: j.elegida ? [] : G.sobran.map(x => ({ id: x, rol: carta(x).rol, img: carta(x).img })) } : null,
+        ladron: c.rol === "ladron" ? { elegida: j.elegida, opciones: j.elegida ? [] : G.sobran.map(x => ({ id: x, rol: carta(x).rol, img: carta(x).img, bloqueada: carta(x).rol !== "mafia" && G.sobran.some(y => carta(y).rol === "mafia") })) } : null,
         pareja: p ? p.nombre : null, sinPareja: r === "amantes" && !p
       },
       chat: null

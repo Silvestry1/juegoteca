@@ -85,6 +85,7 @@ html.grande .cartaYo{width:min(86vw,360px)}
 .robar{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .robar button{padding:0;background:none;border:3px solid transparent;border-radius:10px}
 .robar button.on{border-color:var(--acc)}
+.robar button.bloq img{filter:grayscale(1) brightness(.45)}
 .robar img{width:100%;border-radius:8px}
 
 /* barra */
@@ -230,7 +231,7 @@ html.grande .fj .mini{width:64px;height:64px}
   <div class="estado" id="jEstado"></div>
   <div class="caja" id="jRobar" hidden>
     <h3>Robá una carta</h3>
-    <p class="nota">Sos el Ladrón. Estas son las 2 cartas que sobraron: elegí con cuál jugás. Que nadie vea tu pantalla.</p>
+    <p class="nota" id="robarNota"></p>
     <div class="robar" id="robarOps"></div>
     <button class="prin" id="btnRobar" disabled>Elegí una carta</button>
   </div>
@@ -539,9 +540,11 @@ function mostrarJugador(d){
   const L=y.ladron&&!y.ladron.elegida?y.ladron.opciones:null;
   $("jRobar").hidden=!L;
   if(L){
-    if(!L.some(o=>o.id===elegidaRobo))elegidaRobo=null;
-    $("robarOps").innerHTML=L.map(o=>`<button data-c="${o.id}" class="${o.id===elegidaRobo?"on":""}"><img class="px" src="${IMG(o.img)}" alt="${esc(nomRol(o.rol))}" draggable="false"></button>`).join("");
-    $("robarOps").querySelectorAll("button").forEach(b=>mantener(b,()=>{const c=Motor.carta(b.dataset.c);hojaRol(c.rol,c.img)},()=>{elegidaRobo=b.dataset.c;mostrarJugador(ULT)}));
+    if(!L.some(o=>o.id===elegidaRobo&&!o.bloqueada))elegidaRobo=null;
+    const oblig=L.find(o=>o.rol==="mafia"&&L.some(x=>x.bloqueada));if(oblig)elegidaRobo=oblig.id;
+    $("robarNota").textContent=oblig?"Sos el Ladrón. Sobró una carta de Mafia: la tenés que robar, así que ahora sos de la Mafia. Que nadie vea tu pantalla.":"Sos el Ladrón. Estas son las 2 cartas que sobraron: elegí con cuál jugás. Que nadie vea tu pantalla.";
+    $("robarOps").innerHTML=L.map(o=>`<button data-c="${o.id}" class="${o.id===elegidaRobo?"on":""}${o.bloqueada?" bloq":""}"><img class="px" src="${IMG(o.img)}" alt="${esc(nomRol(o.rol))}" draggable="false"></button>`).join("");
+    $("robarOps").querySelectorAll("button").forEach(b=>mantener(b,()=>{const c=Motor.carta(b.dataset.c);hojaRol(c.rol,c.img)},()=>{if(b.classList.contains("bloq"))return;elegidaRobo=b.dataset.c;mostrarJugador(ULT)}));
     $("btnRobar").disabled=!elegidaRobo;
     $("btnRobar").textContent=elegidaRobo?"Me quedo con "+nomRol(Motor.carta(elegidaRobo).rol):"Elegí una carta";
   }
