@@ -71,13 +71,13 @@ html.grande .mesa{grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}
 .cuentaMazo.mal{color:var(--mal)}
 
 /* carta del jugador */
-.cartaYo{position:relative;width:min(72vw,300px);align-self:center;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;cursor:pointer}
+.cartaYo{position:relative;width:min(72vw,300px);align-self:center;margin-bottom:34px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;cursor:pointer}
 html.grande .cartaYo{width:min(86vw,360px)}
 .cartaYo img{width:100%;border-radius:10px;filter:drop-shadow(0 10px 22px #000c)}
 .cartaYo .cara{position:absolute;inset:0;opacity:0}
 .cartaYo.ver .cara{opacity:1}
 .cartaYo.ver .dorso{opacity:0}
-.cartaYo .pie{position:absolute;left:6%;right:6%;bottom:-14px;background:var(--acc);color:var(--acc-txt);border:3px solid var(--out);border-radius:10px;padding:6px 8px;font-weight:900;text-align:center;font-size:.95rem;opacity:0}
+.cartaYo .pie{position:absolute;left:6%;right:6%;top:calc(100% + 6px);background:var(--acc);color:var(--acc-txt);border:3px solid var(--out);border-radius:10px;padding:6px 8px;font-weight:900;text-align:center;font-size:.95rem;opacity:0}
 .cartaYo.ver .pie:not(:empty){opacity:1}
 .ayuda{text-align:center;color:var(--sub);font-size:.9rem;margin:6px 0 0}
 .estado{text-align:center;font-weight:900;font-size:1.15rem}
